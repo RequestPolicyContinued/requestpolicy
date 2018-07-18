@@ -261,7 +261,7 @@ var FakeWebExt = (function() {
 
     const commonjsEnv = createCommonjsEnv();
     commonjsEnv.load({
-      mainFile: "framescripts/main",
+      mainFile: "main.framescript",
       additionalGlobals: [
         ["cfmm", cfmm],
         ["browser", api.contentApi],

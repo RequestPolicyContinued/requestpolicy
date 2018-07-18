@@ -20,23 +20,66 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { dAsyncSettings, log } from "app/log";
-import { RPContentServices } from "app/services/services.module.content";
-import { UriService } from "app/services/uri-service";
-import { Storage } from "app/storage/storage.module";
-import { JSMs } from "bootstrap/api/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
+import { MessageListenerModule } from "lib/classes/message-listener-module";
 import { AppContent } from "./app.content.module";
+import { ManagerForBlockedContent } from "./contentscript/blocked-content";
+import { ContentscriptModule } from "./contentscript/contentscript.module";
+import { ManagerForDOMContentLoaded } from "./contentscript/dom-content-loaded";
+import {
+  FramescriptToBackgroundCommunication,
+} from "./contentscript/framescript-to-background-communication";
+import { ContentscriptMisc } from "./contentscript/misc";
+import { dAsyncSettings, log } from "./log";
+import { RPContentServices } from "./services/services.module.content";
+import { UriService } from "./services/uri-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
+import { Storage } from "./storage/storage.module";
 
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Services: JSMs.Services;
+declare const cfmm: XPCOM.nsIContentFrameMessageManager;
 
 const storageReadyPromise = Promise.resolve();
 
+const msgListener = new MessageListenerModule(
+    "app.contentSide.msgListener",
+    log,
+    cfmm,
+);
+const bgCommunication = new FramescriptToBackgroundCommunication(
+    log,
+    cfmm,
+    msgListener,
+);
+const blockedContent = new ManagerForBlockedContent(log);
 const xpconnectService = new XPConnectService();
 const uriService = new UriService(log, "AppContent", Services.eTLD,
     xpconnectService.getIDNService(), Services.io);
+const domContentLoaded = new ManagerForDOMContentLoaded(
+    log,
+    Ci,
+    cfmm,
+    bgCommunication,
+    blockedContent,
+    uriService,
+);
+const contentscriptMisc = new ContentscriptMisc(
+    log,
+    cfmm,
+    bgCommunication,
+    msgListener,
+);
+const contentSide = new ContentscriptModule(
+    log,
+    bgCommunication,
+    blockedContent,
+    domContentLoaded,
+    contentscriptMisc,
+);
+
 const rpServices = new RPContentServices(log, uriService);
 
 const asyncSettings = new AsyncSettings(
@@ -50,6 +93,7 @@ dAsyncSettings.resolve(asyncSettings);
 const storage = new Storage(log, asyncSettings, null, storageReadyPromise);
 export const rp = new AppContent(
     log,
+    contentSide,
     rpServices,
     storage,
 );

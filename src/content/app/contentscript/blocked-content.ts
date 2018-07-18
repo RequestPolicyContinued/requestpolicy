@@ -20,12 +20,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export const ManagerForBlockedContent = (function() {
-  let self = {};
+import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
 
-  // ===========================================================================
-
-  const MISSING_IMAGE_DATA_URI = "data:image/png;base64," +
+export class ManagerForBlockedContent extends Module {
+  private readonly MISSING_IMAGE_DATA_URI = "data:image/png;base64," +
       "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c" +
       "6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0" +
       "SU1FB9gMFRANL5LXnioAAAJWSURBVDjLnZI/ixtXFMV/972ZNzPSrmTtalex" +
@@ -44,16 +43,23 @@ export const ManagerForBlockedContent = (function() {
       "tNvtRZIkfCz+ZQwGg6rT6Zj/LTAajTbD4bD5WIF/AAseEisPFO8uAAAAAElF" +
       "TkSuQmCC";
 
-  const TRANSPARENT_IMAGE_DATA_URI = "data:image/gif;base64,R0lGODlhAQABAIAAA" +
+  private readonly TRANSPARENT_IMAGE_DATA_URI =
+      "data:image/gif;base64,R0lGODlhAQABAIAAA" +
       "AAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
-  self.indicateBlockedVisibleObjects = function(doc, blockedURIs) {
+  constructor(
+      parentLog: Common.ILog,
+  ) {
+    super("app.contentSide.blockedContent", parentLog);
+  }
+
+  public indicateBlockedVisibleObjects(doc: Document, blockedURIs: any) {
     if (Object.getOwnPropertyNames(blockedURIs).length === 0) {
       // there are no blocked uris
       return;
     }
 
-    let images = doc.getElementsByTagName("img");
+    const images = doc.getElementsByTagName("img");
 
     // Ideally, want the image to be a broken image so that the alt text
     // shows. By default, the blocked image will just not show up at all.
@@ -70,15 +76,16 @@ export const ManagerForBlockedContent = (function() {
     // original, blocked image src. With "web page, complete" the saved source
     // has changes we make here to show the blocked request indicator.
 
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < images.length; i++) {
       const img = images[i];
       // Note: we're no longer checking img.rpcontinuedBlocked here.
-      if (!img.rpcontinuedIdentified && img.src in blockedURIs) {
-        img.rpcontinuedIdentified = true;
+      if (!(img as any).rpcontinuedIdentified && img.src in blockedURIs) {
+        (img as any).rpcontinuedIdentified = true;
         img.style.border = "solid 1px #fcc";
         img.style.backgroundRepeat = "no-repeat";
         img.style.backgroundPosition = "center center";
-        img.style.backgroundImage = `url('${MISSING_IMAGE_DATA_URI}')`;
+        img.style.backgroundImage = `url('${this.MISSING_IMAGE_DATA_URI}')`;
         if (!img.width) {
           img.width = 50;
         }
@@ -88,10 +95,8 @@ export const ManagerForBlockedContent = (function() {
         img.title = `[${blockedURIs[img.src].identifier}]${
           img.title ? ` ${img.title}` : ""
         }${img.alt ? ` ${img.alt}` : ""}`;
-        img.src = TRANSPARENT_IMAGE_DATA_URI;
+        img.src = this.TRANSPARENT_IMAGE_DATA_URI;
       }
     }
-  };
-
-  return self;
-})();
+  }
+}

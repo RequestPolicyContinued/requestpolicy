@@ -22,8 +22,12 @@
 
 // tslint:disable:no-namespace
 
-import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
+import { ManagerForBlockedContent } from "./contentscript/blocked-content";
+import { ContentscriptModule } from "./contentscript/contentscript.module";
+import { ManagerForDOMContentLoaded } from "./contentscript/dom-content-loaded";
+import { FramescriptToBackgroundCommunication } from "./contentscript/framescript-to-background-communication";
+import { ContentscriptMisc } from "./contentscript/misc";
 import { Migration } from "./migration/migration.module";
 import { SettingsMigration } from "./migration/storage/settings-migration";
 import { Policy } from "./policy/policy.module";
@@ -44,14 +48,24 @@ import { RequestMemory } from "./web-request/request-memory";
 import { RequestProcessor } from "./web-request/request-processor";
 import { WebRequest } from "./web-request/web-request.module";
 import { MetadataMemory } from "./web-request/metadata-memory";
+import { XPCOM } from "bootstrap/api/interfaces";
 import { V0RulesMigration } from "legacy/app/migration/v0-rules-migration";
 import { StorageMigrationToWebExtension } from "legacy/app/migration/storage-migration-to-we";
+import { MessageListenerModule } from "lib/classes/message-listener-module";
+import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
 }
 
 export namespace App {
+  export namespace contentscript {
+    export type ICommunicationToBackground = FramescriptToBackgroundCommunication;
+    export type IContentscriptMisc = ContentscriptMisc;
+    export type IManagerForBlockedContent = ManagerForBlockedContent;
+    export type IManagerForDOMContentLoaded = ManagerForDOMContentLoaded;
+  }
+
   export namespace migration {
     export namespace storage {
       export type ISettingsMigration = SettingsMigration;
@@ -83,10 +97,15 @@ export namespace App {
   }
 
   export type IBrowserSettings = BrowserSettings;
+  export type IContentSide = ContentscriptModule;
   export type IMigration = Migration;
   export type IPolicy = Policy;
   export type IRPServices = RPServices;
   export type IStorage = Storage;
   export type IUi = Ui;
   export type IWebRequest = WebRequest;
+
+  export namespace utils {
+    export type IMessageListener<T extends XPCOM.nsIMessageManager> = MessageListenerModule<T>;
+  }
 }

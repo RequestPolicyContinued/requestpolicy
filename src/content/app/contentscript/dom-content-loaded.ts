@@ -21,59 +21,67 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.content";
-import {log} from "app/log";
-import {
-  Environment,
-  Level as EnvLevel,
-  MainEnvironment,
-} from "lib/environment";
+import { App } from "app/interfaces";
+import { XPCOM } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import { C } from "data/constants";
+import { EventListenerModule } from "lib/classes/event-listener-module";
+import { Module } from "lib/classes/module";
 import {parseRefresh} from "lib/utils/html-utils";
-import {C} from "data/constants";
 
-import {overlayComm} from "framescripts/managers";
-import {ManagerForBlockedContent}
-  from "framescripts/blocked-content.js";
+interface IDocumentInfo {
+  anchorTags: Set<HTMLAnchorElement>;
+  eventListeners: EventListenerModule;
+  onDocumentUnload: () => void;
+}
 
-const uriServices = rp.services.uri;
+export class ManagerForDOMContentLoaded extends Module {
+  private contentWindow = this.cfmm.content;
 
-export const ManagerForDOMContentLoaded = (function() {
-  let self = {};
+  private eventListeners = {
+    htmlAnchorTagClicked: this.htmlAnchorTagClicked.bind(this),
+  };
 
-  let {content} = cfmm;
+  private documents: Map<Document, IDocumentInfo> = new Map();
 
-  // ===========================================================================
+  constructor(
+      parentLog: Common.ILog,
+      private ci: XPCOM.nsXPCComponents_Interfaces,
+      private cfmm: XPCOM.nsIContentFrameMessageManager,
+      private bgCommunication: App.contentSide.ICommunicationToBackground,
+      private blockedContent: App.contentSide.IManagerForBlockedContent,
+      private uriServices: App.services.IUriService,
+  ) {
+    super("app.contentSide.domContentLoaded", parentLog);
+  }
 
-  function htmlAnchorTagClicked(event) {
+  public htmlAnchorTagClicked(event: any) {
     // Notify the main thread that a link has been clicked.
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
-    overlayComm.run(function() {
-      cfmm.sendSyncMessage(
+    this.bgCommunication.run(() => {
+      this.cfmm.sendSyncMessage(
           `${C.MM_PREFIX}notifyLinkClicked`,
-          {origin: event.currentTarget.ownerDocument.URL,
-            dest: event.currentTarget.href}
+          {
+            dest: event.currentTarget.href,
+            origin: event.currentTarget.ownerDocument.URL,
+          },
       );
     });
   }
 
   /**
-   * Determines if documentToCheck is the main document loaded in the currently
+   * Determine if documentToCheck is the main document loaded in the currently
    * active tab.
-   *
-   * @param {document} documentToCheck
-   * @return {Boolean}
    */
-  function isActiveTopLevelDocument(documentToCheck) {
-    return documentToCheck === content.document;
+  public isActiveTopLevelDocument(documentToCheck: Document): boolean {
+    return documentToCheck === this.contentWindow.document;
   }
 
   /**
    * Things to do when a page has loaded (after images, etc., have been loaded).
-   *
-   * @param {Event} event
    */
-  function onDOMContentLoaded(event) {
+  public onDOMContentLoaded(event: any) {
     // TODO: This is getting called multiple times for a page, should only be
     // called once.
     //    <--- the above comment is very old – is it (still) true that
@@ -84,11 +92,11 @@ export const ManagerForDOMContentLoaded = (function() {
       return;
     }
 
-    onDocumentLoaded(doc);
+    this.onDocumentLoaded(doc);
 
-    let pBlockedURIs = browser.runtime.sendMessage({
-      type: "notifyDocumentLoaded",
+    const pBlockedURIs = browser.runtime.sendMessage({
       documentURI: doc.documentURI,
+      type: "notifyDocumentLoaded",
     }).then((aResponse) => {
       if (typeof aResponse !== "object" ||
           typeof aResponse.blockedURIs !== "object") {
@@ -98,7 +106,7 @@ export const ManagerForDOMContentLoaded = (function() {
       }
 
       const {blockedURIs} = aResponse;
-      // log.log("Received " +
+      // this.log.log("Received " +
       //              Object.getOwnPropertyNames(blockedURIs).length +
       //              " blocked URIs.");
 
@@ -107,9 +115,9 @@ export const ManagerForDOMContentLoaded = (function() {
 
     pBlockedURIs.then((blockedURIs) => {
       if (blockedURIs !== null) {
-        ManagerForBlockedContent.indicateBlockedVisibleObjects(
+        this.blockedContent.indicateBlockedVisibleObjects(
             doc,
-            blockedURIs
+            blockedURIs,
         );
       }
       return;
@@ -118,8 +126,10 @@ export const ManagerForDOMContentLoaded = (function() {
     });
 
     pBlockedURIs.then((blockedURIs) => {
-      if (blockedURIs !== null && isActiveTopLevelDocument(doc)) {
-        cfmm.sendAsyncMessage(`${C.MM_PREFIX}notifyTopLevelDocumentLoaded`);
+      if (blockedURIs !== null && this.isActiveTopLevelDocument(doc)) {
+        this.cfmm.sendAsyncMessage(
+            `${C.MM_PREFIX}notifyTopLevelDocumentLoaded`,
+        );
       }
       return;
     }).catch((e) => {
@@ -129,10 +139,8 @@ export const ManagerForDOMContentLoaded = (function() {
 
   /**
    * Things to do when a page or a frame within the page has loaded.
-   *
-   * @param {Event} event
    */
-  function onDOMFrameContentLoaded(event) {
+  public onDOMFrameContentLoaded(event: any) {
     // TODO: This only works for (i)frames that are direct children of the main
     // document, not (i)frames within those (i)frames.
     const iframe = event.target;
@@ -148,9 +156,9 @@ export const ManagerForDOMContentLoaded = (function() {
     // direct children of the main document. That would require building the
     // other origins every time an iframe is loaded. Maybe, then, this should
     // use a timeout like observerBlockedRequests does.
-    if (isActiveTopLevelDocument(iframe.ownerDocument)) {
-      overlayComm.run(function() {
-        cfmm.sendAsyncMessage(`${C.MM_PREFIX}notifyDOMFrameContentLoaded`);
+    if (this.isActiveTopLevelDocument(iframe.ownerDocument)) {
+      this.bgCommunication.run(() => {
+        this.cfmm.sendAsyncMessage(`${C.MM_PREFIX}notifyDOMFrameContentLoaded`);
       });
     }
   }
@@ -158,26 +166,36 @@ export const ManagerForDOMContentLoaded = (function() {
   /**
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
-   *
-   * @param {Document} doc
    */
-  function onDocumentLoaded(doc) {
+  public onDocumentLoaded(doc: Document) {
     // Create a new environment for this Document and shut it down when
     // the document is unloaded.
-    let DocEnv = new Environment(MainEnvironment, "DocEnv");
-    DocEnv.shutdownOnUnload(doc.defaultView);
-    // start up the environment immediately, as it won't have any startup
-    // functions.
-    DocEnv.startup();
 
-    let documentURI = doc.documentURI;
+    const eventListeners = new EventListenerModule("document", this.parentLog);
 
-    let metaRefreshes = [];
+    const docInfo: IDocumentInfo = {
+      anchorTags: new Set(),
+      eventListeners,
+      onDocumentUnload: this.onDocumentUnload.bind(this, doc),
+    };
+    eventListeners.startup();
+    eventListeners.addListener(
+        doc.defaultView,
+        "unload",
+        docInfo.onDocumentUnload,
+        false,
+    );
+    this.documents.set(doc, docInfo);
+
+    const documentURI = (doc as any).documentURI as string;
+
+    const metaRefreshes: any[] = [];
 
     // Find all meta redirects.
     const metaTags = doc.getElementsByTagName("meta");
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < metaTags.length; i++) {
-      let metaTag = metaTags[i];
+      const metaTag = metaTags[i];
       if (!metaTag.httpEquiv || metaTag.httpEquiv.toLowerCase() !== "refresh") {
         continue;
       }
@@ -189,39 +207,41 @@ export const ManagerForDOMContentLoaded = (function() {
       // TODO: move this logic to the requestpolicy service.
 
       // The dest may be empty if the origin is what should be refreshed.
+      // tslint:disable-next-line:prefer-const
       let {delay, destURI} = parseRefresh(metaTag.content);
 
       // If destURI isn't a valid uri, assume it's a relative uri.
-      if (!uriServices.isValidUri(destURI)) {
+      if (!this.uriServices.isValidUri(destURI)) {
         originalDestURI = destURI;
-        destURI = doc.documentURIObject.resolve(destURI);
+        destURI = ((doc as any).documentURIObject as XPCOM.nsIURI).
+            resolve(destURI);
       }
 
-      metaRefreshes.push({delay: delay, destURI: destURI,
-        originalDestURI: originalDestURI});
+      metaRefreshes.push({delay, destURI,
+        originalDestURI});
     }
 
     if (metaRefreshes.length > 0) {
       // meta refreshes have been found.
 
-      log.info(`Number of meta refreshes found: ${metaRefreshes.length}`);
+      this.log.info(`Number of meta refreshes found: ${metaRefreshes.length}`);
 
-      /* eslint-disable new-cap */
-      const docShell = doc.defaultView.
-          QueryInterface(Ci.nsIInterfaceRequestor).
-          getInterface(Ci.nsIWebNavigation).
-          QueryInterface(Ci.nsIDocShell);
-      /* eslint-enable new-cap */
+      const docShell = ((doc.defaultView as any) as XPCOM.nsIDOMWindow).
+          QueryInterface<XPCOM.nsIInterfaceRequestor>(
+              this.ci.nsIInterfaceRequestor,
+          ).
+          getInterface(this.ci.nsIWebNavigation).
+          QueryInterface<XPCOM.nsIDocShell>(this.ci.nsIDocShell);
       if (!docShell.allowMetaRedirects) {
-        log.warn(
-            "Another extension disabled docShell.allowMetaRedirects."
+        this.log.warn(
+            "Another extension disabled docShell.allowMetaRedirects.",
         );
       }
 
-      overlayComm.run(function() {
-        cfmm.sendAsyncMessage(
+      this.bgCommunication.run(() => {
+        this.cfmm.sendAsyncMessage(
             `${C.MM_PREFIX}handleMetaRefreshes`,
-            {documentURI: documentURI, metaRefreshes: metaRefreshes}
+            {documentURI, metaRefreshes},
         );
       });
     }
@@ -239,31 +259,42 @@ export const ManagerForDOMContentLoaded = (function() {
     // dynamically added links whose target of the click event isn't the anchor
     // tag.
     // TODO: is it possible to implement this differently?
-    const anchorTags = doc.getElementsByTagName("a");
-    for (let anchorTag of anchorTags) {
-      anchorTag.addEventListener("click", htmlAnchorTagClicked, false);
+    const anchorTags = Array.from(doc.getElementsByTagName("a"));
+    for (const anchorTag of anchorTags) {
+      anchorTag.addEventListener(
+          "click",
+          this.eventListeners.htmlAnchorTagClicked,
+          false,
+      );
+      docInfo.anchorTags.add(anchorTag);
     }
-    DocEnv.addShutdownFunction(EnvLevel.INTERFACE, function() {
-      for (let anchorTag of anchorTags) {
-        anchorTag.removeEventListener("click", htmlAnchorTagClicked, false);
-      }
-    });
 
     // TODO: Is it necessary to wrap the window's open() and
     //       openDialog() methods?
 
     // wrapWindowFunctions(doc.defaultView);
-    // DocEnv.addShutdownFunction(EnvLevel.INTERFACE, function() {
-    //   unwrapWindowFunctions(doc.defaultView);
-    // });
   }
 
-  /* eslint-disable */
+  private onDocumentUnload(doc: Document) {
+    const docInfo = this.documents.get(doc)!;
+
+    docInfo.eventListeners.shutdown();
+
+    for (const anchorTag of docInfo.anchorTags.values()) {
+      anchorTag.removeEventListener(
+          "click",
+          this.eventListeners.htmlAnchorTagClicked,
+          false,
+      );
+    }
+
+    // unwrapWindowFunctions(doc.defaultView);
+  }
 
   // If the following code will be used again, the Utils.wrapFunction()
   // and Utils.unwrapFunction() functions can be used instead.
   //
-  ///**
+  /// **
   // * This function wraps an existing method of a window object.
   // * If that method is being called after being wrapped, first the custom
   // * function will be called and then the original function.
@@ -272,7 +303,7 @@ export const ManagerForDOMContentLoaded = (function() {
   // * @param {String} aFunctionName The name of the window's method.
   // * @param {Function} aNewFunction
   // */
-  //function wrapWindowFunction(aWindow, aFunctionName, aNewFunction) {
+  // public wrapWindowFunction(aWindow, aFunctionName, aNewFunction) {
   //  aWindow.rpOriginalFunctions = aWindow.rpOriginalFunctions || {};
   //  let originals = aWindow.rpOriginalFunctions;
   //
@@ -283,8 +314,8 @@ export const ManagerForDOMContentLoaded = (function() {
   //      return originals[aFunctionName].apply(aWindow, arguments);
   //    }
   //  }
-  //}
-  //function unwrapWindowFunction(aWindow, aFunctionName) {
+  // }
+  // public unwrapWindowFunction(aWindow, aFunctionName) {
   //  if (typeof aWindow.rpOriginalFunctions !== 'object') {
   //    return;
   //  }
@@ -295,13 +326,15 @@ export const ManagerForDOMContentLoaded = (function() {
   //        originals[aFunctionName];
   //    delete originals[aFunctionName];
   //  }
-  //}
+  // }
   //
-  ///**
+  /// **
   // * Wraps the window's open() and openDialog() methods so that RequestPolicy
-  // * can know the origin and destination URLs of the window being opened. Assume
+  // * can know the origin and destination URLs of the window being opened.
+  // * Assume
   // * that if window.open() calls have made it this far, it's a window the user
-  // * wanted open (e.g. they have allowed the popup). Unfortunately, this method
+  // * wanted open (e.g. they have allowed the popup). Unfortunately,
+  // * this method
   // * (or our timing of doing self) doesn't seem to work for popups that are
   // * allowed popups (the user has allowed popups from the domain). So, the
   // * workaround was to also add the 'if(aContext.nodeName == "xul:browser" &&
@@ -310,10 +343,10 @@ export const ManagerForDOMContentLoaded = (function() {
   // *
   // * @param {Window} aWindow
   // */
-  //function wrapWindowFunctions(aWindow) {
+  // public wrapWindowFunctions(aWindow) {
   //  wrapWindowFunction(aWindow, "open",
   //      function(url, windowName, windowFeatures) {
-  //        overlayComm.run(function() {
+  //        this.bgCommunication.run(function() {
   //          cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
   //                               {origin: aWindow.document.documentURI,
   //                                dest: url});
@@ -323,31 +356,16 @@ export const ManagerForDOMContentLoaded = (function() {
   //  wrapWindowFunction(aWindow, "openDialog",
   //      function() {
   //        // openDialog(url, name, features, arg1, arg2, ...)
-  //        overlayComm.run(function() {
+  //        this.bgCommunication.run(function() {
   //          cfmm.sendSyncMessage(C.MM_PREFIX + "notifyLinkClicked",
   //                               {origin: aWindow.document.documentURI,
   //                                dest: arguments[0]});
   //        });
   //      });
-  //}
-  //function unwrapWindowFunctions(aWindow) {
+  // }
+  // public unwrapWindowFunctions(aWindow) {
   //  unwrapWindowFunction(aWindow, "open");
   //  unwrapWindowFunction(aWindow, "openDialog");
   //  delete aWindow.rpOriginalFunctions;
-  //}
-  /* eslint-enable */
-
-  MainEnvironment.elManager.addListener(
-      cfmm, "DOMContentLoaded",
-      onDOMContentLoaded, true
-  );
-
-  // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
-  // enclosed frames.
-  MainEnvironment.elManager.addListener(
-      cfmm, "DOMFrameContentLoaded",
-      onDOMFrameContentLoaded, true
-  );
-
-  return self;
-})();
+  // }
+}

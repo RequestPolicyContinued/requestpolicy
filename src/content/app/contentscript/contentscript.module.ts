@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2018 Martin Kimmerle
+ * Copyright (c) 2017 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,25 +20,34 @@
  * ***** END LICENSE BLOCK *****
  */
 
+// @if BUILD_ALIAS='ui-testing'
+import "ui-testing/services";
+// @endif
+
 import { App } from "app/interfaces";
-import { RPContentServices } from "app/services/services.module.content";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class AppContent extends Module {
+export class ContentscriptModule extends Module {
   constructor(
-      log: Common.ILog,
-      public readonly contentSide: App.IContentSide,
-      public readonly services: RPContentServices,
-      public readonly storage: App.IStorage,
+      parentLog: Common.ILog,
+      private readonly bgCommunication:
+          App.contentSide.ICommunicationToBackground,
+      private readonly blockedContent:
+          App.contentSide.IManagerForBlockedContent,
+      private readonly domContentLoaded:
+          App.contentSide.IManagerForDOMContentLoaded,
+      private readonly misc: App.contentSide.IContentscriptMisc,
   ) {
-    super("AppContent", log);
+    super("app.contentSide", parentLog);
   }
 
   public get subModules() {
     return {
-      services: this.services,
-      storage: this.storage,
+      bgCommunication: this.bgCommunication,
+      blockedContent: this.blockedContent,
+      domContentLoaded: this.domContentLoaded,
+      misc: this.misc,
     };
   }
 }

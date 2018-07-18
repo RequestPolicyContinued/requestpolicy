@@ -20,10 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import "framescripts/blocked-content";
-import "framescripts/dom-content-loaded";
-import "framescripts/misc";
-
 import {
   COMMONJS_UNLOAD_SUBJECT,
 } from "legacy/lib/commonjs-unload-subject";
@@ -32,24 +28,41 @@ import {
 import "ui-testing/services";
 // @endif
 
-import {rp} from "app/app.content";
+import { rp } from "app/app.content";
 import { log } from "app/log";
-import {Level as EnvLevel, MainEnvironment} from "lib/environment";
+import { JSMs } from "bootstrap/api/interfaces";
+
+declare const Services: JSMs.Services;
+
+function logSevereError(aMessage: string, aError: any) {
+  console.error("[SEVERE] " + aMessage + " - Details:");
+  console.dir(aError);
+}
 
 // =============================================================================
+// shutdown
+// =============================================================================
 
-MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, () => {
-  // shut down the framescript on the message manager"s
-  // `unload`. That event will occur when the browsing context
-  // (e.g. the tab) has been closed.
-  MainEnvironment.obMan.observeSingleTopic("sdk:loader:destroy",
-                                           (subject: any) => {
+// shut down the framescript on the message manager"s
+// `unload`. That event will occur when the browsing context
+// (e.g. the tab) has been closed.
+
+const observer = {
+  observe(subject: any, topic: any, reason: any) {
     if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
-      MainEnvironment.shutdown();
-      rp.shutdown().catch(log.onError("framescript shutdown"));
+      try {
+        rp.shutdown().catch(log.onError("framescript shutdown"));
+      } catch (e) {
+        logSevereError("framescript shutdown() failed!", e);
+      }
     }
-  });
-});
+  },
+};
+
+Services.obs.addObserver(observer, "sdk:loader:destroy", false);
+
+// =============================================================================
+// start up
+// =============================================================================
 
 rp.startup().catch(log.onError("framescript startup"));
-MainEnvironment.startup();

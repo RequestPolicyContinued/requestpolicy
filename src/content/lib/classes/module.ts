@@ -32,6 +32,15 @@ export interface IModule {
   whenReady: Promise<void>;
 }
 
+export type StartupState =
+    "not yet started" |
+    "starting up" |
+    "startup done";
+export type ShutdownState =
+    "not yet shut down" |
+    "shutting down" |
+    "shutdown done";
+
 export abstract class Module implements IModule {
   protected log: Common.ILog;
   protected debugLog: Common.ILog;
@@ -40,10 +49,23 @@ export abstract class Module implements IModule {
     return undefined;
   }
 
-  private startupCalled = false;
+  // tslint:disable-next-line:variable-name
+  private _startupState: StartupState = "not yet started";
+  protected get startupState() { return this._startupState; }
+  private get startupCalled() {
+    return this.startupState !== "not yet started";
+  }
+  private get ready() { return this.startupState === "startup done"; }
+
   private dReady = defer();
-  private ready = false;
   public get whenReady() { return this.dReady.promise; }
+
+  // tslint:disable-next-line:variable-name
+  private _shutdownState: ShutdownState = "not yet shut down";
+  protected get shutdownState() { return this._shutdownState; }
+  protected get stillRunning() {
+    return this.shutdownState === "not yet shut down";
+  }
 
   private dSelfBootstrap = {
     shutdown: defer(),
@@ -83,7 +105,7 @@ export abstract class Module implements IModule {
 
   constructor(
       public readonly moduleName: string,
-      parentLog: Common.ILog,
+      protected parentLog: Common.ILog,
   ) {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: false, level: "all"});
@@ -97,7 +119,11 @@ export abstract class Module implements IModule {
   }
 
   public async startup(): Promise<void> {
-    this.startupCalled = true;
+    if (this.startupState !== "not yet started") {
+      this.log.error("startup() has already been called!");
+      return;
+    }
+    this._startupState = "starting up";
 
     let timedOutStartingUp = false;
     setTimeout(() => {
@@ -118,7 +144,7 @@ export abstract class Module implements IModule {
     const p = this.startup_();
     p.catch(this.log.onError("error on startup"));
     await p;
-    this.ready = true;
+    this._startupState = "startup done";
     this.dReady.resolve(undefined);
 
     if (timedOutStartingUp) {
@@ -132,10 +158,17 @@ export abstract class Module implements IModule {
   }
 
   public async shutdown(): Promise<void> {
+    if (this.shutdownState !== "not yet shut down") {
+      this.log.error("shutdown() has already been called!");
+      return;
+    }
+    this._shutdownState = "shutting down";
+
     this.debugLog.log("shutting down...");
     const p = this.shutdown_();
     p.catch(this.log.onError("error on shutdown"));
     await p;
+    this._shutdownState = "shutdown done";
     this.debugLog.log("done shutting down");
   }
 

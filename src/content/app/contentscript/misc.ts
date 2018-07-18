@@ -21,36 +21,53 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {C} from "data/constants";
-import {Level as EnvLevel, MainEnvironment} from "lib/environment";
-import {mlManager, overlayComm} from "framescripts/managers";
+import { App } from "app/interfaces";
+import { XPCOM } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import { C } from "data/constants";
+import { EventListenerModule } from "lib/classes/event-listener-module";
+import { Module } from "lib/classes/module";
 
-(function() {
-  let {content, sendSyncMessage} = cfmm;
+export class ContentscriptMisc extends Module {
+  private readonly contentWindow = this.cfmm.content;
 
-  // ===========================================================================
+  private eventListener = new EventListenerModule(
+      this.moduleName, this.parentLog,
+  );
+  private eventListenerCallbacks = {
+    mouseClicked: this.mouseClicked.bind(this),
+  };
+  private msgListenerCallbacks = {
+    reloadDocument: this.reloadDocument.bind(this),
+  };
 
-  function reloadDocument() {
-    content.document.location.reload(false);
+  constructor(
+      parentLog: Common.ILog,
+      private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
+      private readonly bgCommunication:
+          App.contentSide.ICommunicationToBackground,
+      private readonly msgListener: App.utils.IMessageListener<
+          XPCOM.nsIContentFrameMessageManager
+      >,
+  ) {
+    super("app.contentSide.misc", parentLog);
   }
-  mlManager.addListener("reload", reloadDocument);
 
-  function setLocation(aUri, aReplace) {
+  public reloadDocument() {
+    this.contentWindow.document.location.reload(false);
+  }
+
+  public setLocation(aUri: string, aReplace: boolean) {
     if (aReplace) {
-      content.document.location.replace(aUri);
+      this.contentWindow.document.location.replace(aUri);
     } else {
-      content.document.location.assign(aUri);
+      this.contentWindow.document.location.assign(aUri);
     }
   }
-  mlManager.addListener("setLocation", function(message) {
-    let replace = "replaceUri" in message.data &&
-        message.data.replaceUri === content.document.location.href;
-    setLocation(message.data.uri, replace);
-  });
 
   // Listen for click events so that we can allow requests that result from
   // user-initiated link clicks and form submissions.
-  function mouseClicked(event) {
+  public mouseClicked(event: any) {
     // If mozInputSource is undefined or zero, then this was a
     // javascript-generated event. If there is a way to forge mozInputSource
     // from javascript, then that could be used to bypass RequestPolicy.
@@ -69,13 +86,13 @@ import {mlManager, overlayComm} from "framescripts/managers";
     // I believe an empty href always gets filled in with the current URL so
     // it will never actually be empty. However, I don't know this for certain.
     if (event.target.nodeName.toLowerCase() === "a" && event.target.href) {
-      overlayComm.run(function() {
-        sendSyncMessage(
+      this.bgCommunication.run(() => {
+        this.cfmm.sendSyncMessage(
             `${C.MM_PREFIX}notifyLinkClicked`,
             {
-              origin: event.target.ownerDocument.URL,
               dest: event.target.href,
-            }
+              origin: event.target.ownerDocument.URL,
+            },
         );
       });
       return;
@@ -86,20 +103,37 @@ import {mlManager, overlayComm} from "framescripts/managers";
     if (event.target.nodeName.toLowerCase() === "input" &&
         event.target.type.toLowerCase() === "submit" &&
         event.target.form && event.target.form.action) {
-      overlayComm.run(function() {
-        sendSyncMessage(
+      this.bgCommunication.run(() => {
+        this.cfmm.sendSyncMessage(
             `${C.MM_PREFIX}registerFormSubmitted`,
             {
-              origin: event.target.ownerDocument.URL,
               dest: event.target.form.action,
-            }
+              origin: event.target.ownerDocument.URL,
+            },
         );
       });
       return;
     }
   }
 
-  MainEnvironment.addStartupFunction(EnvLevel.INTERFACE, function() {
-    MainEnvironment.elManager.addListener(cfmm, "click", mouseClicked, true);
-  });
-})();
+  protected startupSelf() {
+    this.msgListener.addListener(
+        "reload", this.msgListenerCallbacks.reloadDocument,
+    );
+
+    this.msgListener.addListener("setLocation", (message) => {
+      const replace = "replaceUri" in message.data &&
+          message.data.replaceUri === this.contentWindow.document.location.href;
+      this.setLocation(message.data.uri, replace);
+    });
+
+    this.eventListener.addListener(
+        this.cfmm.content,
+        "click",
+        this.eventListenerCallbacks.mouseClicked,
+        true,
+    );
+
+    return Promise.resolve();
+  }
+}

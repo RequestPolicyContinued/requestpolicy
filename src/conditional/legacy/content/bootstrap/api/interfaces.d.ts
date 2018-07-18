@@ -26,7 +26,10 @@
 // tslint:disable:no-namespace
 
 export namespace XPCOM {
+  export type AString = string;
   export type char = number;
+  export type DOMString = string;
+  export type jsval = any;
   export type nsContentPolicyType = number;
   export type nsLoadFlags = number;
   export type nsResult = number;
@@ -98,11 +101,23 @@ export namespace XPCOM {
     ): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  export interface nsIContentFrameMessageManager extends nsIMessageManagerGlobal {
+    readonly content: nsIDOMWindow & Window;
+    readonly docShell: nsIDocShell;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicy.idl
   export interface nsIContentPolicy extends nsIContentPolicyBase {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicyBase.idl
   interface nsIContentPolicyBase extends nsISupports {}
+
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  export interface nsIContentProcessMessageManager extends nsIMessageManagerGlobal {
+    readonly initialProcessData: jsval;
+  }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIConverterInputStream.idl
   export interface nsIConverterInputStream extends nsIUnicharInputStream {
@@ -128,7 +143,18 @@ export namespace XPCOM {
   export interface nsIDirectoryService extends nsISupports {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShell.idl
-  export interface nsIDocShell extends nsIDocShellTreeItem {}
+  export interface nsIDocShell extends nsIDocShellTreeItem {
+    allowPlugins: boolean;
+    allowJavascript: boolean;
+    allowMetaRedirects: boolean;
+    allowSubframes: boolean;
+    allowImages: boolean;
+    allowMedia: boolean;
+    allowDNSPrefetch: boolean;
+    allowWindowControl: boolean;
+    allowContentRetargeting: boolean;
+    allowContentRetargetingOnChildren: boolean;
+  }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShellTreeItem.idl
   export interface nsIDocShellTreeItem extends nsISupports {
@@ -227,6 +253,13 @@ export namespace XPCOM {
     init(file: nsIFile, ioFlags: number, perm: number, behaviorFlags: number): void;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIProcessScriptLoader extends nsISupports {
+    loadProcessScript(aURL: AString, aAllowDelayedLoad: boolean): void;
+    removeDelayedProcessScript(aURL: AString): void;
+    getDelayedProcessScripts(): jsval;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsIProperties.idl
   export interface nsIProperties extends nsISupports {
     get<T extends nsISupports>(prop: string, iid: nsIJSID): T;
@@ -235,6 +268,22 @@ export namespace XPCOM {
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/file/nsIFileProtocolHandler.idl
   export interface nsIFileProtocolHandler extends nsIProtocolHandler {
     getURLSpecFromDir(file: nsIFile): string;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIFrameScriptLoader extends nsISupports {
+    loadFrameScript(
+      aURL: AString,
+      aAllowDelayedLoad: boolean,
+      aRunInGlobalScope?: boolean,
+    ): void;
+    removeDelayedFrameScript(aURL: AString): void;
+    getDelayedFrameScripts(): jsval;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIGlobalProcessScriptLoader extends nsIProcessScriptLoader {
+    readonly initialProcessData: jsval;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/http/nsIHttpChannel.idl
@@ -308,6 +357,91 @@ export namespace XPCOM {
     getLocaleFromAcceptLanguage(acceptLanguage: string): nsILocale;
     getSystemLocale(): nsILocale;
     newLocale(aLocale: string): nsILocale;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIMessageBroadcaster extends nsIMessageListenerManager {
+    broadcastAsyncMessage(
+      messageName?: AString,
+      obj?: jsval,
+      objects?: jsval,
+    ): void;
+
+    readonly childCount: number;
+    getChildAt(aIndex: number): nsIMessageListenerManager;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIMessageListener extends nsISupports {
+    receiveMessage: (data: {
+      target: any,         /* the target of the message. Either an element owning
+                              the message manager, or message manager itself if no
+                              element owns it */
+      name: string,        /* message name */
+      sync: boolean,
+      data: any,           /* structured clone of the sent message data */
+      objects: any,        /* named table of jsvals/objects, or null */
+      principal: any,      /* principal for the window app */
+    }) => void;
+  }
+
+  type MessageListener = nsIMessageListener | nsIMessageListener["receiveMessage"];
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIMessageListenerManager extends nsISupports {
+    addMessageListener(
+      messageName: AString,
+      listener: MessageListener,
+      listenWhenClosed?: boolean,
+    ): void;
+    removeMessageListener(
+      messageName: AString,
+      listener: MessageListener,
+    ): void;
+    addWeakMessageListener(
+      messageName: AString,
+      listener: MessageListener,
+    ): void;
+    removeWeakMessageListener(
+      messageName: AString,
+      listener: MessageListener,
+    ): void;
+  }
+
+  export type nsIMessageManager = nsIMessageManagerGlobal;
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  export interface nsIMessageManagerGlobal extends nsISyncMessageSender {
+    dump(aStr: DOMString): void;
+    privateNoteIntentionalCrash(): void;
+    atob(aAsciiString: DOMString): DOMString;
+    btoa(aBase64Data: DOMString): DOMString;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsIMessageSender extends nsIMessageListenerManager {
+    sendAsyncMessage(
+      messageName?: string,
+      obj?: jsval,
+      objects?: jsval,
+      principal?: nsIPrincipal,
+    ): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  interface nsISyncMessageSender extends nsIMessageSender {
+    sendSyncMessage(
+      messageName?: AString,
+      obj?: jsval,
+      objects?: jsval,
+      principal?: nsIPrincipal,
+    ): jsval;
+    sendRpcMessage(
+      messageName?: AString,
+      obj?: jsval,
+      objects?: jsval,
+      principal?: nsIPrincipal,
+    ): jsval;
   }
 
   export interface nsIObserver_without_nsISupports<T extends nsISupports = nsISupports> {

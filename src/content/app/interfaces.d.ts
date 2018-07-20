@@ -37,6 +37,7 @@ import { Storage } from "./storage/storage.module";
 import { Ui } from "./ui/ui.module";
 import { HttpChannelService } from "./services/http-channel-service";
 import { RequestService } from "./services/request-service";
+import { RequestSetService } from "./services/request-set-service";
 import { RulesServices } from "./services/rules/rules-services.module";
 import { UriService } from "./services/uri-service";
 import { VersionInfoService } from "./services/version-info-service";
@@ -82,6 +83,7 @@ export namespace App {
   export namespace services {
     export type IHttpChannelService = HttpChannelService;
     export type IRequestService = RequestService;
+    export type IRequestSetService = RequestSetService;
     export type IRulesServices = RulesServices;
     export type IUriService = UriService;
     export type IVersionInfoService = VersionInfoService;

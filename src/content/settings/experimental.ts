@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RequestSet } from "lib/request-set";
+import { RequestSet } from "lib/classes/request-set";
 import { BackgroundPage } from "main";
 
 (() => {

@@ -22,11 +22,13 @@
  */
 
 import { App } from "app/interfaces";
+import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { IListenInterface, Listeners } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
-import {RequestSet} from "lib/request-set";
-import {createListenersMap} from "lib/utils/listener-factories";
+import { RequestResult } from "lib/classes/request-result";
+import { RequestSet } from "lib/request-set";
+import { createListenersMap } from "lib/utils/listener-factories";
 
 export class RequestMemory extends Module {
   public readonly requestSets = {
@@ -40,6 +42,7 @@ export class RequestMemory extends Module {
 
   constructor(
       log: Common.ILog,
+      private readonly requestSetService: App.services.IRequestSetService,
       private readonly uriService: App.services.IUriService,
   ) {
     super("webRequest.requestMemory", log);
@@ -74,7 +77,7 @@ export class RequestMemory extends Module {
       originUri: string,
       destUri: string,
       isAllowed: boolean,
-      requestResult: any,
+      requestResult: RequestResult,
       unforbidable?: boolean,
       isInsert: boolean,
   }) {
@@ -86,19 +89,29 @@ export class RequestMemory extends Module {
           // The destination URI may itself originate further requests.
           this.removeSavedRequestsByOriginURI(destUri);
         }
-        this.requestSets.rejectedRequests.removeRequest(
-            originUri, destUri, this.uriService,
+        this.requestSetService.removeRequest(
+            this.requestSets.rejectedRequests,
+            originUri,
+            destUri,
         );
-        this.requestSets.allowedRequests.addRequest(
-            originUri, destUri, requestResult, this.uriService,
+        this.requestSetService.addRequest(
+          this.requestSets.allowedRequests,
+          originUri,
+          destUri,
+          requestResult,
         );
       }
     } else {
-      this.requestSets.rejectedRequests.addRequest(
-          originUri, destUri, requestResult, this.uriService,
+      this.requestSetService.addRequest(
+          this.requestSets.rejectedRequests,
+          originUri,
+          destUri,
+          requestResult,
       );
-      this.requestSets.allowedRequests.removeRequest(
-          originUri, destUri, this.uriService,
+      this.requestSetService.removeRequest(
+          this.requestSets.allowedRequests,
+          originUri,
+          destUri,
       );
     }
     this.eventListenersMap.onRequest.emit({
@@ -111,7 +124,7 @@ export class RequestMemory extends Module {
 
   public getDeniedRequests(
       currentlySelectedOrigin: string,
-      allRequestsOnDocument: any,
+      allRequestsOnDocument: RequestSet,
   ) {
     this.log.log("## getDeniedRequests");
     return this.getRequestsHelper(
@@ -123,7 +136,7 @@ export class RequestMemory extends Module {
 
   public getAllowedRequests(
       currentlySelectedOrigin: string,
-      allRequestsOnDocument: any,
+      allRequestsOnDocument: RequestSet,
   ) {
     this.log.log("## getAllowedRequests");
     return this.getRequestsHelper(
@@ -150,11 +163,8 @@ export class RequestMemory extends Module {
    * only have in the recorded requests from a source uri the destinations from
    * the most recent iframe that loaded that source uri. It may also help in
    * cases where the user has multiple tabs/windows open to the same page.
-   *
-   * @param {Browser} browser
-   * @return {RequestSet}
    */
-  public getAllRequestsInBrowser(browser: any) {
+  public getAllRequestsInBrowser(browser: XUL.tabBrowser): RequestSet {
     // var origins = {};
     const reqSet = new RequestSet();
 
@@ -171,7 +181,7 @@ export class RequestMemory extends Module {
 
   private getRequestsHelper(
       currentlySelectedOrigin: string,
-      allRequestsOnDocument: any,
+      allRequestsOnDocument: RequestSet,
       isAllowed: boolean,
   ) {
     const result = new RequestSet();
@@ -211,7 +221,12 @@ export class RequestMemory extends Module {
               //       contain a blocked list, an allowed list (and maybe a list
               //       of all requests).
               if (isAllowed === dest[i].isAllowed) {
-                result.addRequest(originUri, destUri, dest[i], this.uriService);
+                this.requestSetService.addRequest(
+                    result,
+                    originUri,
+                    destUri,
+                    dest[i],
+                );
               }
             }
           }
@@ -224,7 +239,7 @@ export class RequestMemory extends Module {
 
   private addRecursivelyAllRequestsFromURI(
       originURI: string,
-      reqSet: any,
+      reqSet: RequestSet,
       checkedOrigins: {[key: string]: boolean},
   ) {
     this.log.log(
@@ -248,8 +263,12 @@ export class RequestMemory extends Module {
             this.log.log(
                 "Found allowed request to <" + destURI + "> " +
                 "from <" + originURI + ">");
-            reqSet.addRequest(originURI, destURI,
-                              allowedRequests[destBase][destIdent][destURI]);
+            this.requestSetService.addRequest(
+                reqSet,
+                originURI,
+                destURI,
+                allowedRequests[destBase][destIdent][destURI],
+            );
 
             if (!checkedOrigins[destURI]) {
               // only check the destination URI if it hasn't been checked yet.
@@ -264,7 +283,7 @@ export class RequestMemory extends Module {
     }
   }
 
-  private addAllDeniedRequestsFromURI(originUri: string, reqSet: any) {
+  private addAllDeniedRequestsFromURI(originUri: string, reqSet: RequestSet) {
     this.log.log(
         "Looking for other origins within denied requests from " + originUri);
 
@@ -280,8 +299,12 @@ export class RequestMemory extends Module {
                 "Found denied request to <" + destUri + "> " +
                 `from <${originUri}>`);
 
-            reqSet.addRequest(originUri, destUri,
-                requests[destBase][destIdent][destUri]);
+            this.requestSetService.addRequest(
+                reqSet,
+                originUri,
+                destUri,
+                requests[destBase][destIdent][destUri],
+            );
           }
         }
       }

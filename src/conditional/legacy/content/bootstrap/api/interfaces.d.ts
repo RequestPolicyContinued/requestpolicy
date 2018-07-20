@@ -897,7 +897,8 @@ export namespace XUL {
 
   // <tabbrowser>
   export interface tabBrowser extends XPCOM.nsIDOMXULElement {
-    tabContainer: tabContainer
+    currentURI: XPCOM.nsIURI;
+    tabContainer: tabContainer;
   }
 
   // <tabs>

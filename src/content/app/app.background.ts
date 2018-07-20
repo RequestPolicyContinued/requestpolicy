@@ -39,6 +39,7 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
 import { HttpChannelService } from "app/services/http-channel-service";
+import { RequestSetService } from "app/services/request-set-service";
 import { MetadataMemory } from "app/web-request/metadata-memory";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
@@ -249,7 +250,8 @@ const initialSetup = new InitialSetup(
 const ui = new Ui(log, initialSetup);
 
 const metadataMemory = new MetadataMemory(log);
-const requestMemory = new RequestMemory(log, uriService);
+const requestSetService = new RequestSetService(log, uriService);
+const requestMemory = new RequestMemory(log, requestSetService, uriService);
 const requestProcessor = new RequestProcessor(
     log,
     Ci,

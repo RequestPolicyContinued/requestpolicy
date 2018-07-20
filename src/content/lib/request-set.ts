@@ -21,35 +21,27 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
-import {log} from "app/log";
-import {RequestResult} from "lib/classes/request-result";
+import { RequestResult } from "lib/classes/request-result";
 
-// =============================================================================
-// utilities
-// =============================================================================
-
-function getUriIdentifier(uri: string, uriService: App.services.IUriService) {
-  try {
-    return uriService.getIdentifier(uri, uriService.hostLevels.SOP);
-  } catch (e) {
-    const msg = `getUriIdentifier exception on uri <${uri}>. ` +
-        `Exception was: ${e}`;
-    throw new Error(msg);
-  }
+export interface IUriMap<T> {
+  [destBase: string]: {
+    [destIdent: string]: {
+      [destUri: string]: T;
+    };
+  };
 }
 
-// =============================================================================
-// RequestSet
-// =============================================================================
+export interface IRequestMap<T> {
+  [originUri: string]: IUriMap<T>;
+}
 
 export class RequestSet {
   // FIXME: should be private
-  public origins: any = {};
+  public origins: IRequestMap<RequestResult[]> = {};
 
   public print(
       name: string,
-      printFn: (s: string) => void = log.log.bind(log),
+      printFn: (s: string) => void,
   ) {
     printFn("-------------------------------------------------");
     printFn(`== Request Set <${name}> ==`);
@@ -81,8 +73,8 @@ export class RequestSet {
   // TODO: the name of this method, getAllMergedOrigins, is confusing. Is it
   // getting all of the "merged origins" is it "getting all" and merging the
   // origins when it does it?
-  public getAllMergedOrigins() {
-    const result: any = {};
+  public getAllMergedOrigins(): IUriMap<RequestResult[]> {
+    const result: IUriMap<RequestResult[]> = {};
     // tslint:disable:forin
     for (const originUri in this.origins) {
       const dests = this.origins[originUri];
@@ -112,103 +104,6 @@ export class RequestSet {
 
   public getOriginUri(originUri: string) {
     return this.origins[originUri] || {};
-  }
-
-  public addRequest(
-      originUri: string,
-      destUri: string,
-      aRequestResult: RequestResult,
-      uriService: App.services.IUriService,
-  ) {
-    let requestResult = aRequestResult;
-    if (requestResult === undefined) {
-      log.warn(
-          "addRequest() was called without a requestResult object!" +
-          " Creating a new one. -- " +
-          `"origin: <${originUri}>, destination: <${destUri}>`,
-      );
-      requestResult = new RequestResult();
-    }
-
-    if (!this.origins[originUri]) {
-      this.origins[originUri] = {};
-    }
-    const dests = this.origins[originUri];
-
-    const destBaseOrNull = uriService.getBaseDomain(destUri);
-    if (destBaseOrNull === null) {
-      log.warn(`Got 'null' base domain for URI <${destUri}>`);
-    }
-    // FIXME
-    const destBase = destBaseOrNull!;
-    if (!dests[destBase]) {
-      dests[destBase] = {};
-    }
-
-    const destIdent = getUriIdentifier(destUri, uriService);
-    if (!dests[destBase][destIdent]) {
-      dests[destBase][destIdent] = {};
-    }
-
-    // if (typeof rules != "object") {
-    //   throw "addRequest 'rules' argument must be an object where each " +
-    //         "key/val is ruleStr/rule";
-    // }
-    /*
-    if (!dests[destBase][destIdent][destUri]) {
-      // TODO: this is a little sketchy. What if we clobber rules
-      // that were already here? Arguably if we are told to add the
-      // same origin and dest pair, this will happen. Is that supposed
-      // to be possible?
-      dests[destBase][destIdent][destUri] = requestResult;
-    } else {
-      // TODO: append rules, removing duplicates.
-    }
-    */
-    if (!dests[destBase][destIdent][destUri]) {
-      dests[destBase][destIdent][destUri] = [];
-    }
-    if (requestResult instanceof Array) {
-      dests[destBase][destIdent][destUri] =
-            dests[destBase][destIdent][destUri].
-                concat(requestResult);
-    } else {
-      dests[destBase][destIdent][destUri].push(requestResult);
-    }
-  }
-
-  public removeRequest(
-      originUri: string,
-      destUri: string,
-      uriService: App.services.IUriService,
-  ) {
-    if (!this.origins[originUri]) { return; }
-    const dests = this.origins[originUri];
-
-    const destBaseOrNull = uriService.getBaseDomain(destUri);
-    if (destBaseOrNull === null) {
-      log.warn(`Got 'null' base domain for URI <${destUri}>`);
-    }
-    // FIXME
-    const destBase = destBaseOrNull!;
-    if (!dests[destBase]) { return; }
-
-    const destIdent = getUriIdentifier(destUri, uriService);
-    if (!dests[destBase][destIdent]) { return; }
-
-    if (!dests[destBase][destIdent][destUri]) { return; }
-    delete dests[destBase][destIdent][destUri];
-
-    if (Object.getOwnPropertyNames(dests[destBase][destIdent]).length > 0) {
-      return;
-    }
-    delete dests[destBase][destIdent];
-
-    if (Object.getOwnPropertyNames(dests[destBase]).length > 0) { return; }
-    delete dests[destBase];
-
-    if (Object.getOwnPropertyNames(dests).length > 0) { return; }
-    delete this.origins[originUri];
   }
 
   public removeOriginUri(originUri: string) {

@@ -238,7 +238,10 @@ export function loadMenuIntoWindow(window) {
       // menu showing relevant info when using the Update Scanner extension.
       self._allRequestsOnDocument = requestMemory.
           getAllRequestsInBrowser(gBrowser.selectedBrowser);
-      self._allRequestsOnDocument.print("_allRequestsOnDocument");
+      self._allRequestsOnDocument.print(
+          "_allRequestsOnDocument",
+          log.log.bind(log),
+      );
 
       self._setPrivateBrowsingStyles();
 
@@ -1292,7 +1295,7 @@ export function loadMenuIntoWindow(window) {
     let userRules = {};
     let subscriptionRules = {};
 
-    reqSet.print("deniedRequests");
+    reqSet.print("deniedRequests", log.log.bind(log));
 
     // TODO: there is no dest if no dest is selected (origin only).
     // var destBase = uriService.getBaseDomain(

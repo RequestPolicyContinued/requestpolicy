@@ -27,7 +27,7 @@ import { Common } from "common/interfaces";
 import { IListenInterface, Listeners } from "lib/classes/listeners";
 import { Module } from "lib/classes/module";
 import { RequestResult } from "lib/classes/request-result";
-import { RequestSet } from "lib/request-set";
+import { RequestSet } from "lib/classes/request-set";
 import { createListenersMap } from "lib/utils/listener-factories";
 
 export class RequestMemory extends Module {

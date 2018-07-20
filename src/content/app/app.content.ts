@@ -42,24 +42,36 @@ declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Services: JSMs.Services;
 declare const cfmm: XPCOM.nsIContentFrameMessageManager;
 
+const winUtil = cfmm.content.
+    QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
+    getInterface<XPCOM.nsIDOMWindowUtils>(Ci.nsIDOMWindowUtils);
+const {outerWindowID} = winUtil;
+
 const storageReadyPromise = Promise.resolve();
 
 const msgListener = new MessageListenerModule(
-    "AppContent.contentSide.msgListener",
+    `AppContent[${outerWindowID}].contentSide.msgListener`,
     log,
     cfmm,
 );
 const bgCommunication = new FramescriptToBackgroundCommunication(
     log,
+    outerWindowID,
     cfmm,
     msgListener,
 );
-const blockedContent = new ManagerForBlockedContent(log);
+const blockedContent = new ManagerForBlockedContent(log, outerWindowID);
 const xpconnectService = new XPConnectService();
-const uriService = new UriService(log, "AppContent", Services.eTLD,
-    xpconnectService.getIDNService(), Services.io);
+const uriService = new UriService(
+    log,
+    outerWindowID,
+    Services.eTLD,
+    xpconnectService.getIDNService(),
+    Services.io,
+);
 const domContentLoaded = new ManagerForDOMContentLoaded(
     log,
+    outerWindowID,
     Ci,
     cfmm,
     bgCommunication,
@@ -68,31 +80,41 @@ const domContentLoaded = new ManagerForDOMContentLoaded(
 );
 const contentscriptMisc = new ContentscriptMisc(
     log,
+    outerWindowID,
     cfmm,
     bgCommunication,
     msgListener,
 );
 const contentSide = new ContentscriptModule(
     log,
+    outerWindowID,
     bgCommunication,
     blockedContent,
     domContentLoaded,
     contentscriptMisc,
 );
 
-const rpServices = new RPContentServices(log, uriService);
+const rpServices = new RPContentServices(log, outerWindowID, uriService);
 
 const asyncSettings = new AsyncSettings(
     log,
+    outerWindowID,
     browser.storage,
     browser.storage.local,
     SETTING_SPECS.defaultValues,
     storageReadyPromise,
 );
 dAsyncSettings.resolve(asyncSettings);
-const storage = new Storage(log, asyncSettings, null, storageReadyPromise);
+const storage = new Storage(
+    log,
+    outerWindowID,
+    asyncSettings,
+    null,
+    storageReadyPromise,
+);
 export const rp = new AppContent(
     log,
+    outerWindowID,
     contentSide,
     rpServices,
     storage,

@@ -49,8 +49,9 @@ export class ManagerForBlockedContent extends Module {
 
   constructor(
       parentLog: Common.ILog,
+      protected readonly outerWindowID: number,
   ) {
-    super("AppContent.contentSide.blockedContent", parentLog);
+    super(`AppContent[${outerWindowID}].contentSide.blockedContent`, parentLog);
   }
 
   public indicateBlockedVisibleObjects(doc: Document, blockedURIs: any) {

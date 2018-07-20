@@ -47,12 +47,16 @@ export class AsyncSettings extends Module
 
   constructor(
       log: Common.ILog,
+      protected readonly outerWindowID: number | null,
       private storageApi: typeof browser.storage,
       private storageArea: browser.storage.StorageArea,
       private defaultSettings: IDefaultSettings,
       private storageReadyPromise: Promise<void>,
   ) {
-    super("app.storage.asyncSettings", log);
+    super(
+        `${
+            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
+        }.storage.asyncSettings`, log);
   }
 
   public get(aKeys: "" | string | string[]): Promise<any> {

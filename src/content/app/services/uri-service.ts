@@ -47,12 +47,17 @@ export class UriService extends Module {
 
   constructor(
       log: Common.ILog,
-      nameRoot = "app",
+      protected readonly outerWindowID: number | null,
       private mozETLDService: JSMs.Services["eTLD"],
       private mozIDNService: XPCOM.nsIIDNService,
       private mozIOService: JSMs.Services["io"],
   ) {
-    super(`${nameRoot}.services.uri`, log);
+    super(
+        `${
+            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
+        }.services.uri`,
+        log,
+    );
   }
 
   public getIdentifier(

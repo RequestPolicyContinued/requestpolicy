@@ -31,6 +31,7 @@ import { Module } from "lib/classes/module";
 export class ContentscriptModule extends Module implements App.IContentSide {
   constructor(
       parentLog: Common.ILog,
+      protected readonly outerWindowID: number,
       private readonly bgCommunication:
           App.contentSide.ICommunicationToBackground,
       private readonly blockedContent:
@@ -39,7 +40,7 @@ export class ContentscriptModule extends Module implements App.IContentSide {
           App.contentSide.IManagerForDOMContentLoaded,
       private readonly misc: App.contentSide.IContentscriptMisc,
   ) {
-    super("AppContent.contentSide", parentLog);
+    super(`AppContent[${outerWindowID}].contentSide`, parentLog);
   }
 
   protected get subModules() {

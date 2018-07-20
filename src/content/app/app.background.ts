@@ -78,6 +78,8 @@ import { RequestMemory } from "./web-request/request-memory";
 import {RequestProcessor} from "./web-request/request-processor";
 import { WebRequest } from "./web-request/web-request.module";
 
+const outerWindowID: number | null = null; // contentscripts only
+
 //
 // NOTES ABOUT BUILD-SPECIFIC (or optional) MODULES:
 //
@@ -164,6 +166,7 @@ const runtime = new Runtime(log, pEWEConnection);
 
 const asyncSettings = new AsyncSettings(
     log,
+    outerWindowID,
     browser.storage,
     browser.storage.local,
     SETTING_SPECS.defaultValues,
@@ -178,7 +181,11 @@ const cachedSettings = new CachedSettings(
     LegacyApi.rpPrefBranch, /* FIXME */
 );
 const storage = new Storage(
-    log, asyncSettings, cachedSettings, storageReadyPromise,
+    log,
+    outerWindowID,
+    asyncSettings,
+    cachedSettings,
+    storageReadyPromise,
 );
 
 const browserSettings = new BrowserSettings(
@@ -192,8 +199,13 @@ const httpChannelService = new HttpChannelService(
     tryCatchUtils,
 );
 const xpconnectService = new XPConnectService();
-const uriService = new UriService(log, undefined, mozServices!.eTLD,
-    xpconnectService.getIDNService(), mozServices!.io);
+const uriService = new UriService(
+    log,
+    outerWindowID,
+    mozServices!.eTLD,
+    xpconnectService.getIDNService(),
+    mozServices!.io,
+);
 const requestService = new RequestService(
     log, httpChannelService, uriService, cachedSettings,
 );

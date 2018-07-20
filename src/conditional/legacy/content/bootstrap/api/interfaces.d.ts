@@ -177,6 +177,11 @@ export namespace XPCOM {
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindow.idl
   export interface nsIDOMWindow extends nsISupports {}
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindowUtils.idl
+  export interface nsIDOMWindowUtils extends nsISupports {
+    readonly outerWindowID: number;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/xul/nsIDOMXULElement.idl
   export interface nsIDOMXULElement extends nsIDOMElement {}
 
@@ -714,6 +719,7 @@ export namespace XPCOM {
       DOCUMENT_NODE: number,
     };
     nsIDOMWindow: XPCOM.nsIJSID;
+    nsIDOMWindowUtils: XPCOM.nsIJSID;
     nsIDOMXULElement: XPCOM.nsIJSID;
     nsIFactory: XPCOM.nsIJSID;
     nsIFile: XPCOM.nsIJSID;

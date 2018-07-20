@@ -46,13 +46,17 @@ export class ManagerForDOMContentLoaded extends Module {
 
   constructor(
       parentLog: Common.ILog,
+      protected readonly outerWindowID: number,
       private ci: XPCOM.nsXPCComponents_Interfaces,
       private cfmm: XPCOM.nsIContentFrameMessageManager,
       private bgCommunication: App.contentSide.ICommunicationToBackground,
       private blockedContent: App.contentSide.IManagerForBlockedContent,
       private uriServices: App.services.IUriService,
   ) {
-    super("AppContent.contentSide.domContentLoaded", parentLog);
+    super(
+        `AppContent[${outerWindowID}].contentSide.domContentLoaded`,
+        parentLog,
+    );
   }
 
   public htmlAnchorTagClicked(event: any) {

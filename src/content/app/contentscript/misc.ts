@@ -43,6 +43,7 @@ export class ContentscriptMisc extends Module {
 
   constructor(
       parentLog: Common.ILog,
+      protected readonly outerWindowID: number,
       private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
       private readonly bgCommunication:
           App.contentSide.ICommunicationToBackground,
@@ -50,7 +51,7 @@ export class ContentscriptMisc extends Module {
           XPCOM.nsIContentFrameMessageManager
       >,
   ) {
-    super("AppContent.contentSide.misc", parentLog);
+    super(`AppContent[${outerWindowID}].contentSide.misc`, parentLog);
   }
 
   public reloadDocument() {

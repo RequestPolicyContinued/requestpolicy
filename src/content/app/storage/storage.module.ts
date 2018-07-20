@@ -33,11 +33,17 @@ export class Storage extends Module implements App.IStorage {
 
   constructor(
       log: Common.ILog,
+      protected readonly outerWindowID: number | null,
       public readonly asyncSettings: App.storage.IAsyncSettings,
       public readonly cachedSettings: App.storage.ICachedSettings | null,
       private storageReadyPromise: Promise<void>,
   ) {
-    super("app.storage", log);
+    super(
+        `${
+            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
+        }.storage`,
+        log,
+    );
   }
 
   protected get subModules() {

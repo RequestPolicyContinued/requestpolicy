@@ -108,7 +108,7 @@ export class RequestProcessor extends Module {
   }
 
   constructor(
-      private readonly parentLog: Common.ILog,
+      parentLog: Common.ILog,
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,
       private readonly cr: XPCOM.nsXPCComponents_Results,
       private readonly observerService: XPCOM.nsIObserverService | null,

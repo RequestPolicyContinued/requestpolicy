@@ -116,6 +116,12 @@ export class ContentscriptMisc extends Module {
     }
   }
 
+  protected get subModules() {
+    return {
+      eventListener: this.eventListener,
+    };
+  }
+
   protected startupSelf() {
     this.msgListener.addListener(
         "reload", this.msgListenerCallbacks.reloadDocument,

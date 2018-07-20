@@ -37,6 +37,7 @@ export class AppContent extends Module {
 
   public get subModules() {
     return {
+      contentSide: this.contentSide,
       services: this.services,
       storage: this.storage,
     };

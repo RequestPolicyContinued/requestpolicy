@@ -28,7 +28,7 @@ import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class ContentscriptModule extends Module {
+export class ContentscriptModule extends Module implements App.IContentSide {
   constructor(
       parentLog: Common.ILog,
       private readonly bgCommunication:
@@ -42,7 +42,7 @@ export class ContentscriptModule extends Module {
     super("app.contentSide", parentLog);
   }
 
-  public get subModules() {
+  protected get subModules() {
     return {
       bgCommunication: this.bgCommunication,
       blockedContent: this.blockedContent,

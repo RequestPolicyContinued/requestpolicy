@@ -178,7 +178,8 @@ export class ManagerForDOMContentLoaded extends Module {
       eventListeners,
       onDocumentUnload: this.onDocumentUnload.bind(this, doc),
     };
-    eventListeners.startup();
+    eventListeners.startup().
+        catch(this.log.onError("eventListeners.startup()"));
     eventListeners.addListener(
         doc.defaultView,
         "unload",
@@ -278,7 +279,8 @@ export class ManagerForDOMContentLoaded extends Module {
   private onDocumentUnload(doc: Document) {
     const docInfo = this.documents.get(doc)!;
 
-    docInfo.eventListeners.shutdown();
+    docInfo.eventListeners.shutdown().
+        catch(this.log.onError("eventListeners.shutdown()"));
 
     for (const anchorTag of docInfo.anchorTags.values()) {
       anchorTag.removeEventListener(

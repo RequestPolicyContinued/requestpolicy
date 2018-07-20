@@ -94,6 +94,12 @@ export class FramescriptToBackgroundCommunication extends Module {
     }
   }
 
+  protected get subModules() {
+    return {
+      msgListener: this.msgListener,
+    };
+  }
+
   protected startupSelf() {
     return this.startCommNowOrLater();
   }
@@ -108,7 +114,7 @@ export class FramescriptToBackgroundCommunication extends Module {
    */
   private startCommNowOrLater(): Promise<void> {
     const answers = this.cfmm.sendSyncMessage(
-        `${C.MM_PREFIX}isBackgroundReady`,
+        `${C.MM_PREFIX}isOverlayReady`,
     );
     if (answers.length > 0 && answers[0] === true) {
       this.startCommunication();

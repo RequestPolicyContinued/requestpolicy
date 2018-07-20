@@ -184,8 +184,9 @@ export function loadOverlayIntoWindow(window) {
         }, function() {
           return false;
         });
-        window.messageManager.broadcastAsyncMessage(`${C.MM_PREFIX
-        }overlayIsReady`, true);
+        window.messageManager.broadcastAsyncMessage(
+            `${C.MM_PREFIX}overlayIsReady`, true
+        );
       }
     } catch (e) {
       console.error("[FATAL] Unable to initialize rpcontinued.overlay. " +

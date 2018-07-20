@@ -59,11 +59,15 @@ export interface IVersionComparator {
 }
 
 export namespace App {
-  export namespace contentscript {
+  export namespace contentSide {
     export type ICommunicationToBackground = FramescriptToBackgroundCommunication;
     export type IContentscriptMisc = ContentscriptMisc;
     export type IManagerForBlockedContent = ManagerForBlockedContent;
     export type IManagerForDOMContentLoaded = ManagerForDOMContentLoaded;
+
+    export type ICSMessageListener = App.utils.IMessageListener<
+        XPCOM.nsIContentFrameMessageManager
+    >;
   }
 
   export namespace migration {

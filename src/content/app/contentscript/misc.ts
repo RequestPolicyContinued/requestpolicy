@@ -50,7 +50,7 @@ export class ContentscriptMisc extends Module {
           XPCOM.nsIContentFrameMessageManager
       >,
   ) {
-    super("app.contentSide.misc", parentLog);
+    super("AppContent.contentSide.misc", parentLog);
   }
 
   public reloadDocument() {

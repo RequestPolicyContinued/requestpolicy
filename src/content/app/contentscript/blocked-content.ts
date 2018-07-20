@@ -50,7 +50,7 @@ export class ManagerForBlockedContent extends Module {
   constructor(
       parentLog: Common.ILog,
   ) {
-    super("app.contentSide.blockedContent", parentLog);
+    super("AppContent.contentSide.blockedContent", parentLog);
   }
 
   public indicateBlockedVisibleObjects(doc: Document, blockedURIs: any) {

@@ -70,7 +70,7 @@ export class FramescriptToBackgroundCommunication extends Module {
           XPCOM.nsIContentFrameMessageManager
       >,
   ) {
-    super("app.contentSide.bgCommunication", parentLog);
+    super("AppContent.contentSide.bgCommunication", parentLog);
   }
 
   /**

@@ -45,7 +45,7 @@ declare const cfmm: XPCOM.nsIContentFrameMessageManager;
 const storageReadyPromise = Promise.resolve();
 
 const msgListener = new MessageListenerModule(
-    "app.contentSide.msgListener",
+    "AppContent.contentSide.msgListener",
     log,
     cfmm,
 );

@@ -39,7 +39,7 @@ export class ContentscriptModule extends Module implements App.IContentSide {
           App.contentSide.IManagerForDOMContentLoaded,
       private readonly misc: App.contentSide.IContentscriptMisc,
   ) {
-    super("app.contentSide", parentLog);
+    super("AppContent.contentSide", parentLog);
   }
 
   protected get subModules() {

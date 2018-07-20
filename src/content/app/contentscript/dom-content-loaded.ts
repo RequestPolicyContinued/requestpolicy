@@ -52,7 +52,7 @@ export class ManagerForDOMContentLoaded extends Module {
       private blockedContent: App.contentSide.IManagerForBlockedContent,
       private uriServices: App.services.IUriService,
   ) {
-    super("app.contentSide.domContentLoaded", parentLog);
+    super("AppContent.contentSide.domContentLoaded", parentLog);
   }
 
   public htmlAnchorTagClicked(event: any) {

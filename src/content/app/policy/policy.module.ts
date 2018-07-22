@@ -45,13 +45,19 @@ export class Policy extends Module {
   public userRulesetExistedOnStartup: boolean;
   private userRulesets: any = {};
 
+  protected get subModules() {
+    return {
+      rulesetStorage: this.rulesetStorage,
+      subscriptions: this.subscriptions,
+    };
+  }
+
   constructor(
       log: Common.ILog,
       public readonly subscriptions: Subscriptions,
       public readonly rulesetStorage: RulesetStorage,
   ) {
     super("app.policy", log);
-    this.subscriptions = subscriptions;
   }
 
   public getUserRulesets() {
@@ -322,15 +328,8 @@ export class Policy extends Module {
   }
 
   // ---------------------------------------------------------------------------
-  // private functions
+  // protected functions
   // ---------------------------------------------------------------------------
-
-  protected get subModules() {
-    return {
-      rulesetStorage: this.rulesetStorage,
-      subscriptions: this.subscriptions,
-    };
-  }
 
   protected async startupSelf() {
     await this.loadUserRules();

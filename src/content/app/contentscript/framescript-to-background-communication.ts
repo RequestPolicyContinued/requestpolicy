@@ -63,6 +63,12 @@ export class FramescriptToBackgroundCommunication extends Module {
     startCommunication: this.startCommunication.bind(this),
   };
 
+  protected get subModules() {
+    return {
+      msgListener: this.msgListener,
+    };
+  }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
@@ -96,12 +102,6 @@ export class FramescriptToBackgroundCommunication extends Module {
         // this.log.log("Ignoring runnable.");
         break;
     }
-  }
-
-  protected get subModules() {
-    return {
-      msgListener: this.msgListener,
-    };
   }
 
   protected startupSelf() {

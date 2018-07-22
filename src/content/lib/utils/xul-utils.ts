@@ -20,28 +20,36 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {arrayIncludes} from "lib/utils/js-utils";
-import {C} from "data/constants";
+/// <reference path="./xul-utils.d.ts" />
+
+import { API, JSMs, XUL } from "bootstrap/api/interfaces";
+import { C } from "data/constants";
+import { arrayIncludes } from "lib/utils/js-utils";
+
+declare const LegacyApi: API.ILegacyApi;
+declare const Services: JSMs.Services;
 
 // =============================================================================
 // XULUtils
 // =============================================================================
 
-export const xulTrees = {};
+export let xulTrees: IXulTreeLists;
 
 /**
  * IIFE: Import the XUL trees and ensure their integrity.
  */
 (function importXulTrees() {
+  const maybeIncompleteXulTrees: IMaybeIncompleteXulTreeLists = {};
+
   const xulTreesScope = {
-    "exports": xulTrees,
-    "C": C,
-    "appID": Services.appinfo.ID,
+    C,
+    appID: Services.appinfo.ID,
+    exports: maybeIncompleteXulTrees,
   };
 
   Services.scriptloader.loadSubScript(
       "chrome://rpcontinued/content/ui/xul-trees.js",
-      xulTreesScope
+      xulTreesScope,
   );
 
   // For ensuring that each Element Spec has an ID.
@@ -49,38 +57,44 @@ export const xulTrees = {};
 
   // Call the "ensureIntegrity" function on _all_ element specs
   // of _all_ trees.
-  for (let treeName in xulTrees) {
-    recursivelyGetAllElementSpecs(xulTrees[treeName]).forEach(ensureIntegrity);
+  // tslint:disable-next-line:forin
+  for (const treeName in maybeIncompleteXulTrees) {
+    recursivelyGetAllElementSpecs(maybeIncompleteXulTrees[treeName]).
+        forEach(ensureIntegrity);
   }
 
-  function ensureIntegrity(aElementSpec) {
-    /* eslint-disable no-param-reassign */
+  xulTrees = maybeIncompleteXulTrees as IXulTreeLists;
 
+  function ensureIntegrity(
+      aElementSpec: MaybeIncompleteRootOrNonrootXulElementSpec,
+  ) {
     // Ensure "attributes" exists.
-    if (!aElementSpec.hasOwnProperty("attributes")) {
+    if (!("attributes" in aElementSpec)) {
       aElementSpec.attributes = {};
     }
 
     // Ensure the Element Spec has an ID attribute.
-    if (!aElementSpec.attributes.hasOwnProperty("id")) {
-      aElementSpec.attributes.id = `rpc-autoid-${nextID++}`;
-      // log.log(
-      //     "Automatically created ID '" + aElementSpec.attributes.id +
-      //     "' for element <" + aElementSpec.tag + ">");
+    if (!("id" in aElementSpec.attributes!)) {
+      aElementSpec.attributes!.id = `rpc-autoid-${nextID++}`;
     }
   }
 })();
 
-/**
- * @param {Array<Object>} aElementSpecList
- *
- * @return {Array<Object>}
- */
-function recursivelyGetAllElementSpecs(aElementSpecList) {
-  // Create a new array.
-  let allElementSpecs = [];
+function recursivelyGetAllElementSpecs<
+    T = IXulElementSpec
+>(aElementSpecList: T[]): T[];
+function recursivelyGetAllElementSpecs<
+    T = IMaybeIncompleteXulElementSpec
+>(aElementSpecList: T[]): T[];
+function recursivelyGetAllElementSpecs<
+    T extends (
+        IXulElementSpec |
+        IMaybeIncompleteXulElementSpec
+    )
+>(aElementSpecList: T[]): T[] {
+  let allElementSpecs: T[] = [];
 
-  for (let elementSpec of aElementSpecList) {
+  for (const elementSpec of aElementSpecList) {
     if (!elementSpec) {
       console.error("An element spec is null!");
       continue;
@@ -90,9 +104,9 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
     allElementSpecs.push(elementSpec);
 
     // Add all children recursively.
-    if (elementSpec.hasOwnProperty("children")) {
-      let allChildrenSpecs = recursivelyGetAllElementSpecs(
-          elementSpec.children
+    if ("children" in elementSpec) {
+      const allChildrenSpecs = recursivelyGetAllElementSpecs<T>(
+          (elementSpec.children! as T[]),
       );
       allElementSpecs = allElementSpecs.concat(allChildrenSpecs);
     }
@@ -101,77 +115,79 @@ function recursivelyGetAllElementSpecs(aElementSpecList) {
   return allElementSpecs;
 }
 
-function getParentElementOfSubobject(aDocument, aElementSpec) {
-  let subobjectTree = aElementSpec.parent.special.tree;
-  let parentElement = aDocument.getElementById(aElementSpec.parent.special.id);
+function getParentElementOfSubobject(
+    aDocument: XUL.chromeDocument,
+    aParent: ISubobjectParentSpec,
+): Element | null {
+  const subobjectTree = aParent.tree;
+  let parentElement = aDocument.getElementById(aParent.id);
+  if (!parentElement === null) return null;
   for (let i = 0, len = subobjectTree.length; i < len; ++i) {
-    parentElement = parentElement[subobjectTree[i]];
+    parentElement = (parentElement as any)[subobjectTree[i]];
   }
   return parentElement;
 }
 
-function getParentElement(aDocument, aElementSpec) {
-  if (!aElementSpec.parent) {
-    return false;
-  } else {
-    if (aElementSpec.parent.id) {
-      return aDocument.getElementById(aElementSpec.parent.id);
-    } else if (aElementSpec.parent.special) {
-      switch (aElementSpec.parent.special.type) {
-        case "__window__":
-          return aDocument.querySelector("window");
+function isRootXulElementSpec(
+    aElementSpec: RootOrNonrootXulElementSpec,
+): aElementSpec is IXulTree {
+  return "parent" in aElementSpec;
+}
 
-        case "subobject":
-          return getParentElementOfSubobject(aDocument, aElementSpec);
+function getParentElement(
+    aDocument: XUL.chromeDocument,
+    aElementSpec: RootOrNonrootXulElementSpec,
+): Element | null | false {
+  if (!isRootXulElementSpec(aElementSpec)) return false;
+  if ("id" in aElementSpec.parent) {
+    return aDocument.getElementById(aElementSpec.parent.id);
+  } else if (aElementSpec.parent.special) {
+    switch (aElementSpec.parent.special.type) {
+      case "__window__":
+        return aDocument.querySelector("window");
 
-        default:
-          return false;
-      }
-    } else {
-      return false;
+      case "subobject":
+        return getParentElementOfSubobject(
+            aDocument,
+            aElementSpec.parent.special,
+        );
+
+      default:
+        return false;
     }
+  } else {
+    return false;
   }
 }
 
 /**
  * Get the localized value of an attribute.
- *
- * @param {string} aRawValue
- * @return {string}
  */
-function getLocalizedValue(aRawValue) {
+function getLocalizedValue(aRawValue: string): string {
   if (!LegacyApi.i18n.matchKeyPattern(aRawValue)) {
     return aRawValue;
   }
   return LegacyApi.i18n.updateString(aRawValue);
 }
 
-/**
- * @param {Element} aElement
- * @param {!Object} aElementSpec
- */
-function setAttributes(aElement, aElementSpec) {
-  if (!aElementSpec.hasOwnProperty("attributes")) {
-    return;
-  }
-  for (let attributeName in aElementSpec.attributes) {
-    let value = getLocalizedValue(aElementSpec.attributes[attributeName]);
+function setAttributes(aElement: Element, aElementSpec: IXulElementSpec) {
+  if (!("attributes" in aElementSpec)) return;
+  // tslint:disable-next-line:forin
+  for (const attributeName in aElementSpec.attributes) {
+    const value = getLocalizedValue(aElementSpec.attributes[attributeName]);
     if (value) {
       aElement.setAttribute(attributeName, value);
     }
   }
 }
 
-const {addEventListeners, removeEventListeners} = (function() {
-  /**
-   * @param {!Object} aRootObject
-   * @param {Array<string>} aListenerSpec
-   *
-   * @return {?Function} The listener function.
-   */
-  function getEventListener(aRootObject, aListenerSpec) {
+const {addEventListeners, removeEventListeners} = (() => {
+  function getEventListener(
+      aRootObject: any,
+      aListenerSpec: string[],
+  ): Function | null {
     let object = aRootObject;
-    for (let propertyName of aListenerSpec) {
+    for (const propertyName of aListenerSpec) {
       if (!object.hasOwnProperty(propertyName)) {
         return null;
       }
@@ -180,19 +196,15 @@ const {addEventListeners, removeEventListeners} = (function() {
     return object;
   }
 
-  /**
-   * @param {Element} aEventTarget
-   * @param {Object} aEventList
-   *
-   * @return {Array}
-   */
-  function getEventInfoList(aEventTarget, aEventList) {
+  function getEventInfoList(aEventTarget: Element, aEventList: any): any[] {
     if (!aEventList) {
       return [];
     }
-    const rootObject = aEventTarget.ownerDocument.defaultView.rpcontinued;
+    const rootObject = (
+      aEventTarget.ownerDocument.defaultView as any
+    ).rpcontinued;
 
-    return Object.keys(aEventList).map(function(eventName) {
+    return Object.keys(aEventList).map((eventName) => {
       return [
         eventName,
         getEventListener(rootObject, aEventList[eventName]),
@@ -200,46 +212,50 @@ const {addEventListeners, removeEventListeners} = (function() {
     });
   }
 
-  /**
-   * @param {Element} aEventTarget The event target.
-   * @param {!Object} aElementSpec
-   * @param {Object} aElementSpec.events
-   */
-  function addEventListeners(aEventTarget, {events}) {
+  function addEventListeners_(
+      aEventTarget: Element,
+      {events}: IXulElementSpec,
+  ) {
     const listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function([eventName, listener]) {
+    listeners.forEach(([eventName, listener]) => {
       aEventTarget.addEventListener(eventName, listener, false);
     });
   }
 
-  function removeEventListeners(aEventTarget, {events}) {
+  function removeEventListeners_(
+      aEventTarget: Element,
+      {events}: IXulElementSpec,
+  ) {
     const listeners = getEventInfoList(aEventTarget, events);
-    listeners.forEach(function([eventName, listener]) {
+    listeners.forEach(([eventName, listener]) => {
       aEventTarget.removeEventListener(eventName, listener, false);
     });
   }
 
   return {
-    addEventListeners: addEventListeners,
-    removeEventListeners: removeEventListeners,
+    addEventListeners: addEventListeners_,
+    removeEventListeners: removeEventListeners_,
   };
 })();
 
 function recursivelyAddXULElements(
-    aDocument, aElementSpecList,
-    aParentElement = null
+    aDocument: XUL.chromeDocument,
+    aElementSpecList: IXulElementSpec[],
+    aParentElement: Element | null = null,
 ) {
-  for (let elementSpec of aElementSpecList) {
+  for (const elementSpec of aElementSpecList) {
     if (!elementSpec || !elementSpec.tag) {
       console.error("Element spec incomplete!");
       continue;
     }
-    let parentElement = aParentElement ? aParentElement :
-      getParentElement(aDocument, elementSpec);
+    const parentElement = aParentElement ? aParentElement :
+        getParentElement(aDocument, elementSpec);
     if (false === parentElement) {
-      console.error(`${"The parent element could not " +
-          "be determined. Tag: "}${elementSpec.tag}; ` +
-          `ID: ${elementSpec.attributes.id}`);
+      console.error(
+          `The parent element could not be determined. ` +
+          `Tag: ${elementSpec.tag}; ` +
+          `ID: ${elementSpec.attributes.id}`,
+      );
       continue;
     }
     if (parentElement === null) {
@@ -248,7 +264,7 @@ function recursivelyAddXULElements(
     }
 
     // Create the new element.
-    let newElement = aDocument.createElement(elementSpec.tag);
+    const newElement = aDocument.createElement(elementSpec.tag);
 
     // Set all attributes.
     setAttributes(newElement, elementSpec);
@@ -264,7 +280,10 @@ function recursivelyAddXULElements(
   }
 }
 
-export function addTreeElementsToWindow(aWin, aTreeName) {
+export function addTreeElementsToWindow(
+    aWin: XUL.chromeWindow,
+    aTreeName: string,
+) {
   if (xulTrees.hasOwnProperty(aTreeName)) {
     recursivelyAddXULElements(aWin.document, xulTrees[aTreeName]);
   }
@@ -272,18 +291,18 @@ export function addTreeElementsToWindow(aWin, aTreeName) {
 
 /**
  * Return a list of the IDs of the specified tree's root elements.
- *
- * @param {string} aTreeName
- * @return {Array<string>} The list of IDs.
  */
-function getRootElementIDs(aTreeName) {
-  const ids = xulTrees[aTreeName].map(function(aElementSpec) {
+function getRootElementIDs(aTreeName: string): string[] {
+  const ids = xulTrees[aTreeName].map((aElementSpec) => {
     return aElementSpec.attributes.id;
   });
   return ids;
 }
 
-export function removeTreeElementsFromWindow(aWin, aTreeName) {
+export function removeTreeElementsFromWindow(
+    aWin: XUL.chromeWindow,
+    aTreeName: string,
+) {
   if (!xulTrees.hasOwnProperty(aTreeName)) {
     console.error(`There's no tree with name '${aTreeName}'.`);
     return;
@@ -292,9 +311,10 @@ export function removeTreeElementsFromWindow(aWin, aTreeName) {
   const $id = aWin.document.getElementById.bind(aWin.document);
 
   // Recursively remove all event listeners.
-  for (let elementSpec of recursivelyGetAllElementSpecs(xulTrees[aTreeName])) {
-    let {id} = elementSpec.attributes;
-    let eventTarget = $id(id);
+  const elementSpecs = recursivelyGetAllElementSpecs(xulTrees[aTreeName]);
+  for (const elementSpec of elementSpecs) {
+    const {id} = elementSpec.attributes;
+    const eventTarget = $id(id);
     if (!eventTarget) {
       console.error(`Could not find element with ID "${id}".`);
       continue;
@@ -303,17 +323,18 @@ export function removeTreeElementsFromWindow(aWin, aTreeName) {
   }
 
   // Remove the root elements.
-  for (let id of getRootElementIDs(aTreeName)) {
-    let node = $id(id);
+  for (const id of getRootElementIDs(aTreeName)) {
+    const node = $id(id);
     if (node && node.parentNode) {
       node.parentNode.removeChild(node);
     }
   }
 }
 
-export const keyboardShortcuts = (function() {
-  let self = {};
+export const keyboardShortcuts = (() => {
+  const self: any = {};
 
+  // tslint:disable-next-line:max-line-length
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Attribute/modifiers
   // See also the SDK Hotkeys API
   // https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/hotkeys
@@ -325,22 +346,22 @@ export const keyboardShortcuts = (function() {
     "accel",
   ];
 
-  function error(msg) {
+  function error(msg: string) {
     return {success: false, errorMessage: msg};
   }
 
-  function success(returnValue) {
+  function success<T extends {success?: boolean}>(returnValue: T) {
     returnValue.success = true;
-    return returnValue;
+    return returnValue as T & {success: true};
   }
 
-  function isValidModifier(aModifier) {
+  function isValidModifier(aModifier: string) {
     return arrayIncludes(VALID_MODIFIERS, aModifier);
   }
 
-  let keyRegEx = /^[a-z]$/;
+  const keyRegEx = /^[a-z]$/;
 
-  function _getKeyAttributesFromCombo(aCombo) {
+  function _getKeyAttributesFromCombo(aCombo: string) {
     if (typeof aCombo !== "string") {
       return error("Not a string!");
     }
@@ -348,15 +369,15 @@ export const keyboardShortcuts = (function() {
       return error("The string must not be empty.");
     }
 
-    let parts = aCombo.split(" ");
+    const parts = aCombo.split(" ");
     // Take the last element as the key
-    let key = parts.slice(-1)[0];
+    const key = parts.slice(-1)[0];
     // Take all elements except the last one as the modifiers.
     let modifiers = parts.slice(0, -1);
     // Remove duplicates
     modifiers = [...new Set(modifiers)];
 
-    for (let modifier of modifiers) {
+    for (const modifier of modifiers) {
       if (false === isValidModifier(modifier)) {
         return error(`Invalid modifier: "${modifier}"`);
       }
@@ -367,18 +388,16 @@ export const keyboardShortcuts = (function() {
     }
 
     return success({
+      key,
       modifiers: modifiers.join(" "),
-      key: key,
+      success: undefined,
     });
   }
 
   /**
    * Check if the <key modifiers="..."> string is valid.
-   *
-   * @param  {string} aCombo
-   * @return {Object}
    */
-  self.getKeyAttributesFromCombo = function(aCombo) {
+  self.getKeyAttributesFromCombo = (aCombo: string) => {
     return _getKeyAttributesFromCombo(aCombo);
   };
 

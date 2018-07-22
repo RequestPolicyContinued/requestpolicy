@@ -50,6 +50,12 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
 
   private dCapturing = defer();
 
+  protected get startupPreconditions() {
+    return [
+      this.requestProcessor.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       xpconnectService: API.IXPConnectService,

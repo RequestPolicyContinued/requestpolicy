@@ -44,6 +44,14 @@ export class ManagerForDOMContentLoaded extends Module {
 
   private documents: Map<Document, IDocumentInfo> = new Map();
 
+  protected get startupPreconditions() {
+    return [
+      this.bgCommunication.whenReady,
+      this.blockedContent.whenReady,
+      this.uriServices.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,

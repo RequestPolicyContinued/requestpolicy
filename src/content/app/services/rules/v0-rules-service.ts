@@ -55,6 +55,12 @@ function splitString(aRulesString: string = ""): Set<string> {
 export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
+  protected get startupPreconditions() {
+    return [
+      this.uriService.whenReady,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
       private uriService: UriService,

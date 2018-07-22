@@ -50,9 +50,11 @@ export function getChromeWindow(
       getInterface(Ci.nsIDOMWindow);
 }
 
-export function getBrowserForWindow(aContentWindow: XUL.contentWindow) {
+export function getBrowserForWindow(
+    aContentWindow: XUL.contentWindow,
+): XUL.browser | null {
   const win = getChromeWindow(aContentWindow);
-  const tabs = getTabsForWindow(win);
+  const tabs = getTabsForWindow(win) || [];
   for (const tab of tabs) {
     if (tab.linkedBrowser.contentWindow === aContentWindow.top) {
       return tab.linkedBrowser;
@@ -69,15 +71,27 @@ export function getChromeWindowForDocShell(aDocShell: XPCOM.nsIDocShell) {
       getInterface(Ci.nsIDOMWindow);
 }
 
-export function getTabBrowser(aChromeWindow: XUL.chromeWindow) {
+export function getTabBrowser(
+    aChromeWindow: XUL.chromeWindow,
+): XUL.tabBrowser | null {
   // bug 1009938 - may be null in SeaMonkey
-  return aChromeWindow.gBrowser || aChromeWindow.getBrowser();
+  return aChromeWindow.gBrowser || (
+    "getBrowser" in aChromeWindow && aChromeWindow.getBrowser() || null
+  );
 }
 
 export function getTabsForWindow(
     aChromeWindow: XUL.chromeWindow,
-): XUL.tab[] {
-  return getTabBrowser(aChromeWindow).tabContainer.children;
+): XUL.tab[] | null {
+  const tabBrowser = getTabBrowser(aChromeWindow);
+  if (tabBrowser === null) return null;
+  return tabBrowser.tabContainer.children;
+}
+
+export function contentWindowHasAssociatedTab(
+    contentWindow: XUL.contentWindow,
+): boolean {
+  return getBrowserForWindow(contentWindow) !== null;
 }
 
 //

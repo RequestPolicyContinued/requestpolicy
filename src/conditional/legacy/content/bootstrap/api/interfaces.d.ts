@@ -57,6 +57,14 @@ export namespace XPCOM {
     getService<T extends nsISupports>(id: nsIJSID): T;
   }
 
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/js/xpconnect/idl/mozIJSSubScriptLoader.idl
+  export interface mozIJSSubScriptLoader extends nsISupports {
+    loadSubScript(url: AString, obj?: jsval, charset?: AString): jsval;
+    loadSubScriptWithOptions(url: AString, options: jsval): jsval;
+    precompileScript(uri: nsIURI, principal: nsIPrincipal, observer: nsIObserver): void;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIAsyncVerifyRedirectCallback.idl
   export interface nsIAsyncVerifyRedirectCallback extends nsISupports {
     onRedirectVerifyCallback(result: nsResult): void;
@@ -103,7 +111,7 @@ export namespace XPCOM {
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
   export interface nsIContentFrameMessageManager extends nsIMessageManagerGlobal {
-    readonly content: nsIDOMWindow & Window;
+    readonly content: XUL.contentWindow;
     readonly docShell: nsIDocShell;
   }
 
@@ -861,6 +869,7 @@ export namespace JSMs {
     locale: XPCOM.nsILocaleService;
     obs: XPCOM.nsIObserverService;
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
+    scriptloader: XPCOM.mozIJSSubScriptLoader;
     scriptSecurityManager: XPCOM.nsIScriptSecurityManager;
     vc: XPCOM.nsIVersionComparator;
     wm: XPCOM.nsIWindowMediator;
@@ -872,26 +881,29 @@ export namespace JSMs {
 }
 
 export namespace XUL {
-  export interface contentDocument extends XPCOM.nsIDOMDocument {
-    readonly defaultView: contentWindow;
-    getElementById: Document["getElementById"];
+  export type chromeDocument = XPCOM.nsIDOMDocument & Document & {
   }
 
-  export interface chromeWindow extends XPCOM.nsIDOMWindow {
+  export type contentDocument = XPCOM.nsIDOMDocument & Document & {
+    readonly defaultView: contentWindow;
+  }
+
+  export type chromeWindow = XPCOM.nsIDOMWindow & Window & {
+    document: chromeDocument;
     gBrowser: tabBrowser | null;  // bug 1009938 - may be null in SeaMonkey
     getBrowser(): tabBrowser;
 
     rpcontinued: any;  // FIXME
   }
 
-  export interface contentWindow extends XPCOM.nsIDOMWindow {
+  export type contentWindow = XPCOM.nsIDOMWindow & Window & {
     readonly top: XUL.contentWindow;
     readonly document: contentDocument;
     addEventListener: Window["addEventListener"];
     removeEventListener: Window["removeEventListener"];
-  }
+  };
 
-  export interface contentNode extends XPCOM.nsIDOMNode {
+  export type contentNode = XPCOM.nsIDOMNode & Node & {
     ownerDocument: contentDocument;
   }
 

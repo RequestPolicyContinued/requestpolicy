@@ -107,6 +107,18 @@ export class RequestProcessor extends Module {
     };
   }
 
+  protected get startupPreconditions() {
+    return [
+      this.rpPolicy.whenReady,
+      this.httpChannelService.whenReady,
+      this.requestService.whenReady,
+      this.uriService.whenReady,
+      this.cachedSettings.whenReady,
+      this.requestMemory.whenReady,
+      this.mm.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,

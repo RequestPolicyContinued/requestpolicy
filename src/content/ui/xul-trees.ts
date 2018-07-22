@@ -21,14 +21,20 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global exports: true, C, appID */
+/// <reference path="../lib/utils/xul-utils.d.ts" />
+
+import { C as C_ } from "data/constants";
+
+declare const C: typeof C_;
+declare const appID: string;
+declare const exports: IMaybeIncompleteXulTreeLists;
+
+// tslint:disable:object-literal-sort-keys
+// tslint:disable:max-line-length
 
 // differences in seamonkey:
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
-let isSeamonkey = appID === C.SEAMONKEY_ID;
-
-/* eslint-disable max-len */
-/* eslint-disable indent */
+const isSeamonkey = appID === C.SEAMONKEY_ID;
 
 exports.toolbarbutton = [
   {

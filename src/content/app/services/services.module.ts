@@ -29,6 +29,7 @@ export class RPServices extends Module {
       log: Common.ILog,
       public readonly httpChannel: App.services.IHttpChannelService,
       public readonly request: App.services.IRequestService,
+      public readonly requestSet: App.services.IRequestSetService,
       public readonly rules: App.services.IRulesServices,
       public readonly uri: App.services.IUriService,
       public readonly versionInfo: App.services.IVersionInfoService,
@@ -40,6 +41,7 @@ export class RPServices extends Module {
     return {
       httpChannel: this.httpChannel,
       request: this.request,
+      requestSet: this.requestSet,
       rules: this.rules,
       uri: this.uri,
       versionInfo: this.versionInfo,

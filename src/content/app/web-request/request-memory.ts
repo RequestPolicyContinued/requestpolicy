@@ -40,6 +40,13 @@ export class RequestMemory extends Module {
   private readonly eventListenersMap: {[key: string]: Listeners};
   public get onRequest() { return this.eventTargets.onRequest; }
 
+  protected get startupPreconditions() {
+    return [
+      this.requestSetService.whenReady,
+      this.uriService.whenReady,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
       private readonly requestSetService: App.services.IRequestSetService,

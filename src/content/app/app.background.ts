@@ -210,6 +210,7 @@ const uriService = new UriService(
 const requestService = new RequestService(
     log, httpChannelService, uriService, cachedSettings,
 );
+const requestSetService = new RequestSetService(log, uriService);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -226,6 +227,7 @@ const rpServices = new RPServices(
     log,
     httpChannelService,
     requestService,
+    requestSetService,
     rulesServices,
     uriService,
     versionInfoService,
@@ -250,7 +252,6 @@ const initialSetup = new InitialSetup(
 const ui = new Ui(log, initialSetup);
 
 const metadataMemory = new MetadataMemory(log);
-const requestSetService = new RequestSetService(log, uriService);
 const requestMemory = new RequestMemory(log, requestSetService, uriService);
 const requestProcessor = new RequestProcessor(
     log,

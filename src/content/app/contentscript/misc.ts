@@ -41,6 +41,19 @@ export class ContentscriptMisc extends Module {
     reloadDocument: this.reloadDocument.bind(this),
   };
 
+  protected get subModules() {
+    return {
+      eventListener: this.eventListener,
+    };
+  }
+
+  protected get startupPreconditions() {
+    return [
+      this.bgCommunication.whenReady,
+      this.msgListener.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
@@ -115,12 +128,6 @@ export class ContentscriptMisc extends Module {
       });
       return;
     }
-  }
-
-  protected get subModules() {
-    return {
-      eventListener: this.eventListener,
-    };
   }
 
   protected startupSelf() {

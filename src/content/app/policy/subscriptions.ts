@@ -49,6 +49,12 @@ export class Subscriptions extends Module {
   private subscriptionRulesets: SubscriptionRulesets = {};
   private events = createListenersMap(["onRulesChanged"]);
 
+  protected get startupPreconditions() {
+    return [
+      this.rulesetStorage.whenReady,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
       private rulesetStorage: RulesetStorage,

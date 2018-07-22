@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
@@ -42,7 +43,7 @@ enum HostLevel {
   SOP = 3,
 }
 
-export class UriService extends Module {
+export class UriService extends Module implements App.services.IUriService {
   public get hostLevels() { return HostLevel; }
 
   constructor(

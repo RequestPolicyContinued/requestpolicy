@@ -20,18 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {
-  COMMONJS_UNLOAD_SUBJECT,
-} from "legacy/lib/commonjs-unload-subject";
-
 // @if BUILD_ALIAS='ui-testing'
 import "ui-testing/services";
 // @endif
 
-import { rp } from "app/app.content";
-import { log } from "app/log";
-import { JSMs } from "bootstrap/api/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { contentWindowHasAssociatedTab } from "lib/utils/window-utils";
 
+declare const cfmm: XPCOM.nsIContentFrameMessageManager;
 declare const Services: JSMs.Services;
 
 function logSevereError(aMessage: string, aError: any) {
@@ -39,30 +35,45 @@ function logSevereError(aMessage: string, aError: any) {
   console.dir(aError);
 }
 
-// =============================================================================
-// shutdown
-// =============================================================================
+if (contentWindowHasAssociatedTab(cfmm.content)) {
+  Promise.all([
+    import("legacy/lib/commonjs-unload-subject"),
+    import("app/app.content"),
+    import("app/log"),
+  ]).then(([
+    { COMMONJS_UNLOAD_SUBJECT },
+    { rp },
+    { log },
+  ]) => {
+    // =========================================================================
+  // shutdown
+    // =========================================================================
 
-// shut down the framescript on the message manager"s
-// `unload`. That event will occur when the browsing context
-// (e.g. the tab) has been closed.
+  // shut down the framescript on the message manager"s
+  // `unload`. That event will occur when the browsing context
+  // (e.g. the tab) has been closed.
 
-const observer = {
-  observe(subject: any, topic: any, reason: any) {
-    if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
-      try {
-        rp.shutdown().catch(log.onError("framescript shutdown"));
-      } catch (e) {
-        logSevereError("framescript shutdown() failed!", e);
+  const observer = {
+    observe(subject: any, topic: any, reason: any) {
+      if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
+        try {
+          rp.shutdown().catch(log.onError("framescript shutdown"));
+        } catch (e) {
+          logSevereError("framescript shutdown() failed!", e);
+        }
       }
-    }
-  },
-};
+    },
+  };
 
-Services.obs.addObserver(observer, "sdk:loader:destroy", false);
+  Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 
-// =============================================================================
-// start up
-// =============================================================================
+    // =========================================================================
+  // start up
+    // =========================================================================
 
-rp.startup().catch(log.onError("framescript startup"));
+  rp.startup().catch(log.onError("framescript startup failed"));
+  }).catch((e) => {
+    console.error("framescript startup failed");
+    console.dir(e);
+  });
+}

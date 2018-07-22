@@ -84,6 +84,14 @@ const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
 ];
 
 export class RequestService extends Module {
+  protected get startupPreconditions() {
+    return [
+      this.httpChannelService.whenReady,
+      this.uriService.whenReady,
+      this.cachedSettings.whenReady,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
       private httpChannelService: App.services.IHttpChannelService,

@@ -62,7 +62,9 @@ import { XulTrees } from "app/windows/window/xul-trees";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
+import { EventListenerModule } from "lib/classes/event-listener-module";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
+import { MessageListenerModule } from "lib/classes/message-listener-module";
 import { NormalRequest, RedirectRequest } from "lib/classes/request";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
@@ -398,6 +400,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
     window: XUL.chromeWindow,
 ) => {
   const windowID = getDOMWindowUtils(window).outerWindowID;
+  const moduleNamePrefix = `app.chromeWindow[${windowID}]`;
   const classicMenu = new ClassicMenu(
       log,
       windowID,
@@ -429,6 +432,14 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       menu,
       overlayWrapper,
   );
+
+  const eventListener = new EventListenerModule(moduleNamePrefix, log);
+  const msgListener = new MessageListenerModule(
+      moduleNamePrefix,
+      log,
+      window.messageManager,
+  );
+
   const overlay = new Overlay(
       log,
       windowID,
@@ -441,12 +452,14 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       browser.storage,
       classicMenu,
       menu,
+      eventListener,
       privateBrowsingService,
       uriService,
       policy,
       cachedSettings,
       requestMemory,
       requestProcessor,
+      msgListener,
       xulTrees,
   );
   overlayWrapper.module = overlay;
@@ -462,6 +475,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       window,
       LegacyApi.createPrefObserver,
       cachedSettings,
+      xulTrees,
       id,
       defaultCombo,
       callback,
@@ -484,11 +498,16 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
   return new WindowModule(
       log,
       windowID,
+      window,
       classicMenu,
+      eventListener,
       keyboardShortcuts,
       menu,
+      msgListener,
       overlay,
       nonAustralisToolbarButton,
+      xulTrees,
+      windowService,
   );
 };
 const chromeStyleSheets = new ChromeStyleSheets(

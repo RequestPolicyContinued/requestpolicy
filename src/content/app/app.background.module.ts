@@ -51,6 +51,7 @@ export class AppBackground extends Module {
       storage: this.storage,
       ui: this.ui,
       webRequest: this.webRequest,
+      windows: this.windows,
     };
   }
 }

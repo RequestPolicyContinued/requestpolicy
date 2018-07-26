@@ -21,7 +21,7 @@
  */
 
 import { App } from "app/interfaces";
-import { API } from "bootstrap/api/interfaces";
+import { API, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
@@ -29,22 +29,39 @@ export class WindowModule extends Module {
   protected get subModules() {
     return {
       classicMenu: this.classicMenu,
+      eventListener: this.eventListener,
       keyboardShortcuts: this.keyboardShortcuts,
       menu: this.menu,
+      msgListener: this.msgListener,
       overlay: this.overlay,
       toolbarButton: this.toolbarButton,
+      xulTrees: this.xulTrees,
     };
+  }
+
+  protected get startupPreconditions() {
+    return [
+      // FIXME !! (promiseTabBrowser)
+      // (what is the event we need to listen for?)
+      this.windowService.promiseTabBrowser(this.window).then(() => undefined),
+    ];
   }
 
   constructor(
       parentLog: Common.ILog,
       public readonly windowID: number,
+      private window: XUL.chromeWindow,
 
-      private classicMenu: App.windows.window.IClassicMenu,
-      private keyboardShortcuts: API.windows.window.IKeyboardShortcuts,
-      private menu: App.windows.window.IMenu,
-      private overlay: App.windows.window.IOverlay,
-      private toolbarButton: App.windows.window.IToolbarButton,
+      private readonly classicMenu: App.windows.window.IClassicMenu,
+      private readonly eventListener: App.common.IEventListenerModule,
+      private readonly keyboardShortcuts: API.windows.window.IKeyboardShortcuts,
+      private readonly menu: App.windows.window.IMenu,
+      private readonly msgListener: App.windows.window.IMessageListenerModule,
+      private readonly overlay: App.windows.window.IOverlay,
+      private readonly toolbarButton: App.windows.window.IToolbarButton,
+      private readonly xulTrees: App.windows.window.IXulTrees,
+
+      private readonly windowService: App.services.IWindowService,
   ) {
     super(`app.windows[${windowID}]`, parentLog);
   }

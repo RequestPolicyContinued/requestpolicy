@@ -26,8 +26,6 @@ import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import { BoundMethods } from "lib/classes/bound-methods";
-import { EventListenerModule } from "lib/classes/event-listener-module";
-import { MessageListenerModule } from "lib/classes/message-listener-module";
 import { Module } from "lib/classes/module";
 import * as DOMUtils from "lib/utils/dom-utils";
 import { arrayIncludes, leftRotateArray, range } from "lib/utils/js-utils";
@@ -58,6 +56,8 @@ function onOpenLinkViaContextMenu(
 // tslint:disable:member-ordering
 
 export class Overlay extends Module implements App.windows.window.IOverlay {
+  // protected get debugEnabled() { return true; }
+
   private readonly onOpenLinkViaContextMenu = onOpenLinkViaContextMenu.bind(
       null,
       this.window,
@@ -76,18 +76,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   // This is set by the request log when it is initialized.
   // We don't need to worry about setting it here.
   public requestLog: any = null;
-
-  private msgListener = new MessageListenerModule<
-      XUL.chromeWindow["messageManager"]
-  >(
-      `app.chromeWindow[${this.winID}].contentSide.msgListener`,
-      this.parentLog,
-      this.window.messageManager,
-  );
-
-  private eventListener = new EventListenerModule(
-      this.moduleName, this.parentLog,
-  );
 
   private toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 
@@ -108,8 +96,22 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private needsReloadOnMenuClose: boolean;
 
   protected readonly document = this.window.document;
-  protected readonly gBrowser = WindowUtils.getTabBrowser(this.window)!;
+  protected get gBrowser() { return WindowUtils.getTabBrowser(this.window)!; }
   protected get $str() { return this.i18n.getMessage.bind(browser.i18n); }
+
+  protected get startupPreconditions() {
+    return [
+      this.eventListener.whenReady,
+      this.privateBrowsingService.whenReady,
+      this.uriService.whenReady,
+      this.policy.whenReady,
+      this.cachedSettings.whenReady,
+      this.requestMemory.whenReady,
+      this.requestProcessor.whenReady,
+      this.msgListener.whenReady,
+      this.xulTrees.whenReady,
+    ];
+  }
 
   constructor(
       parentLog: Common.ILog,
@@ -127,6 +129,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly classicmenu: App.windows.window.IClassicMenu,
       private readonly menu: App.windows.window.IMenu,
 
+      private readonly eventListener: App.common.IEventListenerModule,
       private readonly privateBrowsingService:
           App.services.IPrivateBrowsingService,
       private readonly uriService: App.services.IUriService,
@@ -134,6 +137,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly requestProcessor: App.webRequest.IRequestProcessor,
+      private readonly msgListener: App.windows.window.IMessageListenerModule,
       private readonly xulTrees: App.windows.window.IXulTrees,
   ) {
     super(`app.windows[${windowID}]`, parentLog);
@@ -177,12 +181,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private setContextMenuEntryEnabled(isEnabled: boolean) {
     const contextMenuEntry = this.$id("rpcontinuedContextMenuEntry");
     contextMenuEntry!.setAttribute("hidden", String(!isEnabled));
-  }
-
-  protected get startupPreconditions() {
-    return [
-      this.xulTrees.whenReady,
-    ];
   }
 
   protected startupSelf() {
@@ -875,7 +873,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
    */
   private tabAdded(
       aURI: string,
-      aReferrerURI: XPCOM.nsIURI| {referrerURI: XPCOM.nsIURI},
+      aReferrerURI: XPCOM.nsIURI | {referrerURI: XPCOM.nsIURI},
   ) {
     let referrerURI: XPCOM.nsIURI;
 

@@ -63,8 +63,8 @@ export function getTabBrowser(
 ): XUL.tabBrowser | null {
   // bug 1009938 - may be null in SeaMonkey
   return aChromeWindow.gBrowser || (
-    "getBrowser" in aChromeWindow && aChromeWindow.getBrowser() || null
-  );
+    "getBrowser" in aChromeWindow && aChromeWindow.getBrowser()
+  ) || null;
 }
 
 export function getTabsForWindow(

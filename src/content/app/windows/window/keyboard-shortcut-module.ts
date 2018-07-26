@@ -56,7 +56,8 @@ const ELEMENT_ATTRIBUTES_WHEN_DISABLED: IElementAttributes = {
  * - set element attributes (all windows)
  */
 
-export class KeyboardShortcutModule extends Module {
+export class KeyboardShortcutModule extends Module
+    implements API.windows.window.IKeyboardShortcutModule {
   private elementID = `rpKey_${this.id}`;
 
   private elementAttributes: IElementAttributes = {
@@ -68,12 +69,20 @@ export class KeyboardShortcutModule extends Module {
   private boundMethods = new BoundMethods(this);
   private prefObserver = this.createPrefObserver();
 
+  protected get startupPreconditions() {
+    return [
+      this.cachedSettings.whenReady,
+      this.xulTrees.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       windowID: number,
       private window: XUL.chromeWindow,
       private readonly createPrefObserver: API.storage.PrefObserverFactory,
       private readonly cachedSettings: App.storage.ICachedSettings,
+      private readonly xulTrees: App.windows.window.IXulTrees,
       private id: string,
       private defaultCombo: string,
       private callback: (window: XUL.chromeWindow) => void,
@@ -81,7 +90,7 @@ export class KeyboardShortcutModule extends Module {
       private userComboPrefName: string,
   ) {
     super(
-        `app.windows.window[${windowID}].keyboardShortcut[${id}]`,
+        `app.windows.window[${windowID}].keyboardShortcut.${id}`,
         parentLog,
     );
   }

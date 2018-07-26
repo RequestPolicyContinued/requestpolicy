@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
@@ -36,16 +37,16 @@ interface IMessageListenerWrapper {
 
 export class MessageListenerModule<
     T extends XPCOM.nsIMessageListenerManager
-> extends Module {
+> extends Module implements App.common.IMessageListenerModule<T> {
   private listeners: IMessageListenerWrapper[] = [];
   private addNewListenersImmediately = false;
 
   constructor(
-      moduleName: string,
+      parentModuleName: string,
       parentLog: Common.ILog,
       private readonly mm: T,
   ) {
-    super(moduleName, parentLog);
+    super(`${parentModuleName}.msgListener`, parentLog);
   }
 
   public addListener(

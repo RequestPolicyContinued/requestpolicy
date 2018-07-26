@@ -43,6 +43,7 @@ export type ShutdownState =
 
 export abstract class Module implements IModule {
   protected log: Common.ILog;
+  protected get debugEnabled() { return false; }
   protected debugLog: Common.ILog;
 
   protected get subModules(): {[key: string]: IModule} | undefined {
@@ -108,7 +109,7 @@ export abstract class Module implements IModule {
       protected parentLog: Common.ILog,
   ) {
     this.log = parentLog.extend({name: moduleName});
-    this.debugLog = this.log.extend({enabled: false, level: "all"});
+    this.debugLog = this.log.extend({enabled: this.debugEnabled, level: "all"});
 
     this.creationTime = new Date().getTime();
     setTimeout(() => {
@@ -192,10 +193,10 @@ export abstract class Module implements IModule {
   }
 
   private async startup_(): Promise<void> {
-    if (this.startupPreconditions.length !== 0) {
-      const n = this.startupPreconditions.length;
+    const nPrecond = this.startupPreconditions.length;
+    if (nPrecond !== 0) {
       this.debugLog.log(
-          `awaiting ${n} precondition${ n > 1 ? "s" : "" }...`,
+          `awaiting ${nPrecond} precondition${ nPrecond > 1 ? "s" : "" }...`,
       );
       await Promise.all(this.startupPreconditions);
       this.debugLog.log("done awaiting preconditions");

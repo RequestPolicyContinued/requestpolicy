@@ -73,9 +73,7 @@ export class FramescriptToBackgroundCommunication extends Module {
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
       private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
-      private readonly msgListener: App.utils.IMessageListener<
-          XPCOM.nsIContentFrameMessageManager
-      >,
+      private readonly msgListener: App.contentSide.IMessageListenerModule,
   ) {
     super(
         `AppContent[${outerWindowID}].contentSide.bgCommunication`,

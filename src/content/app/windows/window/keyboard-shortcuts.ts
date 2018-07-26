@@ -26,7 +26,10 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class KeyboardShortcuts extends Module {
-  protected readonly subModules = {
+  // protected get debugEnabled() { return true; }
+
+  // tslint:disable-next-line:variable-name
+  private readonly _subModules = {
     openMenu: this.generateKeyboardShortcut(
         "openMenu",
         "alt shift r",
@@ -42,6 +45,16 @@ export class KeyboardShortcuts extends Module {
         "keyboardShortcuts.openRequestLog.combo",
     ),
   };
+
+  protected get subModules() {
+    return this._subModules;
+  }
+
+  protected get startupPreconditions() {
+    return [
+      this.rpOverlay.whenReady,
+    ];
+  }
 
   constructor(
       parentLog: Common.ILog,

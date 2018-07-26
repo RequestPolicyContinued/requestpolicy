@@ -73,6 +73,7 @@ import { WindowModule } from "./windows/window/window.module";
 import { XulTrees } from "./windows/window/xul-trees";
 import { Windows } from "./windows/windows.module";
 import { AboutUri } from "app/runtime/about-uri";
+import { EventListenerModule } from "lib/classes/event-listener-module";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -85,9 +86,7 @@ export namespace App {
     export type IManagerForBlockedContent = ManagerForBlockedContent;
     export type IManagerForDOMContentLoaded = ManagerForDOMContentLoaded;
 
-    export type ICSMessageListener = App.utils.IMessageListener<
-        XPCOM.nsIContentFrameMessageManager
-    >;
+    export type IMessageListenerModule = MessageListenerModule<XPCOM.nsIContentFrameMessageManager>;
   }
 
   export namespace framescripts {
@@ -147,6 +146,7 @@ export namespace App {
       export type IOverlay = Overlay;
       export type IToolbarButton = NonAustralisToolbarButton;
       export type IXulTrees = XulTrees;
+      export type IMessageListenerModule = MessageListenerModule<XUL.chromeWindow["messageManager"]>;
     }
 
     export type IChromeStyleSheets = ChromeStyleSheets;
@@ -168,8 +168,12 @@ export namespace App {
   export type IWebRequest = WebRequest;
   export type IWindows = Windows;
 
+  export namespace common {
+    export type IEventListenerModule = EventListenerModule;
+    export type IMessageListenerModule<T extends XPCOM.nsIMessageListenerManager> = MessageListenerModule<T>;
+  }
+
   export namespace utils {
-    export type IMessageListener<T extends XPCOM.nsIMessageManager> = MessageListenerModule<T>;
     export type IWindowUtils = typeof WindowUtils;
   }
 }

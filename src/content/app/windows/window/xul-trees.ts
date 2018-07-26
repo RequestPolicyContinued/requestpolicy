@@ -29,6 +29,12 @@ import * as XULUtils from "lib/utils/xul-utils";
 export class XulTrees extends Module {
   private get overlay() { return this.overlayWrapper.module!; }
 
+  protected get startupPreconditions() {
+    return [
+      Promise.resolve(),
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly windowID: number,

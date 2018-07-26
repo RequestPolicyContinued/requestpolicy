@@ -259,7 +259,14 @@ function recursivelyAddXULElements(
       continue;
     }
     if (parentElement === null) {
-      console.error(`parentElement of '${elementSpec.attributes.id}' is null!`);
+      console.error(
+          `parentElement of '${elementSpec.attributes.id}' ` +
+          `(tag: '${elementSpec.tag}') is null!`);
+      const specDebug = Object.assign({}, elementSpec);
+      delete specDebug.attributes;
+      delete specDebug.children;
+      delete specDebug.events;
+      console.dir(specDebug);
       continue;
     }
 

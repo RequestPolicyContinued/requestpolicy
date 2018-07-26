@@ -49,7 +49,7 @@ const {outerWindowID} = domWindowUtils;
 const storageReadyPromise = Promise.resolve();
 
 const msgListener = new MessageListenerModule(
-    `AppContent[${outerWindowID}].contentSide.msgListener`,
+    `AppContent[${outerWindowID}].contentSide`,
     log,
     cfmm,
 );

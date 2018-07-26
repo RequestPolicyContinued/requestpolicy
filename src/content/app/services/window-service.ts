@@ -25,12 +25,15 @@ import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { promiseObserverTopic } from "legacy/lib/utils/xpcom-utils";
 import { Module } from "lib/classes/module";
+import { defer } from "lib/utils/js-utils";
 import { createListenersMap } from "lib/utils/listener-factories";
 import { getDOMWindowFromXULWindow } from "lib/utils/window-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 
 export class WindowService extends Module
     implements App.services.IWindowService {
+  // protected get debugEnabled() { return true; }
+
   public readonly pWindowsAvailable = this.areWindowsAvailable() ?
       Promise.resolve() : this.promiseSessionstoreWindowsRestored();
 
@@ -99,6 +102,29 @@ export class WindowService extends Module
     return this.windowMediator.getMostRecentWindow("navigator:browser") as any;
   }
 
+  public promiseTabBrowser(
+      aChromeWindow: XUL.chromeWindow,
+  ): Promise<XUL.tabBrowser> {
+    const d = defer<XUL.tabBrowser>();
+    let n = 100;
+
+    const step = () => {
+      const tabBrowser = WindowUtils.getTabBrowser(aChromeWindow);
+      if (tabBrowser === null) {
+        if (n-- === 0) {
+          this.log.error(`window has no tabBrowser`);
+          return;
+        }
+        setTimeout(step, 10);
+      } else {
+        d.resolve(tabBrowser);
+      }
+    };
+    step();
+
+    return d.promise;
+  }
+
   protected startupSelf() {
     this.windowMediator.addListener(this.windowMediatorListener);
     return Promise.resolve();
@@ -126,10 +152,12 @@ export class WindowService extends Module
     }
     switch (event.type) {
       case "load":
+        this.debugLog.log(`window "load" event'`);
         this.events.listenersMap.onWindowLoaded.emit(event);
         break;
 
       case "unload":
+        this.debugLog.log(`window "unload" event'`);
         this.events.listenersMap.onWindowUnloaded.emit(event);
         this.windows.delete(domWindow);
         break;

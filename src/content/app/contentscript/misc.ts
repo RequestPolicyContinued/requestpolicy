@@ -60,9 +60,7 @@ export class ContentscriptMisc extends Module {
       private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
       private readonly bgCommunication:
           App.contentSide.ICommunicationToBackground,
-      private readonly msgListener: App.utils.IMessageListener<
-          XPCOM.nsIContentFrameMessageManager
-      >,
+      private readonly msgListener: App.contentSide.IMessageListenerModule,
   ) {
     super(`AppContent[${outerWindowID}].contentSide.misc`, parentLog);
   }

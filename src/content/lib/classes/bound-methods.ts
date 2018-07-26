@@ -20,15 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-export class BoundMethods {
-  private map = new Map();
+export class BoundMethods<TTarget> {
+  private map = new Map<Function, Function>();
 
-  constructor(private target: any) {}
+  constructor(private target: TTarget) {}
 
   public get<T extends Function>(fn: T): T {
     if (!this.map.has(fn)) {
       this.map.set(fn, fn.bind(this.target));
     }
-    return this.map.get(this.target);
+    return this.map.get(fn) as T;
   }
 }

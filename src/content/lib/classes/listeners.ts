@@ -37,11 +37,17 @@ export class Listeners extends OverridableSet<Listener> {
     removeListener: this.delete.bind(this),
   };
 
+  public add(listener: Listener) {
+    if (typeof listener !== "function") {
+      throw new Error(`'${listener}' is not a function!`);
+    }
+    return super.add(listener);
+  }
+
   public emit(...args: any[]) {
     const returnValues: any[] = [];
     let withPromises = false;
-    // tslint:disable-next-line prefer-const
-    for (let listener of this.values()) {
+    for (const listener of this.values()) {
       const rv: any = listener(...args);
       if (rv && typeof rv.then === "function") {
         withPromises = true;

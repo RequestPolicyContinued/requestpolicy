@@ -200,6 +200,7 @@ const mozIDNService = whenLegacy(() => xpconnectService!.getIDNService());
 const mozPromptService = whenLegacy(() => xpconnectService!.getPromptService());
 const mozStyleSheetService = whenLegacy(() =>
     xpconnectService!.getStyleSheetService());
+const mozXulAppInfo = whenLegacy(() => xpconnectService!.getXULAppInfo());
 
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
@@ -447,6 +448,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       Cc,
       Ci,
       Cr,
+      mozXulAppInfo!,  // fixme
       browser.i18n,
       browser.runtime,
       browser.storage,

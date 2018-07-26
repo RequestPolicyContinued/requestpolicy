@@ -73,6 +73,11 @@ export class XPConnectService {
         getService(Ci.nsIStyleSheetService);
   }
 
+  public getXULAppInfo(): XPCOM.nsIXULAppInfo {
+    return Cc["@mozilla.org/xre/app-info;1"].
+        getService<XPCOM.nsIXULAppInfo>(Ci.nsIXULAppInfo);
+  }
+
   // other
 
   public getComponentRegistrar(): XPCOM.nsIComponentRegistrar {

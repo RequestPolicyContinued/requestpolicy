@@ -58,26 +58,28 @@ export class Windows extends Module {
   }
 
   protected startupSelf() {
-    const promises = this.windowService.forEachOpenWindow<
-        Windows,
-        Promise<void>
-    >(this.loadIntoWindow.bind(this));
-    this.windowService.onWindowLoaded.
-        addListener(this.loadIntoWindow.bind(this));
-    this.windowService.onWindowUnloaded.
-        addListener(this.unloadFromWindow.bind(this));
+    const promises = this.windowService.
+        forEachOpenWindow<Windows, Promise<void>>(
+            this.boundMethods.get(this.loadIntoWindow),
+        );
+    this.windowService.onWindowLoaded.addListener(
+        this.boundMethods.get(this.loadIntoWindow),
+    );
+    this.windowService.onWindowUnloaded.addListener(
+        this.boundMethods.get(this.unloadFromWindow),
+    );
     return Promise.all(promises).then(() => undefined);
   }
 
   protected shutdownSelf() {
-    const rvs = this.windowService.forEachOpenWindow<
-        Windows,
-        Promise<void>
-    >(this.unloadFromWindow.bind(this));
+    const rvs = this.windowService.
+        forEachOpenWindow<Windows, Promise<void>>(
+            this.boundMethods.get(this.unloadFromWindow),
+        );
     return Promise.all(rvs).then(() => undefined);
   }
 
-  private loadIntoWindow(window: XPCOM.nsIDOMWindow) {
+  private loadIntoWindow(window: XPCOM.nsIDOMWindow): Promise<void> {
     const domWindowUtils = getDOMWindowUtils(window as any);
     const {outerWindowID} = domWindowUtils;
     if (this.windowModules.has(outerWindowID)) {
@@ -86,16 +88,15 @@ export class Windows extends Module {
     }
     const windowModule = this.createWindowModule(window);
     this.windowModules.set(outerWindowID, windowModule);
-    windowModule.startup().
-        catch(this.log.onError(`Window #${outerWindowID} startup.`));
+    return windowModule.startup();
   }
 
-  private unloadFromWindow(window: XPCOM.nsIDOMWindow) {
+  private unloadFromWindow(window: XPCOM.nsIDOMWindow): Promise<void> {
     const domWindowUtils = getDOMWindowUtils(window as any);
     const {outerWindowID} = domWindowUtils;
     if (!this.windowModules.has(outerWindowID)) {
       this.log.error(`Window #${outerWindowID} not loaded.`);
-      return;
+      return Promise.resolve();
     }
     const windowModule = this.windowModules.get(outerWindowID)!;
     return windowModule.shutdown();

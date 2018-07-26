@@ -135,7 +135,10 @@ export function getBrowserFromLoadContext(
   }
 }
 
-export function addSessionHistoryListener(gBrowser: any, listener: any): RV {
+export function addSessionHistoryListener(
+    gBrowser: XUL.tabBrowser,
+    listener: XPCOM.nsISHistoryListener,
+): RV<null> {
   try {
     gBrowser.webNavigation.sessionHistory.addSHistoryListener(listener);
     return value(null);
@@ -146,8 +149,8 @@ export function addSessionHistoryListener(gBrowser: any, listener: any): RV {
 
 export function removeSessionHistoryListener(
     gBrowser: XUL.tabBrowser,
-    listener: any,
-): RV {
+    listener: XPCOM.nsISHistoryListener,
+): RV<null> {
   try {
     gBrowser.webNavigation.sessionHistory.removeSHistoryListener(listener);
     return value(null);

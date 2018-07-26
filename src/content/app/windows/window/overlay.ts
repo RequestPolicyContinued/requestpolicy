@@ -118,9 +118,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       windowID: number,
       private window: XUL.chromeWindow,
 
-      private cc: XPCOM.nsXPCComponents_Classes,
-      private ci: XPCOM.nsXPCComponents_Interfaces,
-      private cr: XPCOM.nsXPCComponents_Results,
+      private readonly cc: XPCOM.nsXPCComponents_Classes,
+      private readonly ci: XPCOM.nsXPCComponents_Interfaces,
+      private readonly cr: XPCOM.nsXPCComponents_Results,
+      private readonly xulAppInfo: XPCOM.nsIXULAppInfo,
 
       private readonly i18n: typeof browser.i18n,
       private readonly runtime: typeof browser.runtime,
@@ -140,7 +141,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly msgListener: App.windows.window.IMessageListenerModule,
       private readonly xulTrees: App.windows.window.IXulTrees,
   ) {
-    super(`app.windows[${windowID}]`, parentLog);
+    super(`app.windows[${windowID}].overlay`, parentLog);
   }
 
   private get popupElement(): XUL.menupopup {
@@ -150,8 +151,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private setTimeout(aFn: () => void, aDelay: number) {
     return setTimeout(() => {
       if (this.shutdownState !== "not yet shut down") {
-        console.log("[RequestPolicy] Not calling delayed function " +
-            "because of add-on shutdown.");
+        console.log(
+            "[RequestPolicy] Not calling delayed function " +
+            "because of add-on shutdown.",
+        );
         return;
       }
       aFn.call(null);
@@ -244,9 +247,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // statusbar = $id("status-bar");
     // toolbox = $id("navigator-toolbox");
 
-    const xulAppInfo = this.cc["@mozilla.org/xre/app-info;1"].
-        getService<XPCOM.nsIXULAppInfo>(this.ci.nsIXULAppInfo);
-    this.isFennec = xulAppInfo.name === "Fennec";
+    this.isFennec = this.xulAppInfo.name === "Fennec";
 
     promises.push(this.runtime.getBrowserInfo().then((appInfo) => {
       if (appInfo.name === "Fennec") {
@@ -257,8 +258,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       }
       return;
     }).catch((e) => {
-      console.error("Error on Fennec detection. Details:");
-      console.dir(e);
+      this.log.error("Error on Fennec detection. Details:", e);
     }));
 
     // Register this window with the requestpolicy service so that we can be
@@ -666,9 +666,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
       return Promise.resolve();
     }).catch((e) => {
-      console.error("[SEVERE] " +
-          "Unable to complete 'updateBlockedContentState' actions. Details:");
-      console.dir(e);
+      this.log.error(
+          "[SEVERE] " +
+          "Unable to complete 'updateBlockedContentState' actions. Details:",
+          e,
+      );
     });
   }
 
@@ -797,8 +799,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   private wrapFunctionErrorCallback(aMessage: string, aError: any) {
-    console.error(aMessage);
-    console.dir(aError);
+    this.log.error(aMessage, aError);
   }
 
   /**
@@ -968,9 +969,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
       const e = result.error;
       if (tries >= maxTries) {
-        console.error(`${"[SEVERE] Can't add session history listener, even " +
-            "after "}${tries} tries. Details:`);
-        console.dir(e);
+        this.log.error(
+            `[SEVERE] Can't add session history listener, even ` +
+            `after ${tries} tries. Details:`,
+            e,
+        );
       } else {
         // call this function again in a few miliseconds.
         this.setTimeout(() => {

@@ -41,7 +41,7 @@ export class WindowModule extends Module {
       public readonly windowID: number,
 
       private classicMenu: App.windows.window.IClassicMenu,
-      private keyboardShortcuts: API.windows.window.IKeyboardShortcutModule,
+      private keyboardShortcuts: API.windows.window.IKeyboardShortcuts,
       private menu: App.windows.window.IMenu,
       private overlay: App.windows.window.IOverlay,
       private toolbarButton: App.windows.window.IToolbarButton,

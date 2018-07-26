@@ -965,6 +965,7 @@ export namespace XPCOM {
     "@mozilla.org/appshell/appShellService;1": XPCOM.nsIJSCID;
     "@mozilla.org/categorymanager;1": XPCOM.nsIJSCID;
     "@mozilla.org/content/style-sheet-service;1": XPCOM.nsIJSCID;
+    "@mozilla.org/embedcomp/prompt-service;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
@@ -1019,6 +1020,7 @@ export namespace XPCOM {
     nsILoadContext: XPCOM.nsIJSID;
     nsIObserver: XPCOM.nsIJSID;
     nsIPrefBranch2: XPCOM.nsIJSID;
+    nsIPromptService: XPCOM.nsIJSID;
     nsISHistoryListener: XPCOM.nsIJSID;
     nsIStyleSheetService: XPCOM.nsIJSID;
     nsISupports: XPCOM.nsIJSID;
@@ -1079,7 +1081,7 @@ export namespace JSMs {
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm
   type WidgetGroupWrapper = any;
-  export interface ICustomizableUI {
+  export interface CustomizableUI {
     AREA_NAVBAR: "nav-bar";
     createWidget(aWidgetSpecification: any): WidgetGroupWrapper;
     destroyWidget(aWidgetId: any): void;
@@ -1365,9 +1367,10 @@ import {
 import { PrefObserver } from "./storage/pref-observer";
 import { Storage } from "./storage/storage.module";
 import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
-import { KeyboardShortcutModule } from "app/windows/window/keyboard-shortcut-module";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
+import { KeyboardShortcutModule } from "app/windows/window/keyboard-shortcut-module";
+import { KeyboardShortcuts } from "app/windows/window/keyboard-shortcuts";
 
 export namespace API {
   export namespace extension {
@@ -1416,6 +1419,7 @@ export namespace API {
 
   export namespace windows {
     export namespace window {
+      export type IKeyboardShortcuts = KeyboardShortcuts;
       export type IKeyboardShortcutModule = KeyboardShortcutModule;
       export type KeyboardShortcutFactory = (
           id: string,

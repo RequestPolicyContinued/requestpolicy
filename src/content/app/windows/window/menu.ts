@@ -123,6 +123,8 @@ export class Menu extends Module implements App.windows.window.IMenu {
   protected readonly gBrowser = WindowUtils.getTabBrowser(this.window)!;
   protected get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
+  private get overlay() { return this.overlayWrapper.module!; }
+
   constructor(
       parentLog: Common.ILog,
       windowID: number,
@@ -132,7 +134,9 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
       private i18n: typeof browser.i18n,
 
-      private readonly overlay: App.windows.window.IOverlay,
+      private readonly overlayWrapper: {
+        module: App.windows.window.IOverlay | null;
+      },
 
       private readonly privateBrowsingService:
           App.services.IPrivateBrowsingService,

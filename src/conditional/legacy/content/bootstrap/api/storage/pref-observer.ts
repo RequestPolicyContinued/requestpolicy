@@ -21,7 +21,7 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
-import {MapOfSets} from "lib/classes/map-of-sets";
+import { MapOfSets } from "lib/classes/map-of-sets";
 
 type Listener = (prefName: string) => void;
 

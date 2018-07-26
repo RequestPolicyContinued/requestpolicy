@@ -27,6 +27,8 @@ import { Module } from "lib/classes/module";
 import * as XULUtils from "lib/utils/xul-utils";
 
 export class XulTrees extends Module {
+  private get overlay() { return this.overlayWrapper.module!; }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly windowID: number,
@@ -34,7 +36,9 @@ export class XulTrees extends Module {
 
       private readonly classicmenu: App.windows.window.IClassicMenu,
       private readonly menu: App.windows.window.IMenu,
-      private readonly overlay: App.windows.window.IOverlay,
+      private readonly overlayWrapper: {
+        module: App.windows.window.IOverlay | null;
+      },
   ) {
     super(
         `app.windows[${windowID}].xulTrees`,

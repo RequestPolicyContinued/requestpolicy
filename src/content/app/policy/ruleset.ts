@@ -178,6 +178,13 @@ export class RawRuleset implements IRawRuleset {
   public readonly metadata: IMetadata;
   public readonly entries: IRuleSpecs;
 
+  public get data() {
+    return {
+      entries: this.entries,
+      metadata: this.metadata,
+    };
+  }
+
   constructor(
       private log: Common.ILog,
       private uriService: App.services.IUriService,

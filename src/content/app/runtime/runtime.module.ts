@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Connection } from "lib/classes/connection";
 import { IModule, Module } from "lib/classes/module";
@@ -36,6 +37,7 @@ export class Runtime extends Module {
   constructor(
       log: Common.ILog,
       public readonly pEWEConnection: Promise<Connection<any, any> | null>,
+      private readonly aboutUri: App.runtime.IAboutUri,
   ) {
     super("app.runtime", log);
     pEWEConnection.then((m) => this.eweConnection = m).
@@ -43,7 +45,9 @@ export class Runtime extends Module {
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {};
+    const rv: {[k: string]: IModule} = {
+      aboutUri: this.aboutUri,
+    };
     if (this.eweConnection) { rv.eweConnection = this.eweConnection; }
     return rv;
   }

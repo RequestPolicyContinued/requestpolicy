@@ -35,7 +35,7 @@ export class AustralisToolbarButton extends Module {
 
   constructor(
       parentLog: Common.ILog,
-      private readonly mozCustomizableUI: JSMs.ICustomizableUI | null,
+      private readonly mozCustomizableUI: JSMs.CustomizableUI | null,
       private readonly miscInfos: API.IMiscInfos,
   ) {
     super(`app.windows.toolbarbutton`, parentLog);

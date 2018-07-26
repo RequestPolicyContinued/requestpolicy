@@ -84,7 +84,7 @@ export class Windows extends Module {
       this.log.error(`Window #${outerWindowID} already loaded.`);
       return Promise.reject();
     }
-    const windowModule = this.createWindowModule();
+    const windowModule = this.createWindowModule(window);
     this.windowModules.set(outerWindowID, windowModule);
     windowModule.startup().
         catch(this.log.onError(`Window #${outerWindowID} startup.`));

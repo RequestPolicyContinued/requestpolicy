@@ -22,7 +22,6 @@
  */
 
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
-import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
@@ -49,7 +48,8 @@ export abstract class XpcomClassFactoryModule extends Module {
   constructor(
       moduleName: string,
       parentLog: Common.ILog,
-      protected readonly xpconnectService: XPConnectService,
+      protected readonly catManager: XPCOM.nsICategoryManager,
+      protected readonly compRegistrar: XPCOM.nsIComponentRegistrar,
       protected readonly xpcComponentInterfaces:
           XPCOM.nsXPCComponents_Interfaces,
       protected readonly xpcComponentResults: XPCOM.nsXPCComponents_Results,
@@ -104,16 +104,13 @@ export abstract class XpcomClassFactoryModule extends Module {
   protected beforeUnregistering(): void {}
 
   private register() {
-    const catMan = this.xpconnectService.getCategoryManagerService();
-    const registrar = this.xpconnectService.getComponentRegistrar();
-
-    registrar.registerFactory(
+    this.compRegistrar.registerFactory(
         this.classID, this.classDescription, this.contractID,
         this,
     );
 
     for (const category of this.XPCOM_CATEGORIES) {
-      catMan.addCategoryEntry(
+      this.catManager.addCategoryEntry(
           category, this.contractID, this.contractID, false,
           true,
       );
@@ -123,16 +120,13 @@ export abstract class XpcomClassFactoryModule extends Module {
   private async unregister() {
     this.beforeUnregistering();
 
-    const catMan = this.xpconnectService.getCategoryManagerService();
-    const registrar = this.xpconnectService.getComponentRegistrar();
-
     for (const category of this.XPCOM_CATEGORIES) {
-      catMan.deleteCategoryEntry(category, this.contractID, false);
+      this.catManager.deleteCategoryEntry(category, this.contractID, false);
     }
 
     // This needs to run asynchronously, see bug 753687
     await Promise.resolve();
 
-    registrar.unregisterFactory(this.classID, this);
+    this.compRegistrar.unregisterFactory(this.classID, this);
   }
 }

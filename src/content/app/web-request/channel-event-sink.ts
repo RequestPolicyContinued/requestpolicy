@@ -22,7 +22,7 @@
  */
 
 import { App } from "app/interfaces";
-import {API, JSMs, XPCOM} from "bootstrap/api/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {
   XpcomClassFactoryModule,
@@ -58,7 +58,8 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
 
   constructor(
       parentLog: Common.ILog,
-      xpconnectService: API.IXPConnectService,
+      catManager: XPCOM.nsICategoryManager,
+      compRegistrar: XPCOM.nsIComponentRegistrar,
       xpcComponentInterfaces: XPCOM.nsXPCComponents_Interfaces,
       xpcComponentResults: XPCOM.nsXPCComponents_Results,
       xpcComponentID: XPCOM.nsXPCComponents["ID"],
@@ -69,7 +70,8 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
     super(
         "app.webRequest.channelEventSink",
         parentLog,
-        xpconnectService,
+        catManager,
+        compRegistrar,
         xpcComponentInterfaces,
         xpcComponentResults,
         xpcComponentID,

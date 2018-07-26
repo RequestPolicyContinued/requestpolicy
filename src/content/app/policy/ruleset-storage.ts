@@ -58,7 +58,7 @@ export class RulesetStorage extends Module {
   ) {
     const key = this.getKey(policyName, subscriptionListName);
     const p = this.storageArea.set({
-      [key]: policy as any, // FIXME (as any)
+      [key]: policy.data as any, // FIXME (as any)
     });
     p.catch((e) => {
       this.log.error("RulesetStorage.saveRawRulesetToFile():", e);

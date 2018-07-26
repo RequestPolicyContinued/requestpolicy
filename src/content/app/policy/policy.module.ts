@@ -53,9 +53,10 @@ export class Policy extends Module {
 
   constructor(
       log: Common.ILog,
-      public readonly subscriptions: App.policy.ISubscriptions,
       public readonly rulesetStorage: App.policy.IRulesetStorage,
-      public readonly uriService: App.services.IUriService,
+      public readonly subscriptions: App.policy.ISubscriptions,
+
+      private readonly uriService: App.services.IUriService,
   ) {
     super("app.policy", log);
   }

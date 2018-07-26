@@ -53,8 +53,7 @@ export class XPConnectService {
   }
 
   // services
-
-  public getCategoryManagerService(): XPCOM.nsICategoryManager {
+  public getCategoryManager(): XPCOM.nsICategoryManager {
     return Cc["@mozilla.org/categorymanager;1"].
         getService<XPCOM.nsICategoryManager>(Ci.nsICategoryManager);
   }
@@ -62,6 +61,11 @@ export class XPConnectService {
   public getIDNService(): XPCOM.nsIIDNService {
     return Cc["@mozilla.org/network/idn-service;1"].
           getService<XPCOM.nsIIDNService>(Ci.nsIIDNService);
+  }
+
+  public getPromptService(): XPCOM.nsIPromptService {
+    return Cc["@mozilla.org/embedcomp/prompt-service;1"].
+          getService<XPCOM.nsIPromptService>(Ci.nsIPromptService);
   }
 
   public getStyleSheetService(): XPCOM.nsIStyleSheetService {

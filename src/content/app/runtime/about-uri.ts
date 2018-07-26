@@ -21,7 +21,6 @@
  */
 
 import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
-import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { Common } from "common/interfaces";
 import {
   XpcomClassFactoryModule,
@@ -53,7 +52,7 @@ const FILENAMES = {
 };
 
 // =============================================================================
-// AboutRequestPolicy
+// AboutUri
 // =============================================================================
 
 export class AboutUri extends XpcomClassFactoryModule {
@@ -65,9 +64,9 @@ export class AboutUri extends XpcomClassFactoryModule {
   protected interfaceID = "{77d4be21-6a28-4b91-9886-15ccd83795e8}";
 
   constructor(
-      moduleName: string,
       parentLog: Common.ILog,
-      xpconnectService: XPConnectService,
+      catManager: XPCOM.nsICategoryManager,
+      compRegistrar: XPCOM.nsIComponentRegistrar,
       xpcComponentInterfaces:
           XPCOM.nsXPCComponents_Interfaces,
       xpcComponentResults: XPCOM.nsXPCComponents_Results,
@@ -79,7 +78,8 @@ export class AboutUri extends XpcomClassFactoryModule {
     super(
         `app.runtime.aboutUri`,
         parentLog,
-        xpconnectService,
+        catManager,
+        compRegistrar,
         xpcComponentInterfaces,
         xpcComponentResults,
         xpcComponentID,

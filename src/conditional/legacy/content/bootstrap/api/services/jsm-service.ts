@@ -31,6 +31,10 @@ export class JSMService {
     return this.import("resource://gre/modules/AddonManager.jsm").AddonManager;
   }
 
+  public getCustomizableUI(): JSMs.CustomizableUI {
+    return this.import("resource:///modules/CustomizableUI.jsm").CustomizableUI;
+  }
+
   public getFileUtils(): JSMs.FileUtils {
     return this.import("resource://gre/modules/FileUtils.jsm").FileUtils;
   }

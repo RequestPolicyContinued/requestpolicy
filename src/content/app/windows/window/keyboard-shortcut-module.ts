@@ -66,12 +66,13 @@ export class KeyboardShortcutModule extends Module {
   };
 
   private boundMethods = new BoundMethods(this);
+  private prefObserver = this.createPrefObserver();
 
   constructor(
       parentLog: Common.ILog,
       windowID: number,
       private window: XUL.chromeWindow,
-      private readonly prefObserver: API.storage.IPrefObserver,
+      private readonly createPrefObserver: API.storage.PrefObserverFactory,
       private readonly cachedSettings: App.storage.ICachedSettings,
       private id: string,
       private defaultCombo: string,
@@ -113,10 +114,7 @@ export class KeyboardShortcutModule extends Module {
 
   protected shutdownSelf() {
     this.removeElement();
-    this.prefObserver.removeListeners([
-      this.userEnabledPrefName,
-      this.userComboPrefName,
-    ], this.boundMethods.get(this.onPrefChange));
+    this.prefObserver.removeAllListeners();
     return Promise.resolve();
   }
 

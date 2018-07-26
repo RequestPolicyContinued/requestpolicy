@@ -21,13 +21,14 @@
  */
 
 // @if EXTENSION_TYPE='legacy'
-import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { API, JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import {JSMService} from "bootstrap/api/services/jsm-service";
 import {
   StorageMigrationToWebExtension,
 } from "legacy/app/migration/storage-migration-to-we";
 import {V0RulesMigration} from "legacy/app/migration/v0-rules-migration";
 declare const LegacyApi: API.ILegacyApi;
+declare const Cc: XPCOM.nsXPCComponents_Classes;
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Cr: XPCOM.nsXPCComponents_Results;
 declare const Cu: XPCOM.nsXPCComponents_Utils;
@@ -38,10 +39,26 @@ interface IEmbeddedWebExtension { browser: typeof browser; }
 declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
+import { App } from "app/interfaces";
+import { AboutUri } from "app/runtime/about-uri";
 import { HttpChannelService } from "app/services/http-channel-service";
 import { PrivateBrowsingService } from "app/services/private-browsing-service";
 import { RequestSetService } from "app/services/request-set-service";
 import { MetadataMemory } from "app/web-request/metadata-memory";
+import { ChromeStyleSheets } from "app/windows/stylesheets";
+import { AustralisToolbarButton } from "app/windows/toolbarbutton.australis";
+import { ClassicMenu } from "app/windows/window/classicmenu";
+import {
+  KeyboardShortcutModule,
+} from "app/windows/window/keyboard-shortcut-module";
+import { KeyboardShortcuts } from "app/windows/window/keyboard-shortcuts";
+import { Menu } from "app/windows/window/menu";
+import { Overlay } from "app/windows/window/overlay";
+import {
+  NonAustralisToolbarButton,
+} from "app/windows/window/toolbarbutton.non-australis";
+import { WindowModule } from "app/windows/window/window.module";
+import { XulTrees } from "app/windows/window/xul-trees";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { C } from "data/constants";
 import { Connection } from "lib/classes/connection";
@@ -50,6 +67,7 @@ import { NormalRequest, RedirectRequest } from "lib/classes/request";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
+import { getDOMWindowUtils } from "lib/utils/window-utils";
 import { AppBackground } from "./app.background.module";
 import { BrowserSettings } from "./browser-settings/browser-settings.module";
 import { dAsyncSettings, log } from "./log";
@@ -81,6 +99,7 @@ import { RPContentPolicy } from "./web-request/content-policy";
 import { RequestMemory } from "./web-request/request-memory";
 import {RequestProcessor} from "./web-request/request-processor";
 import { WebRequest } from "./web-request/web-request.module";
+import { Windows } from "./windows/windows.module";
 
 const outerWindowID: number | null = null; // contentscripts only
 
@@ -152,28 +171,46 @@ const settingsMigration = new SettingsMigration(
 );
 const storageReadyPromise = settingsMigration.whenReady;
 
-const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
-const mozPrivateBrowsingUtils = C.EXTENSION_TYPE === "legacy" ?
-    jsmService!.getPrivateBrowsingUtils() : null;
-const mozServices = C.EXTENSION_TYPE === "legacy" ?
-    jsmService!.getServices() : null;
-const mozObserverService = C.EXTENSION_TYPE === "legacy" ?
-    mozServices!.obs : null;
-const mozWindowMediator = C.EXTENSION_TYPE === "legacy" ?
-    mozServices!.wm : null;
+// helper fn
+function whenLegacy<T>(gen: () => T): T | null {
+  return C.EXTENSION_TYPE === "legacy" ? gen() : null;
+}
+// helper classes
+const jsmService = whenLegacy(() => new JSMService(Cu));
+const xpconnectService = whenLegacy(() => new XPConnectService());
+// JSMs
+const mozCustomizableUI = whenLegacy(() => jsmService!.getCustomizableUI());
+const mozPrivateBrowsingUtils = whenLegacy(() =>
+    jsmService!.getPrivateBrowsingUtils());
+const mozServices = whenLegacy(() => jsmService!.getServices());
+// Services from Services.jsm
+const mozEffectiveTLDService = whenLegacy(() => mozServices!.eTLD);
+const mozIOService = whenLegacy(() => mozServices!.io);
+const mozObserverService = whenLegacy(() => mozServices!.obs);
+const mozVersionComparator = whenLegacy(() => mozServices!.vc);
+const mozWindowMediator = whenLegacy(() => mozServices!.wm);
+// Services via Cc["..."].getService(Ci.foo) and similar
+const mozCategoryManager = whenLegacy(() =>
+    xpconnectService!.getCategoryManager());
+const mozComponentRegistrar = whenLegacy(() =>
+    xpconnectService!.getComponentRegistrar());
+const mozIDNService = whenLegacy(() => xpconnectService!.getIDNService());
+const mozPromptService = whenLegacy(() => xpconnectService!.getPromptService());
+const mozStyleSheetService = whenLegacy(() =>
+    xpconnectService!.getStyleSheetService());
+
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
   rpPrefBranch: LegacyApi.rpPrefBranch,
   tryCatchUtils: LegacyApi.tryCatchUtils,
 } : null;
 
-const xpconnectService = new XPConnectService();
 const uriService = new UriService(
     log,
     outerWindowID,
-    mozServices!.eTLD,
-    xpconnectService.getIDNService(),
-    mozServices!.io,
+    mozEffectiveTLDService!,  // fixme
+    mozIDNService!,  // fixme
+    mozIOService!,  // fixme
 );
 const rulesetStorage = new RulesetStorage(log, localStorageArea, uriService);
 const subscriptions = new Subscriptions(
@@ -182,8 +219,19 @@ const subscriptions = new Subscriptions(
     rulesetStorage,
     uriService,
 );
-const policy = new Policy(log, subscriptions, rulesetStorage, uriService);
-const runtime = new Runtime(log, pEWEConnection);
+const policy = new Policy(log, rulesetStorage, subscriptions, uriService);
+const aboutUri = new AboutUri(
+    log,
+    mozCategoryManager!,  // fixme
+    mozComponentRegistrar!,  // fixme
+    Ci,
+    Cr,
+    ComponentsID,
+    XPCOMUtils,
+    LegacyApi.miscInfos,
+    mozIOService!,  // fixme
+);
+const runtime = new Runtime(log, pEWEConnection, aboutUri);
 
 const asyncSettings = new AsyncSettings(
     log,
@@ -320,11 +368,21 @@ const normalRequestFactory = (
     aContext, aMimeTypeGuess, aExtra, aRequestPrincipal,
 );
 const rpChannelEventSink = new RPChannelEventSink(
-    log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
-    requestProcessor, redirectRequestFactory,
+    log,
+    mozCategoryManager!,  // fixme
+    mozComponentRegistrar!,  // fixme
+    Ci,
+    Cr,
+    ComponentsID,
+    XPCOMUtils,
+    requestProcessor,
+    redirectRequestFactory,
 );
 const rpContentPolicy = new RPContentPolicy(
-    log, xpconnectService, Ci, Cr, ComponentsID, XPCOMUtils,
+    log,
+    mozCategoryManager!,  // fixme
+    mozComponentRegistrar!,  // fixme
+    Ci, Cr, ComponentsID, XPCOMUtils,
     requestProcessor, normalRequestFactory,
 );
 const rpWebRequest = new WebRequest(
@@ -334,6 +392,123 @@ const rpWebRequest = new WebRequest(
     requestProcessor,
     rpChannelEventSink,
     rpContentPolicy,
+);
+
+const windowModuleFactory: App.windows.WindowModuleFactory = (
+    window: XUL.chromeWindow,
+) => {
+  const windowID = getDOMWindowUtils(window).outerWindowID;
+  const classicMenu = new ClassicMenu(
+      log,
+      windowID,
+      policy,
+  );
+  const overlayWrapper: {
+    module: App.windows.window.IOverlay | null;
+  } = {
+    module: null,
+  };
+  const menu = new Menu(
+      log,
+      windowID,
+      window,
+      mozPromptService!,  // fixme
+      browser.i18n,
+      overlayWrapper,
+      privateBrowsingService,
+      uriService,
+      policy,
+      cachedSettings,
+      requestMemory,
+  );
+  const xulTrees = new XulTrees(
+      log,
+      windowID,
+      window,
+      classicMenu,
+      menu,
+      overlayWrapper,
+  );
+  const overlay = new Overlay(
+      log,
+      windowID,
+      window,
+      Cc,
+      Ci,
+      Cr,
+      browser.i18n,
+      browser.runtime,
+      browser.storage,
+      classicMenu,
+      menu,
+      privateBrowsingService,
+      uriService,
+      policy,
+      cachedSettings,
+      requestMemory,
+      requestProcessor,
+      xulTrees,
+  );
+  overlayWrapper.module = overlay;
+  const keyboardShortcutFactory: API.windows.window.KeyboardShortcutFactory = (
+      id: string,
+      defaultCombo: string,
+      callback: () => void,
+      userEnabledPrefName: string,
+      userComboPrefName: string,
+  ) => new KeyboardShortcutModule(
+      log,
+      windowID,
+      window,
+      LegacyApi.createPrefObserver,
+      cachedSettings,
+      id,
+      defaultCombo,
+      callback,
+      userEnabledPrefName,
+      userComboPrefName,
+  );
+  const keyboardShortcuts = new KeyboardShortcuts(
+      log,
+      windowID,
+      overlay,
+      keyboardShortcutFactory,
+  );
+  const nonAustralisToolbarButton = new NonAustralisToolbarButton(
+      log,
+      windowID,
+      window,
+      mozVersionComparator!,  // fixme
+      LegacyApi.miscInfos,
+  );
+  return new WindowModule(
+      log,
+      windowID,
+      classicMenu,
+      keyboardShortcuts,
+      menu,
+      overlay,
+      nonAustralisToolbarButton,
+  );
+};
+const chromeStyleSheets = new ChromeStyleSheets(
+    log,
+    mozStyleSheetService!,  // fixme
+    LegacyApi.miscInfos,
+    uriService,
+);
+const toolbarbuttonAustralis = new AustralisToolbarButton(
+    log,
+    mozCustomizableUI,
+    LegacyApi.miscInfos,
+);
+const windows = new Windows(
+    log,
+    cachedSettings,
+    windowModuleFactory,
+    windowService,
+    chromeStyleSheets,
+    toolbarbuttonAustralis,
 );
 
 export const rp = new AppBackground(
@@ -346,4 +521,5 @@ export const rp = new AppBackground(
     storage,
     ui,
     rpWebRequest,
+    windows,
 );

@@ -36,6 +36,7 @@ export class AppBackground extends Module {
       public readonly storage: App.IStorage,
       public readonly ui: App.IUi,
       public readonly webRequest: App.IWebRequest,
+      public readonly windows: App.IWindows,
   ) {
     super("app", log);
   }

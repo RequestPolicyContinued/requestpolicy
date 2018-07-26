@@ -72,6 +72,7 @@ import { NonAustralisToolbarButton } from "./windows/window/toolbarbutton.non-au
 import { WindowModule } from "./windows/window/window.module";
 import { XulTrees } from "./windows/window/xul-trees";
 import { Windows } from "./windows/windows.module";
+import { AboutUri } from "app/runtime/about-uri";
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -118,6 +119,10 @@ export namespace App {
     export type IWindowService = WindowService;
   }
 
+  export namespace runtime {
+    export type IAboutUri = AboutUri;
+  }
+
   export namespace storage {
     export type IAsyncSettings = AsyncSettings;
     export type ICachedSettings = CachedSettings;
@@ -147,7 +152,9 @@ export namespace App {
     export type IChromeStyleSheets = ChromeStyleSheets;
     export type IWindowModule = WindowModule;
     export type IToolbarButton = AustralisToolbarButton;
-    export type WindowModuleFactory = () => WindowModule;
+    export type WindowModuleFactory = (
+        window: XPCOM.nsIDOMWindow,
+    ) => WindowModule;
   }
 
   export type IBrowserSettings = BrowserSettings;

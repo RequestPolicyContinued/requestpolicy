@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class Framescripts extends Module {
@@ -51,7 +52,7 @@ export class Framescripts extends Module {
     // Also tell the globalMM to load it into each new
     // tab from now on.
     this.globalFrameMessageManager.loadFrameScript(this.frameScriptURI, true);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
@@ -66,6 +67,7 @@ export class Framescripts extends Module {
     //   children.
     this.globalFrameMessageManager.
         removeDelayedFrameScript(this.frameScriptURI);
-    return Promise.resolve();
+
+    return MaybePromise.resolve(undefined);
   }
 }

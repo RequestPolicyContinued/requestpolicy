@@ -22,6 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { RequestResult } from "lib/classes/request-result";
 
@@ -43,7 +44,7 @@ export class FramescriptServices extends Module {
 
   protected startupSelf() {
     this.runtimeApi.onMessage.addListener(this.onMessage.bind(this));
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private containsNonBlacklistedRequests(aRequests: RequestResult[]) {

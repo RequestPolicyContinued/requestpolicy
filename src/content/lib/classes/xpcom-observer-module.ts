@@ -22,6 +22,7 @@
 
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 // "known" observer topics
@@ -64,13 +65,13 @@ export class XPCOMObserverModule extends Module {
     this.topics.forEach((topic) => {
       this.observerService.addObserver(this, topic, false);
     });
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.topics.forEach((topic) => {
       this.observerService.removeObserver(this, topic);
     });
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

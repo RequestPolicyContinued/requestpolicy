@@ -22,13 +22,18 @@
 
 import { App } from "app/interfaces";
 import { WindowModule } from "app/windows/window/window.module";
-import { XPCOM } from "bootstrap/api/interfaces";
+import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { BoundMethods } from "lib/classes/bound-methods";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { getDOMWindowUtils } from "lib/utils/window-utils";
 
 export class Windows extends Module {
+  // protected get debugEnabled() { return true; }
+
   private windowModules = new Map<number, WindowModule>();
+  private boundMethods = new BoundMethods(this);
 
   protected get startupPreconditions() {
     return [
@@ -59,44 +64,58 @@ export class Windows extends Module {
 
   protected startupSelf() {
     const promises = this.windowService.
-        forEachOpenWindow<Windows, Promise<void>>(
+        forEachOpenWindow<Windows, MaybePromise<void>>(
             this.boundMethods.get(this.loadIntoWindow),
         );
     this.windowService.onWindowLoaded.addListener(
-        this.boundMethods.get(this.loadIntoWindow),
+        this.boundMethods.get(this.onWindowLoaded),
     );
     this.windowService.onWindowUnloaded.addListener(
-        this.boundMethods.get(this.unloadFromWindow),
+        this.boundMethods.get(this.onWindowUnloaded),
     );
-    return Promise.all(promises).then(() => undefined);
+    return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
   protected shutdownSelf() {
     const rvs = this.windowService.
-        forEachOpenWindow<Windows, Promise<void>>(
+        forEachOpenWindow<Windows, MaybePromise<void>>(
             this.boundMethods.get(this.unloadFromWindow),
         );
-    return Promise.all(rvs).then(() => undefined);
+    return MaybePromise.all(rvs) as MaybePromise<any>;
   }
 
-  private loadIntoWindow(window: XPCOM.nsIDOMWindow): Promise<void> {
-    const domWindowUtils = getDOMWindowUtils(window as any);
+  private onWindowLoaded(event: ProgressEvent): void {
+    const doc = event.target as XUL.chromeDocument;
+    const win = doc.defaultView as XUL.chromeWindow;
+    this.loadIntoWindow(win);
+  }
+
+  private onWindowUnloaded(event: ProgressEvent): void {
+    const doc = event.target as XUL.chromeDocument;
+    const win = doc.defaultView as XUL.chromeWindow;
+    this.unloadFromWindow(win);
+  }
+
+  private loadIntoWindow(window: XUL.chromeWindow): MaybePromise<void> {
+    const domWindowUtils = getDOMWindowUtils(window);
     const {outerWindowID} = domWindowUtils;
+    this.debugLog.log(`loadIntoWindow(), windowID=${outerWindowID}`);
     if (this.windowModules.has(outerWindowID)) {
       this.log.error(`Window #${outerWindowID} already loaded.`);
-      return Promise.reject();
+      return MaybePromise.reject(undefined) as MaybePromise<any>;
     }
     const windowModule = this.createWindowModule(window);
     this.windowModules.set(outerWindowID, windowModule);
     return windowModule.startup();
   }
 
-  private unloadFromWindow(window: XPCOM.nsIDOMWindow): Promise<void> {
-    const domWindowUtils = getDOMWindowUtils(window as any);
+  private unloadFromWindow(window: XUL.chromeWindow): MaybePromise<void> {
+    const domWindowUtils = getDOMWindowUtils(window);
     const {outerWindowID} = domWindowUtils;
+    this.debugLog.log(`unloadFromWindow(), windowID=${outerWindowID}`);
     if (!this.windowModules.has(outerWindowID)) {
       this.log.error(`Window #${outerWindowID} not loaded.`);
-      return Promise.resolve();
+      return MaybePromise.resolve(undefined);
     }
     const windowModule = this.windowModules.get(outerWindowID)!;
     return windowModule.shutdown();

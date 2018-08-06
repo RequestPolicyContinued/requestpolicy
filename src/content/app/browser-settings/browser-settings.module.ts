@@ -22,6 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class BrowserSettings extends Module implements App.IBrowserSettings {
@@ -50,6 +51,6 @@ export class BrowserSettings extends Module implements App.IBrowserSettings {
       );
     }
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

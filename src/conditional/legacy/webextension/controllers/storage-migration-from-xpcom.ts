@@ -22,6 +22,7 @@
 
 import { Common } from "common/interfaces";
 import { IConnection } from "lib/classes/connection";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 const TARGET_NAME = "storage-migration-from-xpcom";
@@ -50,7 +51,11 @@ export class StorageMigrationFromXpcom extends Module {
         catch(this.log.onError("connectionToLegacy"));
   }
 
-  public startupSelf() {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  private startupSelfAsync() {
     return this.storage.local.get(
         "lastStorageChange",
     ).then((result) => {

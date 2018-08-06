@@ -24,6 +24,7 @@ import { Policy } from "app/policy/policy.module";
 import { V0RulesService } from "app/services/rules/v0-rules-service";
 import { VersionInfoService } from "app/services/version-info-service";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class V0RulesMigration extends Module {
@@ -36,7 +37,11 @@ export class V0RulesMigration extends Module {
     super("app.migration.v0Rules", log);
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected async startupSelfAsync() {
     // If the user ...
     //   * upgrades to 1.0,
     //   * downgrades back to 0.5

@@ -23,6 +23,7 @@
 import {log} from "app/log";
 import { API, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import * as XULUtils from "lib/utils/xul-utils";
 
@@ -54,14 +55,14 @@ export class NonAustralisToolbarButton extends Module {
       XULUtils.addTreeElementsToWindow(this.window, "toolbarbutton");
       this.addToolbarButtonToNavBar();
     }
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     if (!this.isAustralis) {
       XULUtils.removeTreeElementsFromWindow(this.window, "toolbarbutton");
     }
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private addToolbarButtonToNavBar() {

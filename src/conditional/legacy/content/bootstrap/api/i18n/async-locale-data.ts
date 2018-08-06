@@ -21,6 +21,7 @@
  */
 
 import { API, JSMs } from "bootstrap/api/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { IModule } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 import * as I18nUtils from "./i18n-utils";
@@ -216,6 +217,6 @@ export class AsyncLocaleData extends LocaleData implements IModule {
       console.dir(e);
       this.dReady.reject(e);
     });
-    return p;
+    return MaybePromise.resolve(p);
   }
 }

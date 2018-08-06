@@ -28,8 +28,8 @@ import { IModule, Module } from "lib/classes/module";
 export class Runtime extends Module {
   protected get startupPreconditions() {
     return [
-      this.pEWEConnection.then(() => undefined),
-    ];
+      this.pEWEConnection,
+    ] as Array<Promise<any>>;
   }
 
   private eweConnection: Connection<any, any> | null;

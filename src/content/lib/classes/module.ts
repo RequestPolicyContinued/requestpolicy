@@ -21,14 +21,15 @@
  */
 
 import { Common } from "common/interfaces";
-import {defer} from "lib/utils/js-utils";
+import { MaybePromise } from "lib/classes/maybe-promise";
+import { defer, IDeferred } from "lib/utils/js-utils";
 
 const MAX_WAIT_FOR_STARTUP_SECONDS = 15;
 const MAX_STARTUP_SECONDS = 15;
 
 export interface IModule {
-  startup?: () => Promise<void>;
-  shutdown?: () => Promise<void>;
+  startup?: () => MaybePromise<void>;
+  shutdown?: () => MaybePromise<void>;
   whenReady: Promise<void>;
 }
 
@@ -68,7 +69,7 @@ export abstract class Module implements IModule {
     return this.shutdownState === "not yet shut down";
   }
 
-  private dSelfBootstrap = {
+  private dSelfBootstrap: {[key: string]: IDeferred<void, any>} = {
     shutdown: defer(),
     startup: defer(),
   };
@@ -78,17 +79,17 @@ export abstract class Module implements IModule {
     startup: defer(),
   };
 
-  private pBootstrap = {
-    shutdown: Promise.all([
+  private pBootstrap: {[name: string]: MaybePromise<void>} = {
+    shutdown: MaybePromise.all([
       this.dChildBootstrap.shutdown.promise,
       this.dSelfBootstrap.shutdown.promise,
-    ]).then(() => undefined),
+    ]),
 
-    startup: Promise.all([
+    startup: MaybePromise.all([
       this.dChildBootstrap.startup.promise,
       this.dSelfBootstrap.startup.promise,
-    ]).then(() => undefined),
-  };
+    ]),
+  } as {[name: string]: MaybePromise<any>};
 
   protected get startupPreconditions(): Array<Promise<void>> {
     return [];
@@ -99,7 +100,6 @@ export abstract class Module implements IModule {
   }
 
   public get pStartup() { return this.pBootstrap.startup; }
-  public get pShutdown() { return this.pBootstrap.shutdown; }
 
   private timedOutWaitingForStartup = false;
   private creationTime: number;
@@ -119,10 +119,10 @@ export abstract class Module implements IModule {
     }, 1000 * MAX_WAIT_FOR_STARTUP_SECONDS);
   }
 
-  public async startup(): Promise<void> {
+  public startup(): MaybePromise<void> {
     if (this.startupState !== "not yet started") {
       this.log.error("startup() has already been called!");
-      return;
+      return MaybePromise.resolve(undefined);
     }
     this._startupState = "starting up";
 
@@ -144,43 +144,45 @@ export abstract class Module implements IModule {
 
     const p = this.startup_();
     p.catch(this.log.onError("error on startup"));
-    await p;
-    this._startupState = "startup done";
-    this.dReady.resolve(undefined);
+    return MaybePromise.resolve(p.then(() => {
+      this._startupState = "startup done";
+      this.dReady.resolve(undefined);
 
-    if (timedOutStartingUp) {
-      const startupEndTime = new Date().getTime();
-      this.log.error(
-          `startup done / startup took ` +
-          `${(startupEndTime - startupStartTime) / 1000} seconds!`);
-    } else {
-      this.debugLog.log("startup done");
-    }
+      if (timedOutStartingUp) {
+        const startupEndTime = new Date().getTime();
+        this.log.error(
+            `startup done / startup took ` +
+            `${(startupEndTime - startupStartTime) / 1000} seconds!`);
+      } else {
+        this.debugLog.log("startup done");
+      }
+    }));
   }
 
-  public async shutdown(): Promise<void> {
+  public shutdown(): MaybePromise<void> {
     if (this.shutdownState !== "not yet shut down") {
       this.log.error("shutdown() has already been called!");
-      return;
+      return MaybePromise.resolve(undefined);
     }
     this._shutdownState = "shutting down";
 
     this.debugLog.log("shutting down...");
     const p = this.shutdown_();
     p.catch(this.log.onError("error on shutdown"));
-    await p;
-    this._shutdownState = "shutdown done";
-    this.debugLog.log("done shutting down");
+    return p.then(() => {
+      this._shutdownState = "shutdown done";
+      this.debugLog.log("done shutting down");
+    });
   }
 
   public isReady() { return this.ready; }
 
-  protected startupSelf(): Promise<void> {
-    return Promise.resolve();
+  protected startupSelf(): MaybePromise<void> {
+    return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf(): Promise<void> {
-    return Promise.resolve();
+  protected shutdownSelf(): MaybePromise<void> {
+    return MaybePromise.resolve(undefined);
   }
 
   protected assertReady(): void | never {
@@ -192,27 +194,35 @@ export abstract class Module implements IModule {
     }
   }
 
-  private async startup_(): Promise<void> {
+  private startup_(): MaybePromise<void> {
     const nPrecond = this.startupPreconditions.length;
+    let pPrecond: MaybePromise<void>;
     if (nPrecond !== 0) {
       this.debugLog.log(
           `awaiting ${nPrecond} precondition${ nPrecond > 1 ? "s" : "" }...`,
       );
-      await Promise.all(this.startupPreconditions);
-      this.debugLog.log("done awaiting preconditions");
+      pPrecond = MaybePromise.all(this.startupPreconditions).then(() => {
+        this.debugLog.log("done awaiting preconditions");
+      });
+    } else {
+      pPrecond = MaybePromise.resolve(undefined);
     }
-    this.debugLog.log(`starting up self and submodules...`);
-    await Promise.all([
-      this.runSubmoduleFns("startup"),
-      this.runSelfFn("startup"),
-    ]);
-    this.debugLog.log("done starting up self and submodules");
+    return pPrecond.then(() => {
+      this.debugLog.log(`starting up self and submodules...`);
+      return MaybePromise.all([
+        this.runSubmoduleFns("startup"),
+        this.runSelfFn("startup"),
+      ]);
+    }).then(() => {
+      this.debugLog.log("done starting up self and submodules");
+    });
   }
 
-  private async shutdown_(): Promise<void> {
-    await Promise.all(this.shutdownPreconditions);
-    await this.runSelfFn("shutdown");
-    await this.runSubmoduleFns("shutdown");
+  private shutdown_(): MaybePromise<void> {
+    return MaybePromise.
+        all(this.shutdownPreconditions).
+        then(() => this.runSelfFn("shutdown")).
+        then(() => this.runSubmoduleFns("shutdown"));
   }
 
   private getSubmodules(): IModule[] {
@@ -228,23 +238,25 @@ export abstract class Module implements IModule {
         });
   }
 
-  private runSubmoduleFns(fnName: "startup" | "shutdown"): Promise<void> {
-    const p = Promise.all(
+  private runSubmoduleFns(fnName: "startup" | "shutdown"): MaybePromise<void> {
+    const p = MaybePromise.all(
         this.getSubmodules().
         filter((m) => fnName in m).
         map((m) => m[fnName]!()),
-    ).then(() => undefined);
+    ) as MaybePromise<any>;
     p.catch(this.log.onError(`submodule ${fnName}`));
-    this.dChildBootstrap[fnName].resolve(p);
-    return p as Promise<any>;
+    this.dChildBootstrap[fnName].resolve(p.toPromise());
+    return p;
   }
 
-  private runSelfFn(fnName: "startup" | "shutdown"): Promise<void> {
+  private runSelfFn(fnName: "startup" | "shutdown"): MaybePromise<void> {
     const selfFnName =
         `${fnName}Self` as "startupSelf" | "shutdownSelf";
-    const p = this[selfFnName] ? this[selfFnName]!() : Promise.resolve();
+    const p = this[selfFnName] ?
+        this[selfFnName]() :
+        MaybePromise.resolve(undefined);
     p.catch(this.log.onError(`self-${fnName}`));
-    this.dSelfBootstrap[fnName].resolve(p);
+    this.dSelfBootstrap[fnName].resolve(p.toPromise());
     return p;
   }
 }

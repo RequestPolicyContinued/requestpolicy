@@ -22,6 +22,7 @@
 
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class Manifest extends Module {
@@ -34,11 +35,12 @@ export class Manifest extends Module {
     super("manifest", log);
   }
 
-  public async startupSelf() {
+  public startupSelf() {
     const manifestUrl = this.chromeFileService.
         getChromeUrl("bootstrap-data/manifest.json");
-    await this.chromeFileService.parseJSON(manifestUrl).then((data) => {
+    const p = this.chromeFileService.parseJSON(manifestUrl).then((data) => {
       this.data = data;
     });
+    return MaybePromise.resolve(p);
   }
 }

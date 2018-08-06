@@ -25,6 +25,7 @@ import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {RequestResult} from "lib/classes/request-result";
 import {RawRuleset, Ruleset} from "./ruleset";
@@ -337,8 +338,9 @@ export class Policy extends Module {
   // protected functions
   // ---------------------------------------------------------------------------
 
-  protected async startupSelf() {
-    await this.loadUserRules();
+  protected startupSelf() {
+    const p = this.loadUserRules();
+    return MaybePromise.resolve(p);
   }
 
   // ---------------------------------------------------------------------------

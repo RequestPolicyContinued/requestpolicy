@@ -26,6 +26,7 @@ import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
 import { EventListenerModule } from "lib/classes/event-listener-module";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class ContentscriptMisc extends Module {
@@ -146,6 +147,6 @@ export class ContentscriptMisc extends Module {
         true,
     );
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

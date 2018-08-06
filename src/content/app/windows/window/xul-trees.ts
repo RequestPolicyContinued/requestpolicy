@@ -23,8 +23,12 @@
 import { App } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
-import * as XULUtils from "lib/utils/xul-utils";
+import {
+  addTreeElementsToWindow,
+  removeTreeElementsFromWindow,
+} from "lib/utils/xul-utils";
 
 export class XulTrees extends Module {
   private get overlay() { return this.overlayWrapper.module!; }
@@ -61,14 +65,14 @@ export class XulTrees extends Module {
     };
 
     // add all XUL elements
-    XULUtils.addTreeElementsToWindow(this.window, "mainTree");
+    addTreeElementsToWindow(this.window, "mainTree");
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     // remove all XUL elements
-    XULUtils.removeTreeElementsFromWindow(this.window, "mainTree");
+    removeTreeElementsFromWindow(this.window, "mainTree");
 
     // Remove the scope variable.
     // This wouldn't be needed when the window is closed, but this has to be
@@ -76,6 +80,6 @@ export class XulTrees extends Module {
     // eslint-disable-next-line no-param-reassign
     delete (this.window as any).rpcontinued;
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

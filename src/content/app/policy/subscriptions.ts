@@ -25,6 +25,7 @@ import { App } from "app/interfaces";
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {MainEnvironment} from "lib/environment";
 import {createListenersMap} from "lib/utils/listener-factories";
@@ -283,7 +284,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
       SUBSCRIPTION_REMOVED_TOPIC,
     ], this.observe.bind(this));
 
-    return this.loadSubscriptionRules();
+    return MaybePromise.resolve(this.loadSubscriptionRules());
   }
 
   public addSubscription(listName: string, subName: string) {

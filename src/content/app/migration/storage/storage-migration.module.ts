@@ -28,8 +28,8 @@ export class StorageMigration extends Module
     implements App.migration.IStorageMigration {
   protected get startupPreconditions() {
     return [
-      this.pStorageMigrationToWE.then(() => undefined),
-    ];
+      this.pStorageMigrationToWE,
+    ] as Array<Promise<any>>;
   }
 
   private storageMigrationToWE:

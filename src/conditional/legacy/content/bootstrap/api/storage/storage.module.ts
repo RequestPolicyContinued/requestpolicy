@@ -22,6 +22,7 @@
 
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
@@ -64,13 +65,13 @@ export class Storage extends Module {
   protected startupSelf() {
     this.rpPrefBranch.addObserver("", this.prefObserver);
     this.slsa.onChanged.addListener(this.slsaChangedListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.slsa.onChanged.removeListener(this.slsaChangedListener);
     this.rpPrefBranch.removeObserver("", this.prefObserver);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private getLocal(

@@ -22,6 +22,7 @@
 
 import { Common } from "common/interfaces";
 import { IConnection } from "lib/classes/connection";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 
@@ -57,7 +58,11 @@ export class StorageMigrationToWebExtension extends Module {
         catch(this.log.onError("connectionToEWE"));
   }
 
-  protected startupSelf(): Promise<void> {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected startupSelfAsync(): Promise<void> {
     const pGotLastStorageChange =
         this.storageArea.get("lastStorageChange").then((result) => {
           this.lastStorageChange =

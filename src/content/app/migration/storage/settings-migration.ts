@@ -25,6 +25,7 @@ import { Common } from "common/interfaces";
 import {
   StorageMigrationToWebExtension,
 } from "legacy/app/migration/storage-migration-to-we";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { PrefetchSettingsMerger } from "./merge-prefetch-settings";
 
@@ -41,7 +42,11 @@ export class SettingsMigration extends Module
     super("app.migration.storage.settings", log);
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected async startupSelfAsync() {
     this.storageMigrationToWE = await this.pStorageMigrationToWE;
     if (this.storageMigrationToWE) {
       await this.storageMigrationToWE.pStorageReadyForAccess;
@@ -55,9 +60,9 @@ export class SettingsMigration extends Module
   private async performMergeActions(): Promise<void> {
     const pMerges = Promise.all([
       new PrefetchSettingsMerger(this.log, this.storage).performAction(),
-    ]).then(() => undefined);
+    ]);
     pMerges.catch(this.log.onError("merge settings"));
-    return pMerges;
+    return pMerges as Promise<any>;
   }
 
   private performRemoveActions(): Promise<void> {

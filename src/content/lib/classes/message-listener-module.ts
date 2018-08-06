@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 type MessageListener = XPCOM.nsIMessageListener["receiveMessage"];
@@ -121,12 +122,11 @@ export class MessageListenerModule<
     );
     this.addNewListenersImmediately = true;
     this.addAllListeners();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.removeAllListeners();
-
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

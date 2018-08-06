@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class ChromeStyleSheets extends Module {
@@ -44,12 +45,12 @@ export class ChromeStyleSheets extends Module {
 
   protected startupSelf() {
     this.loadStyleSheets();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.unloadStyleSheets();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private loadStyleSheets() {

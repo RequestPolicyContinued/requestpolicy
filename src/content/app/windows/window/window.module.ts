@@ -26,6 +26,8 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class WindowModule extends Module {
+  // protected get debugEnabled() { return true; }
+
   protected get subModules() {
     return {
       classicMenu: this.classicMenu,
@@ -43,8 +45,8 @@ export class WindowModule extends Module {
     return [
       // FIXME !! (promiseTabBrowser)
       // (what is the event we need to listen for?)
-      this.windowService.promiseTabBrowser(this.window).then(() => undefined),
-    ];
+      this.windowService.promiseTabBrowser(this.window),
+    ] as Array<Promise<any>>;
   }
 
   constructor(

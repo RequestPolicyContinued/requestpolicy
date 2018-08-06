@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { defer } from "lib/utils/js-utils";
 
@@ -103,7 +104,7 @@ export class FramescriptToBackgroundCommunication extends Module {
   }
 
   protected startupSelf() {
-    return this.startCommNowOrLater();
+    return MaybePromise.resolve(this.startCommNowOrLater());
   }
 
   protected shutdownSelf() {
@@ -151,8 +152,8 @@ export class FramescriptToBackgroundCommunication extends Module {
     }
   }
 
-  private stopCommunication(): Promise<void> {
+  private stopCommunication(): MaybePromise<void> {
     this.state = States.STOPPED;
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

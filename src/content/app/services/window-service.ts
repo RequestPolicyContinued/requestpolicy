@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { promiseObserverTopic } from "legacy/lib/utils/xpcom-utils";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { defer } from "lib/utils/js-utils";
 import { createListenersMap } from "lib/utils/listener-factories";
@@ -43,8 +44,6 @@ export class WindowService extends Module
   ]);
 
   // tslint:disable:member-ordering
-  public onXULWindowOpened = this.events.interfaces.onXULWindowOpened;
-  public onXULWindowClosed = this.events.interfaces.onXULWindowClosed;
   public onWindowLoaded = this.events.interfaces.onWindowLoaded;
   public onWindowUnloaded = this.events.interfaces.onWindowUnloaded;
   // tslint:enable:member-ordering
@@ -127,7 +126,7 @@ export class WindowService extends Module
 
   protected startupSelf() {
     this.windowMediator.addListener(this.windowMediatorListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
@@ -139,7 +138,7 @@ export class WindowService extends Module
     }
     this.windows.clear();
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private onProgressEvent(event: ProgressEvent) {
@@ -152,12 +151,18 @@ export class WindowService extends Module
     }
     switch (event.type) {
       case "load":
-        this.debugLog.log(`window "load" event'`);
+        this.debugLog.log(
+            `window "load" event, ` +
+            `#listeners=${ this.events.listenersMap.onWindowLoaded.size }`,
+        );
         this.events.listenersMap.onWindowLoaded.emit(event);
         break;
 
       case "unload":
-        this.debugLog.log(`window "unload" event'`);
+        this.debugLog.log(
+            `window "unload" event", ` +
+            `#listeners=${ this.events.listenersMap.onWindowUnloaded.size }`,
+        );
         this.events.listenersMap.onWindowUnloaded.emit(event);
         this.windows.delete(domWindow);
         break;
@@ -180,7 +185,7 @@ export class WindowService extends Module
   }
 
   private promiseSessionstoreWindowsRestored() {
-    return promiseObserverTopic("sessionstore-windows-restored").
-        then(() => undefined);
+    const p = promiseObserverTopic("sessionstore-windows-restored");
+    return p as Promise<any>;
   }
 }

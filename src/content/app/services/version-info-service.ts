@@ -23,6 +23,7 @@
 
 import { App, IVersionComparator } from "app/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {objectValues} from "lib/utils/js-utils";
 
@@ -77,7 +78,7 @@ export class VersionInfoService extends Module {
     ];
   }
 
-  protected startupSelf(): Promise<void> {
+  protected startupSelf() {
     const promises: IInfoPromises = {};
 
     const checkPromise = (aPropName: keyof IInfoPromises) => {
@@ -137,7 +138,7 @@ export class VersionInfoService extends Module {
     // store last*Version
     // -------------------------------------------------------------------------
 
-    return Promise.all(objectValues(promises)).then(() => {
+    const p = Promise.all(objectValues(promises)).then(() => {
       this.infos = infos as IInfos;
       const {curAppVersion, curRPVersion} = infos;
       return this.cachedSettings.set({
@@ -147,5 +148,7 @@ export class VersionInfoService extends Module {
     }).catch((e) => {
       this.log.error("Failed to initialize VersionInfoService", e);
     }) as Promise<void>;
+
+    return MaybePromise.resolve(p);
   }
 }

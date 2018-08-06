@@ -1,10 +1,10 @@
 "use strict";
 
-const {assert} = require("chai");
-const {createBrowserApi, createPort} = require("../lib/sinon-chrome");
+import {assert} from "chai";
+import {createBrowserApi, createPort} from "../lib/sinon-chrome";
 
-const {Log} = require("lib/classes/log");
-const {Connection} = require("lib/classes/connection");
+import {Log} from "lib/classes/log";
+import {Connection} from "lib/classes/connection";
 
 describe("connection", function() {
   const sinon = require("sinon").sandbox.create();
@@ -14,7 +14,7 @@ describe("connection", function() {
   const moduleName = "my-module";
   const targetName = "my-target";
   let port;
-  let connection;
+  let connection: Connection<any, any>;
 
   beforeEach(() => {
     port = createPort(sinon);

@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { API, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { BoundMethods } from "lib/classes/bound-methods";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import * as XULUtils from "lib/utils/xul-utils";
 
@@ -118,13 +119,13 @@ export class KeyboardShortcutModule extends Module
       this.userComboPrefName,
     ], this.boundMethods.get(this.onPrefChange));
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.removeElement();
     this.prefObserver.removeAllListeners();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private onPress(event: Event) {

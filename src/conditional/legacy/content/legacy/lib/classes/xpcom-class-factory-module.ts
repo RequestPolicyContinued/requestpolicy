@@ -23,6 +23,7 @@
 
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export abstract class XpcomClassFactoryModule extends Module {
@@ -76,7 +77,11 @@ export abstract class XpcomClassFactoryModule extends Module {
     return [this.xpcComponentInterfaces.nsIFactory];
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected async startupSelfAsync() {
     const nTimes = 10;
     for (let i = 0; i < nTimes; ++i) {
       try {
@@ -97,7 +102,7 @@ export abstract class XpcomClassFactoryModule extends Module {
   }
 
   protected shutdownSelf() {
-    return this.unregister();
+    return MaybePromise.resolve(this.unregister());
   }
 
   // tslint:disable-next-line:no-empty

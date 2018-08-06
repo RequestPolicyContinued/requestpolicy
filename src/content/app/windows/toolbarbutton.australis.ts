@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import * as XULUtils from "lib/utils/xul-utils";
 
@@ -45,14 +46,14 @@ export class AustralisToolbarButton extends Module {
     if (this.isAustralis) {
       this.addToolbarButtonToAustralis();
     }
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     if (this.isAustralis) {
       this.removeToolbarButtonFromAustralis();
     }
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private removeToolbarButtonFromAustralis() {

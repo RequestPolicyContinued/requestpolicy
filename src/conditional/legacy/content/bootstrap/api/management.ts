@@ -22,6 +22,7 @@
 
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
 
@@ -107,12 +108,14 @@ export class Management extends Module implements API.management.IManagement {
     return this.get("/* @echo EXTENSION_ID */");
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
     this.addonManager.addAddonListener(this.addonListener);
+    return MaybePromise.resolve(undefined);
   }
 
-  protected async shutdownSelf() {
+  protected shutdownSelf() {
     this.addonManager.removeAddonListener(this.addonListener);
+    return MaybePromise.resolve(undefined);
   }
 
   private mapAddonInfoToWebextExtensionInfo(aAddon: Addon): ExtensionInfo {

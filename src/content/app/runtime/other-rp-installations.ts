@@ -26,6 +26,7 @@ import { log } from "app/log";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
 import { FilteredManagement } from "lib/classes/filtered-management";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 // The other extension IDs of RequestPolicy.
@@ -65,7 +66,7 @@ export class OtherRPInstallations extends Module {
     const maybeAddNotification = this.maybeAddNotification.bind(this);
     browser.management.onEnabled.addListener(maybeAddNotification);
     browser.management.onInstalled.addListener(maybeAddNotification);
-    return pDone;
+    return MaybePromise.resolve(pDone);
   }
 
   private addNotification() {

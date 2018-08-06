@@ -21,6 +21,7 @@
  */
 
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 type EventListenerCallback = (event: Event) => void;
@@ -81,12 +82,12 @@ export class EventListenerModule extends Module {
     );
     this.addNewListenersImmediately = true;
     this.addAllListeners();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.removeAllListeners();
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   /**

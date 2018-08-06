@@ -26,15 +26,21 @@ import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import { BoundMethods } from "lib/classes/bound-methods";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import * as DOMUtils from "lib/utils/dom-utils";
-import { arrayIncludes, leftRotateArray, range } from "lib/utils/js-utils";
+import {
+  arrayIncludes,
+  defer,
+  leftRotateArray,
+  range,
+} from "lib/utils/js-utils";
 import * as Utils from "lib/utils/misc-utils";
 import {
   addSessionHistoryListener,
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
-import * as WindowUtils from "lib/utils/window-utils";
+import { getTabBrowser } from "lib/utils/window-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
 import { IClassicmenuRuleSpec } from "./classicmenu";
 
@@ -96,7 +102,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private needsReloadOnMenuClose: boolean;
 
   protected readonly document = this.window.document;
-  protected get gBrowser() { return WindowUtils.getTabBrowser(this.window)!; }
+  protected get gBrowser() { return getTabBrowser(this.window)!; }
   protected get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
   protected get startupPreconditions() {
@@ -186,12 +192,12 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     contextMenuEntry!.setAttribute("hidden", String(!isEnabled));
   }
 
-  protected startupSelf() {
-    const promises: Array<Promise<void>> = [];
+  protected startupSelf(): MaybePromise<void> {
+    const promises: Array<MaybePromise<void> | Promise<void>> = [];
 
-    this.addAppcontentTabSelectListener();
-    this.addContextMenuListener();
-    this.addTabContainerTabSelectListener();
+    promises.push(this.addAppcontentTabSelectListener());
+    promises.push(this.addContextMenuListener());
+    promises.push(this.addTabContainerTabSelectListener());
 
     this.msgListener.addListener("notifyTopLevelDocumentLoaded", (message) => {
       // Clear any notifications that may have been present.
@@ -239,8 +245,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       );
     });
 
-    this.updatePermissiveStatusOnPrefChanges();
-    this.updatePermissiveStatus();
+    promises.push(this.updatePermissiveStatusOnPrefChanges());
+    promises.push(this.updatePermissiveStatus());
 
     const popupElement = this.popupElement!;
 
@@ -249,7 +255,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
     this.isFennec = this.xulAppInfo.name === "Fennec";
 
-    promises.push(this.runtime.getBrowserInfo().then((appInfo) => {
+    const p = this.runtime.getBrowserInfo().then((appInfo) => {
       if (appInfo.name === "Fennec") {
         this.log.log("Detected Fennec.");
         // Set an attribute for CSS usage.
@@ -259,7 +265,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       return;
     }).catch((e) => {
       this.log.error("Error on Fennec detection. Details:", e);
-    }));
+    });
+    promises.push(p);
 
     // Register this window with the requestpolicy service so that we can be
     // notified of blocked requests. When blocked requests happen, this
@@ -281,7 +288,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
         `${C.MM_PREFIX}overlayIsReady`, true,
     );
 
-    return Promise.all(promises).then(() => undefined);
+    return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
   protected shutdownSelf() {
@@ -301,10 +308,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       this.toggleRequestLog();
     }
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
-  private addAppcontentTabSelectListener() {
+  private addAppcontentTabSelectListener(): MaybePromise<void> {
     // Info on detecting page load at:
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
     const appcontent = this.$id("appcontent"); // browser
@@ -316,13 +323,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
         );
       }
     }
+    return MaybePromise.resolve(undefined);
   }
 
   /**
    * Add an event listener for when the contentAreaContextMenu (generally
    * the right-click menu within the document) is shown.
    */
-  private addContextMenuListener() {
+  private addContextMenuListener(): MaybePromise<void> {
     const contextMenu = this.$id("contentAreaContextMenu");
     if (contextMenu) {
       this.eventListener.addListener(
@@ -331,29 +339,28 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
           false,
       );
     }
+    return MaybePromise.resolve(undefined);
   }
 
-  private addTabContainerTabSelectListener() {
+  private addTabContainerTabSelectListener(): MaybePromise<void> {
+    const promises: Array<MaybePromise<void>> = [];
     // Listen for the user changing tab so we can update any notification or
     // indication of blocked requests.
     if (!this.isFennec) {
       const container = this.gBrowser.tabContainer;
 
-      const tabSelectCallback = () => {
-        this.tabChanged();
-      };
-
       this.eventListener.addListener(
           container as any,
           "TabSelect",
-          tabSelectCallback,
+          this.boundMethods.get(this.tabChanged),
           false,
       );
 
-      this.wrapAddTab();
-      this.addLocationObserver();
-      this.addHistoryObserver();
+      promises.push(this.wrapAddTab());
+      promises.push(this.addLocationObserver());
+      promises.push(this.addHistoryObserver());
     }
+    return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
   public handleMetaRefreshes(message: any) {
@@ -691,14 +698,15 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private onStorageChanged(changes: browser.storage.StorageChange) {
     if ("startWithAllowAllEnabled" in changes) {
-      this.updatePermissiveStatus();
+      this.updatePermissiveStatus().
+          catch(this.log.onError("onStorageChanged:startWithAllowAllEnabled"));
     }
   }
 
   /**
    * Update RP's "permissive" status, which is to true or false.
    */
-  private updatePermissiveStatus() {
+  private updatePermissiveStatus(): MaybePromise<void> {
     const button = this.$id(this.toolbarButtonId);
     const contextMenuEntry = this.$id("rpcontinuedContextMenuEntry");
     if (button) {
@@ -706,12 +714,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       button.setAttribute("rpcontinuedPermissive", isPermissive);
       contextMenuEntry!.setAttribute("rpcontinuedPermissive", isPermissive);
     }
+    return MaybePromise.resolve(undefined);
   }
 
-  private updatePermissiveStatusOnPrefChanges() {
+  private updatePermissiveStatusOnPrefChanges(): MaybePromise<void> {
     this.storageApi.onChanged.addListener(
         this.boundMethods.get(this.onStorageChanged),
     );
+    return MaybePromise.resolve(undefined);
   }
 
   /**
@@ -849,13 +859,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
    *
    * TODO: Give examples when the wrap is necessary.
    */
-  private wrapAddTab() {
+  private wrapAddTab(): MaybePromise<void> {
     Utils.wrapFunction(
         this.gBrowser,
         "addTab",
         this.boundMethods.get(this.wrapFunctionErrorCallback),
         this.boundMethods.get(this.tabAdded),
     );
+    return MaybePromise.resolve(undefined);
   }
 
   /**
@@ -891,17 +902,17 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     }
   }
 
-  private addLocationObserver() {
-    const self = this;
+  private addLocationObserver(): MaybePromise<void> {
     this.locationListener = {
-      onLocationChange(aProgress, aRequest, aURI) {
+      onLocationChange: (aProgress, aRequest, aURI) => {
         // This gets called both for tab changes and for history navigation.
         // The timer is running on the main window, not the document's window,
         // so we want to stop the timer when the tab is changed.
-        self.stopBlockedContentCheckTimeout();
-        self.updateBlockedContentState(self.gBrowser.selectedBrowser);
+        this.stopBlockedContentCheckTimeout();
+        this.updateBlockedContentState(this.gBrowser.selectedBrowser);
       },
 
+      // tslint:disable-next-line:object-literal-sort-keys
       QueryInterface: XPCOMUtils.generateQI([
         "nsIWebProgressListener",
         "nsISupportsWeakReference",
@@ -910,49 +921,55 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
     // https://developer.mozilla.org/en/Code_snippets/Progress_Listeners
     this.gBrowser.addProgressListener(this.locationListener);
+
+    return MaybePromise.resolve(undefined);
   }
 
   private removeLocationObserver() {
     this.gBrowser.removeProgressListener(this.locationListener);
   }
 
-  private addHistoryObserver() {
-    const self = this;
+  private addHistoryObserver(): MaybePromise<void> {
     this.historyListener = {
-      OnHistoryGoBack(backURI) {
-        self.requestProcessor.registerHistoryRequest(backURI.asciiSpec);
+      OnHistoryGoBack: (backURI) => {
+        this.requestProcessor.registerHistoryRequest(backURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGoForward(forwardURI) {
-        self.requestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
+      OnHistoryGoForward: (forwardURI) => {
+        this.requestProcessor.registerHistoryRequest(forwardURI.asciiSpec);
         return true;
       },
 
-      OnHistoryGotoIndex(index, gotoURI) {
-        self.requestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
+      OnHistoryGotoIndex: (index, gotoURI) => {
+        this.requestProcessor.registerHistoryRequest(gotoURI.asciiSpec);
         return true;
       },
 
-      OnHistoryNewEntry(newURI) { return; },
-      OnHistoryPurge(numEntries) { return true; },
-      OnHistoryReload(reloadURI, reloadFlags) { return true; },
-      OnHistoryReplaceEntry(aIndex) { return; },
+      OnHistoryNewEntry: (newURI) => undefined,
+      OnHistoryPurge: (numEntries) => true,
+      OnHistoryReload: (reloadURI, reloadFlags) => true,
+      OnHistoryReplaceEntry: (aIndex) => undefined,
 
-      QueryInterface<T extends XPCOM.nsISupports>(aIID: XPCOM.nsIJSID): T {
-        if (aIID.equals(self.ci.nsISHistoryListener) ||
-            aIID.equals(self.ci.nsISupportsWeakReference) ||
-            aIID.equals(self.ci.nsISupports)) {
-          return self as any;
+      QueryInterface: <T extends XPCOM.nsISupports>(
+          aIID: XPCOM.nsIJSID,
+      ): T => {
+        if (aIID.equals(this.ci.nsISHistoryListener) ||
+            aIID.equals(this.ci.nsISupportsWeakReference) ||
+            aIID.equals(this.ci.nsISupports)) {
+          return this.historyListener as any;
         }
-        throw self.cr.NS_NOINTERFACE;
+        throw this.cr.NS_NOINTERFACE;
       },
 
-      GetWeakReference<T extends XPCOM.nsISupports>() {
-        return self.cc["@mozilla.org/appshell/appShellService;1"].
-            createInstance(self.ci.nsIWeakReference);
+      // tslint:disable-next-line:object-literal-sort-keys
+      GetWeakReference: <T extends XPCOM.nsISupports>() => {
+        return this.cc["@mozilla.org/appshell/appShellService;1"].
+            createInstance(this.ci.nsIWeakReference);
       },
     };
+
+    const d = defer();
 
     // there seems to be a bug in Firefox ESR 24 -- the session history is
     // null. After waiting a few miliseconds it's available. To be sure this
@@ -965,7 +982,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
           this.gBrowser,
           this.historyListener,
       );
-      if (!result.error) return;
+      if (!result.error) {
+        d.resolve(undefined);
+        return;
+      }
 
       const e = result.error;
       if (tries >= maxTries) {
@@ -974,6 +994,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
             `after ${tries} tries. Details:`,
             e,
         );
+        d.reject(e);
       } else {
         // call this function again in a few miliseconds.
         this.setTimeout(() => {
@@ -983,6 +1004,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       }
     };
     tryAddingSHistoryListener();
+
+    return MaybePromise.resolve(d.promise);
   }
 
   private removeHistoryObserver() {

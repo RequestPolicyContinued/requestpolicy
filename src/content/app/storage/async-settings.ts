@@ -22,6 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
 
@@ -79,12 +80,12 @@ export class AsyncSettings extends Module
 
   protected startupSelf() {
     this.storageApi.onChanged.addListener(this.changeEventListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     this.storageApi.onChanged.removeListener(this.changeEventListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
   private onChangedEvent(

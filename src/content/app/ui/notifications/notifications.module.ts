@@ -22,6 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { NotificationID, NotificationsSet } from "./notifications-set";
 
@@ -50,6 +51,6 @@ export class Notifications extends Module implements App.ui.INotifications {
     this.notifications.forEach(showNotification);
     this.notifications.onAdded.addListener(showNotification);
 
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 }

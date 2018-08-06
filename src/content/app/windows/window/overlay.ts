@@ -59,10 +59,12 @@ function onOpenLinkViaContextMenu(
   requestProcessor.registerLinkClicked(origin, dest);
 }
 
-// tslint:disable:member-ordering
-
 export class Overlay extends Module implements App.windows.window.IOverlay {
   // protected get debugEnabled() { return true; }
+
+  // This is set by the request log when it is initialized.
+  // We don't need to worry about setting it here.
+  public requestLog: any = null;
 
   private readonly onOpenLinkViaContextMenu = onOpenLinkViaContextMenu.bind(
       null,
@@ -70,18 +72,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       this.requestProcessor,
   );
 
-  private readonly winUtil = this.window.
-      QueryInterface<XPCOM.nsIInterfaceRequestor>(
-          this.ci.nsIInterfaceRequestor,
-      ).
-      getInterface<XPCOM.nsIDOMWindowUtils>(this.ci.nsIDOMWindowUtils);
-  private readonly winID = this.winUtil.outerWindowID;
-
   private boundMethods = new BoundMethods(this);
-
-  // This is set by the request log when it is initialized.
-  // We don't need to worry about setting it here.
-  public requestLog: any = null;
 
   private toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 
@@ -101,9 +92,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private needsReloadOnMenuClose: boolean;
 
-  protected readonly document = this.window.document;
-  protected get gBrowser() { return getTabBrowser(this.window)!; }
-  protected get $str() { return this.i18n.getMessage.bind(browser.i18n); }
+  private get gBrowser() { return getTabBrowser(this.window)!; }
+  private get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
   protected get startupPreconditions() {
     return [
@@ -120,9 +110,9 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   constructor(
-      parentLog: Common.ILog,
-      windowID: number,
-      private window: XUL.chromeWindow,
+      readonly parentLog: Common.ILog,
+      readonly windowID: number,
+      private readonly window: XUL.chromeWindow,
 
       private readonly cc: XPCOM.nsXPCComponents_Classes,
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,
@@ -150,46 +140,181 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     super(`app.windows[${windowID}].overlay`, parentLog);
   }
 
-  private get popupElement(): XUL.menupopup {
-    return (this.$id("rpc-popup") as any) as XUL.menupopup;
-  }
-
-  private setTimeout(aFn: () => void, aDelay: number) {
-    return setTimeout(() => {
-      if (this.shutdownState !== "not yet shut down") {
-        console.log(
-            "[RequestPolicy] Not calling delayed function " +
-            "because of add-on shutdown.",
-        );
-        return;
+  /**
+   * This function is called when any requests happen. This must be as
+   * fast as possible because request processing blocks until this function
+   * returns.
+   *
+   * @param {boolean} isAllowed
+   * @param {string} originUri
+   * @param {string} destUri
+   */
+  public observeRequest({isAllowed, originUri, destUri}: {
+      isAllowed: boolean,
+      originUri: string,
+      destUri: string,
+  }) {
+    if (isAllowed) {
+      if (this.requestLog) {
+        this.requestLog!.addAllowedRequest(originUri, destUri);
       }
-      aFn.call(null);
-    }, aDelay);
+    } else {
+      this.updateNotificationDueToBlockedContent();
+      if (this.requestLog) {
+        this.requestLog!.addBlockedRequest(originUri, destUri);
+      }
+    }
   }
 
   /**
-   * Return a DOM element by its id. First search in the main document,
-   * and if not found search in the document included in the frame.
+   * This function gets called when a top-level document request has been
+   * blocked.
+   * This function is called during shouldLoad(). As shouldLoad shoudn't be
+   * blocked, it's better to set a timeout here.
    */
-  private $id(id: string): HTMLElement | null {
-    let element = this.window.top.document.getElementById(id);
-    if (!element) {
-      const popupframe = this.window.top.document.
-          getElementById("rpc-popup-frame") as HTMLFrameElement;
-      if (popupframe && popupframe.contentDocument) {
-        element = popupframe.contentDocument.getElementById(id);
+  public observeBlockedTopLevelDocRequest(
+      browser: XUL.browser,
+      originUri: string,
+      destUri: string,
+  ) {
+    // This function is called during shouldLoad() so set a timeout to
+    // avoid blocking shouldLoad.
+    this.setTimeout(() => {
+      this.showRedirectNotification(
+          browser,
+          destUri,
+          0,
+          originUri,
+      );
+    }, 0);
+  }
+
+  /**
+   * Called before the popup menu is shown.
+   */
+  public onPopupShowing(event: Event) {
+    // if (event.currentTarget != event.originalTarget) {
+    //   return;
+    // }
+    this.menu.prepareMenu();
+  }
+
+  /**
+   * Called after the popup menu has been hidden.
+   */
+  public onPopupHidden(event: Event) {
+    const rulesChanged = this.menu.processQueuedRuleChanges();
+    if (rulesChanged || this.needsReloadOnMenuClose) {
+      if (this.cachedSettings.get("autoReload")) {
+        const mm = this.gBrowser.selectedBrowser.messageManager;
+        mm.sendAsyncMessage(`${C.MM_PREFIX}reload`);
       }
     }
-    return element;
+    this.needsReloadOnMenuClose = false;
   }
 
-  public toString() {
-    return `[rpcontinued.overlay ${this.winID}]`;
+  /**
+   * Get the top-level document's uri.
+   *
+   * @return {string}
+   */
+  public getTopLevelDocumentUri() {
+    const uri = this.gBrowser.selectedBrowser.currentURI.spec;
+    return CompatibilityRules.getTopLevelDocTranslation(uri) ||
+        this.uriService.stripFragment(uri);
   }
 
-  private setContextMenuEntryEnabled(isEnabled: boolean) {
-    const contextMenuEntry = this.$id("rpcontinuedContextMenuEntry");
-    contextMenuEntry!.setAttribute("hidden", String(!isEnabled));
+  /**
+   * Toggle disabling of all blocking for the current session.
+   */
+  public toggleTemporarilyAllowAll(): boolean {
+    const disabled = !this.cachedSettings.alias.isBlockingDisabled();
+    this.cachedSettings.alias.setBlockingDisabled(disabled);
+
+    return disabled;
+  }
+
+  /**
+   * Revoke all temporary permissions granted during the current session.
+   */
+  public revokeTemporaryPermissions(event: Event) {
+    this.policy.revokeTemporaryRules();
+    this.needsReloadOnMenuClose = true;
+    this.popupElement.hidePopup();
+  }
+
+  public toggleMenu() {
+    if (this.popupElement.state === "closed") {
+      this.openMenu();
+    } else {
+      this.closeMenu();
+    }
+  }
+
+  public openPrefs() {
+    let url: string;
+    const equivalentURLs: string[] = [];
+    const relatedToCurrent = true;
+
+    if (C.EXTENSION_TYPE === "legacy") {
+      url = "about:requestpolicy";
+      equivalentURLs.push(
+          browser.runtime.getURL("settings/basicprefs.html"),
+      );
+    } else {
+      url = browser.runtime.getURL("settings/basicprefs.html");
+    }
+
+    this.maybeOpenLinkInNewTab(url, equivalentURLs, relatedToCurrent);
+  }
+
+  public openPolicyManager() {
+    this.maybeOpenLinkInNewTab(
+        browser.runtime.getURL("settings/yourpolicy.html"),
+        [],
+        true,
+    );
+  }
+
+  public openHelp() {
+    this.maybeOpenLinkInNewTab(
+        "https://github.com/" +
+        "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support",
+        [],
+    );
+  }
+
+  public clearRequestLog() {
+    (this.requestLog as any).clear();
+  }
+
+  public toggleRequestLog() {
+    const requestLog: any = this.$id("rpcontinued-requestLog");
+    const requestLogSplitter = this.$id("rpcontinued-requestLog-splitter")!;
+    const requestLogFrame = this.$id("rpcontinued-requestLog-frame")!;
+    // var openRequestLog = this.$id("rpcontinuedOpenRequestLog");
+
+    // TODO: figure out how this should interact with the new menu.
+    // var closeRequestLog = this.$id("requestpolicyCloseRequestLog");
+    const closeRequestLog: any = {};
+
+    if (requestLog.hidden) {
+      requestLogFrame.setAttribute(
+          "src",
+          "chrome://rpcontinued/content/ui/request-log/request-log.xul",
+      );
+      requestLog.hidden = false;
+      requestLogSplitter.hidden = false;
+      closeRequestLog.hidden = false;
+      // openRequestLog.hidden = true;
+    } else {
+      requestLogFrame.setAttribute("src", "about:blank");
+      requestLog.hidden = true;
+      requestLogSplitter.hidden = true;
+      closeRequestLog.hidden = true;
+      // openRequestLog.hidden = false;
+      this.requestLog = null;
+    }
   }
 
   protected startupSelf(): MaybePromise<void> {
@@ -311,6 +436,44 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     return MaybePromise.resolve(undefined);
   }
 
+  private get popupElement(): XUL.menupopup {
+    return (this.$id("rpc-popup") as any) as XUL.menupopup;
+  }
+
+  private setTimeout(aFn: () => void, aDelay: number) {
+    return setTimeout(() => {
+      if (this.shutdownState !== "not yet shut down") {
+        console.log(
+            "[RequestPolicy] Not calling delayed function " +
+            "because of add-on shutdown.",
+        );
+        return;
+      }
+      aFn.call(null);
+    }, aDelay);
+  }
+
+  /**
+   * Return a DOM element by its id. First search in the main document,
+   * and if not found search in the document included in the frame.
+   */
+  private $id(id: string): HTMLElement | null {
+    let element = this.window.top.document.getElementById(id);
+    if (!element) {
+      const popupframe = this.window.top.document.
+          getElementById("rpc-popup-frame") as HTMLFrameElement;
+      if (popupframe && popupframe.contentDocument) {
+        element = popupframe.contentDocument.getElementById(id);
+      }
+    }
+    return element;
+  }
+
+  private setContextMenuEntryEnabled(isEnabled: boolean) {
+    const contextMenuEntry = this.$id("rpcontinuedContextMenuEntry");
+    contextMenuEntry!.setAttribute("hidden", String(!isEnabled));
+  }
+
   private addAppcontentTabSelectListener(): MaybePromise<void> {
     // Info on detecting page load at:
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
@@ -363,7 +526,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
-  public handleMetaRefreshes(message: any) {
+  private handleMetaRefreshes(message: any) {
     this.log.log("Handling meta refreshes...");
 
     const {documentURI, metaRefreshes} = message.data;
@@ -493,10 +656,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     let origin = null;
     let dest = null;
     if (originBaseDomain !== null) {
-      origin = m._addWildcard(originBaseDomain);
+      origin = m.addWildcard(originBaseDomain);
     }
     if (destBaseDomain !== null) {
-      dest = m._addWildcard(destBaseDomain);
+      dest = m.addWildcard(destBaseDomain);
     }
 
     const mayPermRulesBeAdded = this.privateBrowsingService.
@@ -638,7 +801,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   /**
    * Performs actions required to be performed after a tab change.
    */
-  public tabChanged() {
+  private tabChanged() {
     // TODO: verify the Fennec and all supported browser versions update the
     // status bar properly with only the ProgressListener. Once verified,
     // remove calls to tabChanged();
@@ -722,55 +885,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
         this.boundMethods.get(this.onStorageChanged),
     );
     return MaybePromise.resolve(undefined);
-  }
-
-  /**
-   * This function is called when any requests happen. This must be as
-   * fast as possible because request processing blocks until this function
-   * returns.
-   *
-   * @param {boolean} isAllowed
-   * @param {string} originUri
-   * @param {string} destUri
-   */
-  public observeRequest({isAllowed, originUri, destUri}: {
-      isAllowed: boolean,
-      originUri: string,
-      destUri: string,
-  }) {
-    if (isAllowed) {
-      if (this.requestLog) {
-        this.requestLog!.addAllowedRequest(originUri, destUri);
-      }
-    } else {
-      this.updateNotificationDueToBlockedContent();
-      if (this.requestLog) {
-        this.requestLog!.addBlockedRequest(originUri, destUri);
-      }
-    }
-  }
-
-  /**
-   * This function gets called when a top-level document request has been
-   * blocked.
-   * This function is called during shouldLoad(). As shouldLoad shoudn't be
-   * blocked, it's better to set a timeout here.
-   */
-  public observeBlockedTopLevelDocRequest(
-      browser: XUL.browser,
-      originUri: string,
-      destUri: string,
-  ) {
-    // This function is called during shouldLoad() so set a timeout to
-    // avoid blocking shouldLoad.
-    this.setTimeout(() => {
-      this.showRedirectNotification(
-          browser,
-          destUri,
-          0,
-          originUri,
-      );
-    }, 0);
   }
 
   // TODO: observeBlockedFormSubmissionRedirect
@@ -1020,75 +1134,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   /**
-   * Called before the popup menu is shown.
-   */
-  public onPopupShowing(event: Event) {
-    // if (event.currentTarget != event.originalTarget) {
-    //   return;
-    // }
-    this.menu.prepareMenu();
-  }
-
-  /**
-   * Called after the popup menu has been hidden.
-   */
-  public onPopupHidden(event: Event) {
-    const rulesChanged = this.menu.processQueuedRuleChanges();
-    if (rulesChanged || this.needsReloadOnMenuClose) {
-      if (this.cachedSettings.get("autoReload")) {
-        const mm = this.gBrowser.selectedBrowser.messageManager;
-        mm.sendAsyncMessage(`${C.MM_PREFIX}reload`);
-      }
-    }
-    this.needsReloadOnMenuClose = false;
-  }
-
-  /**
-   * Determines the top-level document's uri identifier based on the current
-   * identifier level setting.
-   *
-   * @return {String} The current document's identifier.
-   */
-  public getTopLevelDocumentUriIdentifier() {
-    return this.uriService.getIdentifier(this.getTopLevelDocumentUri());
-  }
-
-  /**
-   * Get the top-level document's uri.
-   *
-   * @return {string}
-   */
-  public getTopLevelDocumentUri() {
-    const uri = this.gBrowser.selectedBrowser.currentURI.spec;
-    return CompatibilityRules.getTopLevelDocTranslation(uri) ||
-        this.uriService.stripFragment(uri);
-  }
-
-  /**
-   * Toggle disabling of all blocking for the current session.
-   */
-  public toggleTemporarilyAllowAll(): boolean {
-    const disabled = !this.cachedSettings.alias.isBlockingDisabled();
-    this.cachedSettings.alias.setBlockingDisabled(disabled);
-
-    return disabled;
-  }
-
-  /**
-   * Revoke all temporary permissions granted during the current session.
-   */
-  public revokeTemporaryPermissions(event: Event) {
-    this.policy.revokeTemporaryRules();
-    this.needsReloadOnMenuClose = true;
-    this.popupElement.hidePopup();
-  }
-
-  /**
    * Open the menu at the browsing content.
    *
    * The menu is aligned to the top right.
    */
-  public openMenuAtContent() {
+  private openMenuAtContent() {
     // There's no good way to right-align a popup. So, we can either
     // let it be left aligned or we can figure out where we think the
     // top-left corner should be. And that's what we do.
@@ -1106,7 +1156,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     popupElement.openPopup(anchor, "overlap", xOffset);
   }
 
-  public openMenuAtToolbarButton() {
+  private openMenuAtToolbarButton() {
     const anchor = this.$id("/* @echo ALPHABETICAL_ID */ToolbarButton");
     // rpcontinued.overlay._toolbox.insertBefore(
     //     rpcontinued.overlay.popupElement, null);
@@ -1119,7 +1169,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
    * If the toolbar button is visible, it will be placed there. Otherwise
    * it will be placed near the browsing content.
    */
-  public openMenu() {
+  private openMenu() {
     // `setTimeout` is needed in certain cases where the toolbar button
     // is actually hidden. For example, it can reside in the Australis
     // menu. By delaying "openMenu" the menu will be closed in the
@@ -1136,19 +1186,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   /**
    * Close RequestPolicy's menu.
    */
-  public closeMenu() {
+  private closeMenu() {
     this.menu.close();
   }
 
-  public toggleMenu() {
-    if (this.popupElement.state === "closed") {
-      this.openMenu();
-    } else {
-      this.closeMenu();
-    }
-  }
-
-  public isToolbarButtonVisible() {
+  private isToolbarButtonVisible() {
     return DOMUtils.isElementVisible(
         this.$id("/* @echo ALPHABETICAL_ID */ToolbarButton")!,
     );
@@ -1191,71 +1233,5 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     }
 
     this.openLinkInNewTab(url, relatedToCurrent);
-  }
-
-  public openPrefs() {
-    let url: string;
-    const equivalentURLs: string[] = [];
-    const relatedToCurrent = true;
-
-    if (C.EXTENSION_TYPE === "legacy") {
-      url = "about:requestpolicy";
-      equivalentURLs.push(
-          browser.runtime.getURL("settings/basicprefs.html"),
-      );
-    } else {
-      url = browser.runtime.getURL("settings/basicprefs.html");
-    }
-
-    this.maybeOpenLinkInNewTab(url, equivalentURLs, relatedToCurrent);
-  }
-
-  public openPolicyManager() {
-    this.maybeOpenLinkInNewTab(
-        browser.runtime.getURL("settings/yourpolicy.html"),
-        [],
-        true,
-    );
-  }
-
-  public openHelp() {
-    this.maybeOpenLinkInNewTab(
-        "https://github.com/" +
-        "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support",
-        [],
-    );
-  }
-
-  public clearRequestLog() {
-    (this.requestLog as any).clear();
-  }
-
-  public toggleRequestLog() {
-    const requestLog: any = this.$id("rpcontinued-requestLog");
-    const requestLogSplitter = this.$id("rpcontinued-requestLog-splitter")!;
-    const requestLogFrame = this.$id("rpcontinued-requestLog-frame")!;
-    // var openRequestLog = this.$id("rpcontinuedOpenRequestLog");
-
-    // TODO: figure out how this should interact with the new menu.
-    // var closeRequestLog = this.$id("requestpolicyCloseRequestLog");
-    const closeRequestLog: any = {};
-
-    if (requestLog.hidden) {
-      requestLogFrame.setAttribute(
-          "src",
-          "chrome://rpcontinued/content/ui/request-log/request-log.xul",
-      );
-      requestLog.hidden = false;
-      requestLogSplitter.hidden = false;
-      closeRequestLog.hidden = false;
-      // openRequestLog.hidden = true;
-    } else {
-      requestLogFrame.setAttribute("src", "about:blank");
-      requestLog.hidden = true;
-      requestLogSplitter.hidden = true;
-      closeRequestLog.hidden = true;
-      // openRequestLog.hidden = false;
-      this.requestLog = null;
-    }
   }
 }

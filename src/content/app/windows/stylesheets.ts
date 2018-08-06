@@ -26,7 +26,8 @@ import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-export class ChromeStyleSheets extends Module {
+export class ChromeStyleSheets extends Module
+    implements App.windows.IChromeStyleSheets {
   private STYLE_SHEETS = [
     "chrome://rpcontinued/skin/requestpolicy.css",
     (this.legacyMiscInfos && this.legacyMiscInfos.isSeamonkey) ?

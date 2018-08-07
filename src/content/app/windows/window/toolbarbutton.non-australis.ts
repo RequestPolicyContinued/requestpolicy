@@ -22,7 +22,6 @@
 
 import {log} from "app/log";
 import { API, XPCOM, XUL } from "bootstrap/api/interfaces";
-import * as XULUtils from "bootstrap/api/services/xul-service";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -44,6 +43,8 @@ export class NonAustralisToolbarButton extends Module {
       windowID: number,
       private window: XUL.chromeWindow,
 
+      private readonly xulService: API.services.IXulService,
+
       private readonly vc: XPCOM.nsIVersionComparator,
       private readonly miscInfos: API.IMiscInfos,
   ) {
@@ -52,7 +53,7 @@ export class NonAustralisToolbarButton extends Module {
 
   protected startupSelf() {
     if (!this.isAustralis) {
-      XULUtils.addTreeElementsToWindow(this.window, "toolbarbutton");
+      this.xulService.addTreeElementsToWindow(this.window, "toolbarbutton");
       this.addToolbarButtonToNavBar();
     }
     return MaybePromise.resolve(undefined);
@@ -60,7 +61,10 @@ export class NonAustralisToolbarButton extends Module {
 
   protected shutdownSelf() {
     if (!this.isAustralis) {
-      XULUtils.removeTreeElementsFromWindow(this.window, "toolbarbutton");
+      this.xulService.removeTreeElementsFromWindow(
+          this.window,
+          "toolbarbutton",
+      );
     }
     return MaybePromise.resolve(undefined);
   }

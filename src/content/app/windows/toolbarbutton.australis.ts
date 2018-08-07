@@ -22,7 +22,6 @@
 
 import { App } from "app/interfaces";
 import { API, JSMs } from "bootstrap/api/interfaces";
-import * as XULUtils from "bootstrap/api/services/xul-service";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -38,6 +37,7 @@ export class AustralisToolbarButton extends Module {
       parentLog: Common.ILog,
       private readonly mozCustomizableUI: JSMs.CustomizableUI | null,
       private readonly miscInfos: API.IMiscInfos,
+      private readonly xulService: API.services.IXulService,
   ) {
     super(`app.windows.toolbarbutton`, parentLog);
   }
@@ -59,14 +59,14 @@ export class AustralisToolbarButton extends Module {
   private removeToolbarButtonFromAustralis() {
     const {
       attributes: {id},
-    } = XULUtils.xulTrees.toolbarbutton[0];
+    } = this.xulService.xulTrees.toolbarbutton[0];
     this.mozCustomizableUI!.destroyWidget(id);
   }
 
   private addToolbarButtonToAustralis() {
     const {
       attributes: {id, label, tooltiptext},
-    } = XULUtils.xulTrees.toolbarbutton[0];
+    } = this.xulService.xulTrees.toolbarbutton[0];
 
     this.mozCustomizableUI!.createWidget({
       defaultArea: this.mozCustomizableUI!.AREA_NAVBAR,

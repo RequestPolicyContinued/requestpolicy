@@ -21,11 +21,7 @@
  */
 
 import { App } from "app/interfaces";
-import { XUL } from "bootstrap/api/interfaces";
-import {
-  addTreeElementsToWindow,
-  removeTreeElementsFromWindow,
-} from "bootstrap/api/services/xul-service";
+import { API, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -43,6 +39,8 @@ export class XulTrees extends Module {
       parentLog: Common.ILog,
       protected readonly windowID: number,
       protected readonly window: XUL.chromeWindow,
+
+      private readonly xulService: API.services.IXulService,
 
       private readonly classicmenu: App.windows.window.IClassicMenu,
       private readonly menu: App.windows.window.IMenu,
@@ -65,14 +63,14 @@ export class XulTrees extends Module {
     };
 
     // add all XUL elements
-    addTreeElementsToWindow(this.window, "mainTree");
+    this.xulService.addTreeElementsToWindow(this.window, "mainTree");
 
     return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     // remove all XUL elements
-    removeTreeElementsFromWindow(this.window, "mainTree");
+    this.xulService.removeTreeElementsFromWindow(this.window, "mainTree");
 
     // Remove the scope variable.
     // This wouldn't be needed when the window is closed, but this has to be

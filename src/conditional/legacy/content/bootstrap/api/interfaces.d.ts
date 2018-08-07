@@ -1359,6 +1359,7 @@ import { Runtime } from "./runtime";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
+import { XulService } from "./services/xul-service";
 import { JsonStorage } from "./storage/json-storage";
 import {
   PrefBranch,
@@ -1401,6 +1402,7 @@ export namespace API {
   export namespace services {
     export type IChromeFileService = ChromeFileService;
     export type IFileService = FileService;
+    export type IXulService = XulService;
   }
 
   export namespace storage {

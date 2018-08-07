@@ -21,6 +21,7 @@
  */
 
 import { JSMService } from "bootstrap/api/services/jsm-service";
+import { XulService } from "bootstrap/api/services/xul-service";
 import { Log } from "lib/classes/log";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { Api } from "./api/api.module";
@@ -65,6 +66,7 @@ const localeData = new AsyncLocaleData(
     tryCatchUtils, chromeFileService, mozServices,
 );
 const i18n = new I18n(log, localeData);
+const xulService = new XulService(i18n);
 const management = new Management(log, mozAddonManager);
 const manifest = new Manifest(log, chromeFileService);
 const runtime = new Runtime(log, Services.appinfo);
@@ -106,4 +108,5 @@ export const api = new Api(
     rpPrefBranch,
     prefObserverFactory,
     tryCatchUtils,
+    xulService,
 );

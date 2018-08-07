@@ -21,10 +21,13 @@
  */
 
 import { API, JSMs } from "bootstrap/api/interfaces";
+import {
+  getBestAvailableLocale,
+  normalizeToBCP47,
+} from "legacy/lib/utils/i18n-utils";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { IModule } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
-import * as I18nUtils from "./i18n-utils";
 import {LocaleData} from "./locale-data";
 
 /**
@@ -55,7 +58,7 @@ export class AsyncLocaleData extends LocaleData implements IModule {
         this.mozServices.prefs,
         this.mozServices.locale,
     );
-    return I18nUtils.normalizeToBCP47(appLocale);
+    return normalizeToBCP47(appLocale);
   }
 
   /**
@@ -71,7 +74,7 @@ export class AsyncLocaleData extends LocaleData implements IModule {
 
     return this.chromeFileService.parseJSON(manifestUrl).then((manifest) => {
       if (manifest && manifest.default_locale) {
-        const bcp47tag = I18nUtils.normalizeToBCP47(manifest.default_locale);
+        const bcp47tag = normalizeToBCP47(manifest.default_locale);
         return Promise.resolve(bcp47tag);
       } else {
         return Promise.reject(
@@ -98,7 +101,7 @@ export class AsyncLocaleData extends LocaleData implements IModule {
         localesListJSON,
     ).then((localesDirNames: string[]) => Promise.all(
         localesDirNames.map((dirName) => [
-          I18nUtils.normalizeToBCP47(dirName),
+          normalizeToBCP47(dirName),
           dirName,
         ]) as Array<[string, string]>,
     )).then((mapAsArray) => new Map(mapAsArray));
@@ -120,8 +123,8 @@ export class AsyncLocaleData extends LocaleData implements IModule {
     const matchesSet = new Set();
     const localesTag = Array.from(localesMap.keys());
     for (const locale of requestedLocales) {
-      const normTag = I18nUtils.normalizeToBCP47(locale);
-      const matchTag = I18nUtils.getBestAvailableLocale(localesTag, normTag);
+      const normTag = normalizeToBCP47(locale);
+      const matchTag = getBestAvailableLocale(localesTag, normTag);
       if (matchTag) {
         matchesSet.add(matchTag);
       }
@@ -161,21 +164,21 @@ export class AsyncLocaleData extends LocaleData implements IModule {
    * @return {Object} An object containing the best matches
    */
   public updateLocalesPrefs(defaultLocale: string, uiLocale: string) {
-    const normDefault = I18nUtils.normalizeToBCP47(defaultLocale);
-    const normUi = I18nUtils.normalizeToBCP47(uiLocale);
+    const normDefault = normalizeToBCP47(defaultLocale);
+    const normUi = normalizeToBCP47(uiLocale);
 
     const loadedTags = Array.from(this.messages.keys()).
         filter((tag) => tag.toLowerCase() !== this.BUILTIN.toLowerCase()).
-        map((tag) => I18nUtils.normalizeToBCP47(tag));
+        map((tag) => normalizeToBCP47(tag));
 
-    const bestDefault = I18nUtils.
+    const bestDefault =
         getBestAvailableLocale(loadedTags, normDefault);
     if (!bestDefault) {
       throw new Error("Can't find a locale matching the default locale "
         + `'${defaultLocale}'`);
     }
 
-    let bestUi = I18nUtils.getBestAvailableLocale(loadedTags, normUi);
+    let bestUi = getBestAvailableLocale(loadedTags, normUi);
     if (!bestUi) {
       // If a match isn't found, we put the real ui locale code. In fact it
       // doesn't matter which value we set because defaultLocale will be used

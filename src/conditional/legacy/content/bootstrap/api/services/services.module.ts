@@ -29,7 +29,8 @@ export class ServicesApi extends Module {
       log: Common.ILog,
       public chromeFileService: API.services.IChromeFileService,
       public fileService: API.services.IFileService,
+      public xulService: API.services.IXulService,
   ) {
-    super("browser.storage", log);
+    super("browser.services", log);
   }
 }

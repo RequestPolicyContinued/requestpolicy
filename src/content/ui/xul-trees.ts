@@ -21,13 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/// <reference path="../lib/utils/xul-utils.d.ts" />
+// tslint:disable-next-line:max-line-length
+/// <reference path="../../conditional/legacy/content/bootstrap/api/services/xul-service.d.ts" />
 
-import { C as C_ } from "data/constants";
+import { JSMs } from "bootstrap/api/interfaces";
+import { C } from "data/constants";
 
-declare const C: typeof C_;
-declare const appID: string;
-declare const exports: IMaybeIncompleteXulTreeLists;
+declare const Services: JSMs.Services;
+const appID = Services.appinfo.ID;
 
 // tslint:disable:object-literal-sort-keys
 // tslint:disable:max-line-length
@@ -36,160 +37,162 @@ declare const exports: IMaybeIncompleteXulTreeLists;
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 const isSeamonkey = appID === C.SEAMONKEY_ID;
 
-exports.toolbarbutton = [
-  {
-    parent: {
-      // $("#navigator-toolbox").palette
-      special: {
-        type: "subobject",
-        id: "navigator-toolbox",
-        tree: ["palette"],
+export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists => ({
+  toolbarbutton: [
+    {
+      parent: {
+        // $("#navigator-toolbox").palette
+        special: {
+          type: "subobject",
+          id: "navigator-toolbox",
+          tree: ["palette"],
+        },
+      },
+
+      tag: "toolbarbutton",
+      attributes: {
+        id: "/* @echo ALPHABETICAL_ID */ToolbarButton",
+        label: "RequestPolicy",
+        tooltiptext: "RequestPolicy Continued",
+        popup: "rpc-popup",
       },
     },
+  ],
 
-    tag: "toolbarbutton",
-    attributes: {
-      id: "/* @echo ALPHABETICAL_ID */ToolbarButton",
-      label: "RequestPolicy",
-      tooltiptext: "RequestPolicy Continued",
-      popup: "rpc-popup",
+  mainTree: [
+    {
+      parent: {id: isSeamonkey ? "taskPopup" : "menu_ToolsPopup"},
+
+      tag: "menu",
+      attributes: {label: "RequestPolicy Continued",
+                  accesskey: "r"},
+      children: [
+        {
+          tag: "menupopup",
+          children: [
+            {
+              tag: "menuitem",
+              attributes: {label: "__MSG_managePolicies@menu__",
+                          accesskey: "m"},
+              events: {command: ["overlay", "openPolicyManager"]},
+            },
+            {
+              tag: "menuitem",
+              attributes: {label: "__MSG_rp_requestLog_title__",
+                          accesskey: "l"},
+              events: {command: ["overlay", "toggleRequestLog"]},
+            },
+            {
+              tag: "menuitem",
+              attributes: {label: "__MSG_rp_menu_preferences__",
+                          accesskey: "p"},
+              events: {command: ["overlay", "openPrefs"]},
+            },
+          ],
+        },
+      ],
     },
-  },
-];
 
-exports.mainTree = [
-  {
-    parent: {id: isSeamonkey ? "taskPopup" : "menu_ToolsPopup"},
+    {
+      parent: {id: "contentAreaContextMenu"},
 
-    tag: "menu",
-    attributes: {label: "RequestPolicy Continued",
-                 accesskey: "r"},
-    children: [
-      {
-        tag: "menupopup",
-        children: [
-          {
-            tag: "menuitem",
-            attributes: {label: "__MSG_managePolicies@menu__",
-                         accesskey: "m"},
-            events: {command: ["overlay", "openPolicyManager"]},
-          },
-          {
-            tag: "menuitem",
-            attributes: {label: "__MSG_rp_requestLog_title__",
-                         accesskey: "l"},
-            events: {command: ["overlay", "toggleRequestLog"]},
-          },
-          {
-            tag: "menuitem",
-            attributes: {label: "__MSG_rp_menu_preferences__",
-                         accesskey: "p"},
-            events: {command: ["overlay", "openPrefs"]},
-          },
-        ],
-      },
-    ],
-  },
+      tag: "menuitem",
+      attributes: {id: "rpcontinuedContextMenuEntry",
+                  label: "RequestPolicy Continued"},
+      events: {command: ["overlay", "toggleMenu"]},
+    },
 
-  {
-    parent: {id: "contentAreaContextMenu"},
+    {
+      parent: {special: {type: "__window__"}},
 
-    tag: "menuitem",
-    attributes: {id: "rpcontinuedContextMenuEntry",
-                 label: "RequestPolicy Continued"},
-    events: {command: ["overlay", "toggleMenu"]},
-  },
+      tag: "keyset",
+      attributes: {id: "rpcontinuedKeyset"},
+    },
 
-  {
-    parent: {special: {type: "__window__"}},
+    {
+      parent: {special: {type: "__window__"}},
 
-    tag: "keyset",
-    attributes: {id: "rpcontinuedKeyset"},
-  },
+      tag: "popupset",
+      attributes: {id: "rpcontinuedPopupset"},
+      children: [
+        {
+          tag: "menupopup",
+          attributes: {id: "rpcontinuedRedirectAddRuleMenu"},
+        }, {
+          tag: "menupopup",
+          attributes: {id: "rpc-popup",
+                      noautohide: "true",
+                      position: "after_start"},
+          events: {popupshowing: ["overlay", "onPopupShowing"],
+                  popuphidden: ["overlay", "onPopupHidden"]},
+          children: [
+            {
+              tag: "iframe",
+              attributes: {id: "rpc-popup-frame",
+                          type: "chrome",
+                          src: "chrome://rpcontinued/content/ui/popup/popup.html"},
+            },
+          ],
+        },
+      ],
+    },
 
-  {
-    parent: {special: {type: "__window__"}},
-
-    tag: "popupset",
-    attributes: {id: "rpcontinuedPopupset"},
-    children: [
-      {
-        tag: "menupopup",
-        attributes: {id: "rpcontinuedRedirectAddRuleMenu"},
-      }, {
-        tag: "menupopup",
-        attributes: {id: "rpc-popup",
-                     noautohide: "true",
-                     position: "after_start"},
-        events: {popupshowing: ["overlay", "onPopupShowing"],
-                 popuphidden: ["overlay", "onPopupHidden"]},
-        children: [
-          {
-            tag: "iframe",
-            attributes: {id: "rpc-popup-frame",
-                         type: "chrome",
-                         src: "chrome://rpcontinued/content/ui/popup/popup.html"},
-          },
-        ],
-      },
-    ],
-  },
-
-  {
-    parent: {id: "appcontent"},
-    tag: "splitter",
-    attributes: {id: "rpcontinued-requestLog-splitter",
-                 hidden: "true"},
-  },
-  {
-    parent: {id: "appcontent"},
-    tag: "vbox",
-    attributes: {id: "rpcontinued-requestLog",
-                 height: "300",
-                 hidden: "true",
-                 persist: "height"},
-    children: [
-      {
-        tag: "toolbox",
-        attributes: {id: "rpcontinued-requestLog-header"},
-        children: [
-          {
-            tag: "toolbar",
-            attributes: {id: "rpcontinued-requestLog-toolbar",
-                         align: "center"},
-            children: [
-              {
-                tag: "label",
-                attributes: {id: "rpcontinued-requestLog-title",
-                             control: "rpcontinued-requestLog-frame",
-                             value: "__MSG_rp_requestLog_title__",
-                             crop: "end"},
-              }, {
-                tag: "button",
-                attributes: {id: "rpcontinued-requestLog-clear",
-                             label: "__MSG_rp_requestLog_clear__"},
-                events: {command: ["overlay", "clearRequestLog"]},
-              }, {
-                tag: "vbox",
-                attributes: {flex: "1"},
-              }, {
-                tag: "toolbarbutton",
-                attributes: {id: "rpcontinued-requestLog-close",
-                             align: "right"},
-                events: {command: ["overlay", "toggleRequestLog"]},
-              },
-            ],
-          },
-        ],
-      },
-      // The src of this iframe is set to
-      // chrome://rpcontinued/content/ui/request-log/request-log.xul in overlay.js
-      {
-        tag: "iframe",
-        attributes: {id: "rpcontinued-requestLog-frame",
-                     type: "chrome",
-                     flex: "1"},
-      },
-    ],
-  },
-];
+    {
+      parent: {id: "appcontent"},
+      tag: "splitter",
+      attributes: {id: "rpcontinued-requestLog-splitter",
+                  hidden: "true"},
+    },
+    {
+      parent: {id: "appcontent"},
+      tag: "vbox",
+      attributes: {id: "rpcontinued-requestLog",
+                  height: "300",
+                  hidden: "true",
+                  persist: "height"},
+      children: [
+        {
+          tag: "toolbox",
+          attributes: {id: "rpcontinued-requestLog-header"},
+          children: [
+            {
+              tag: "toolbar",
+              attributes: {id: "rpcontinued-requestLog-toolbar",
+                          align: "center"},
+              children: [
+                {
+                  tag: "label",
+                  attributes: {id: "rpcontinued-requestLog-title",
+                              control: "rpcontinued-requestLog-frame",
+                              value: "__MSG_rp_requestLog_title__",
+                              crop: "end"},
+                }, {
+                  tag: "button",
+                  attributes: {id: "rpcontinued-requestLog-clear",
+                              label: "__MSG_rp_requestLog_clear__"},
+                  events: {command: ["overlay", "clearRequestLog"]},
+                }, {
+                  tag: "vbox",
+                  attributes: {flex: "1"},
+                }, {
+                  tag: "toolbarbutton",
+                  attributes: {id: "rpcontinued-requestLog-close",
+                              align: "right"},
+                  events: {command: ["overlay", "toggleRequestLog"]},
+                },
+              ],
+            },
+          ],
+        },
+        // The src of this iframe is set to
+        // chrome://rpcontinued/content/ui/request-log/request-log.xul in overlay.js
+        {
+          tag: "iframe",
+          attributes: {id: "rpcontinued-requestLog-frame",
+                      type: "chrome",
+                      flex: "1"},
+        },
+      ],
+    },
+  ],
+});

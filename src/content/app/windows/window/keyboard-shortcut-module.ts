@@ -26,7 +26,11 @@ import { Common } from "common/interfaces";
 import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
-import * as XULUtils from "lib/utils/xul-utils";
+import {
+  getKeyAttributesFromCombo,
+  IError,
+  IKeyAttributes,
+} from "lib/utils/xul-keyboard-shortcut-utils";
 
 interface IElementAttributes {
   disabled: "true" | "false" | null;
@@ -197,17 +201,21 @@ export class KeyboardShortcutModule extends Module
       return;
     }
 
-    const rv = XULUtils.keyboardShortcuts.getKeyAttributesFromCombo(combo);
-    if (false === rv.success) {
+    // tslint:disable-next-line:variable-name
+    const rv_ = getKeyAttributesFromCombo(combo);
+    if (false === rv_.success) {
+      const rv = rv_ as IError;
       console.error("Error parsing keyboard combination for shortcut " +
           `"${this.id}": ${rv.errorMessage}`);
       this.elementAttributes = ELEMENT_ATTRIBUTES_WHEN_DISABLED;
       return;
+    } else {
+      const rv = rv_ as IKeyAttributes;
+      this.elementAttributes = {
+        disabled: "false",
+        key: rv.key,
+        modifiers: rv.modifiers,
+      };
     }
-    this.elementAttributes = {
-      disabled: "false",
-      key: rv.key,
-      modifiers: rv.modifiers,
-    };
   }
 }

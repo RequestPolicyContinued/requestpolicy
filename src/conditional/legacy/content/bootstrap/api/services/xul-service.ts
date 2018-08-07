@@ -20,14 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/// <reference path="./xul-utils.d.ts" />
+/// <reference path="./xul-service.d.ts" />
 
-import { API, JSMs, XUL } from "bootstrap/api/interfaces";
-import { C } from "data/constants";
-import { arrayIncludes } from "lib/utils/js-utils";
+import { API, XUL } from "bootstrap/api/interfaces";
+import { getMaybeIncompleteXulTreeLists } from "ui/xul-trees";
 
 declare const LegacyApi: API.ILegacyApi;
-declare const Services: JSMs.Services;
 
 // =============================================================================
 // XULUtils
@@ -39,18 +37,7 @@ export let xulTrees: IXulTreeLists;
  * IIFE: Import the XUL trees and ensure their integrity.
  */
 (function importXulTrees() {
-  const maybeIncompleteXulTrees: IMaybeIncompleteXulTreeLists = {};
-
-  const xulTreesScope = {
-    C,
-    appID: Services.appinfo.ID,
-    exports: maybeIncompleteXulTrees,
-  };
-
-  Services.scriptloader.loadSubScript(
-      "chrome://rpcontinued/content/ui/xul-trees.js",
-      xulTreesScope,
-  );
+  const maybeIncompleteXulTrees = getMaybeIncompleteXulTreeLists();
 
   // For ensuring that each Element Spec has an ID.
   let nextID = 1;
@@ -337,76 +324,3 @@ export function removeTreeElementsFromWindow(
     }
   }
 }
-
-export const keyboardShortcuts = (() => {
-  const self: any = {};
-
-  // tslint:disable-next-line:max-line-length
-  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/Attribute/modifiers
-  // See also the SDK Hotkeys API
-  // https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/hotkeys
-  const VALID_MODIFIERS = [
-    "shift",
-    "alt",
-    "meta",
-    "control",
-    "accel",
-  ];
-
-  function error(msg: string) {
-    return {success: false, errorMessage: msg};
-  }
-
-  function success<T extends {success?: boolean}>(returnValue: T) {
-    returnValue.success = true;
-    return returnValue as T & {success: true};
-  }
-
-  function isValidModifier(aModifier: string) {
-    return arrayIncludes(VALID_MODIFIERS, aModifier);
-  }
-
-  const keyRegEx = /^[a-z]$/;
-
-  function _getKeyAttributesFromCombo(aCombo: string) {
-    if (typeof aCombo !== "string") {
-      return error("Not a string!");
-    }
-    if (aCombo === "") {
-      return error("The string must not be empty.");
-    }
-
-    const parts = aCombo.split(" ");
-    // Take the last element as the key
-    const key = parts.slice(-1)[0];
-    // Take all elements except the last one as the modifiers.
-    let modifiers = parts.slice(0, -1);
-    // Remove duplicates
-    modifiers = [...new Set(modifiers)];
-
-    for (const modifier of modifiers) {
-      if (false === isValidModifier(modifier)) {
-        return error(`Invalid modifier: "${modifier}"`);
-      }
-    }
-
-    if (!keyRegEx.test(key)) {
-      return error(`Invalid key: "${key}"`);
-    }
-
-    return success({
-      key,
-      modifiers: modifiers.join(" "),
-      success: undefined,
-    });
-  }
-
-  /**
-   * Check if the <key modifiers="..."> string is valid.
-   */
-  self.getKeyAttributesFromCombo = (aCombo: string) => {
-    return _getKeyAttributesFromCombo(aCombo);
-  };
-
-  return self;
-})();

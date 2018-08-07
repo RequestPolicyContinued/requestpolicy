@@ -22,13 +22,13 @@
 
 import { App } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
-import { Common } from "common/interfaces";
-import { MaybePromise } from "lib/classes/maybe-promise";
-import { Module } from "lib/classes/module";
 import {
   addTreeElementsToWindow,
   removeTreeElementsFromWindow,
-} from "lib/utils/xul-utils";
+} from "bootstrap/api/services/xul-service";
+import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
+import { Module } from "lib/classes/module";
 
 export class XulTrees extends Module {
   private get overlay() { return this.overlayWrapper.module!; }

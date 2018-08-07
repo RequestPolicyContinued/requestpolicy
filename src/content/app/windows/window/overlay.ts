@@ -1175,6 +1175,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // menu. By delaying "openMenu" the menu will be closed in the
     // meantime, and the toolbar button will be detected as invisible.
     setTimeout(() => {
+      this.debugLog.log("opening the menu");
       if (this.isToolbarButtonVisible()) {
         this.openMenuAtToolbarButton();
       } else {

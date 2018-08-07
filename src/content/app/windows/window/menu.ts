@@ -33,8 +33,8 @@ import {
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { RequestSet } from "lib/classes/request-set";
-import * as DOMUtils from "lib/utils/dom-utils";
-import * as WindowUtils from "lib/utils/window-utils";
+import { removeChildren } from "lib/utils/dom-utils";
+import { getTabBrowser } from "lib/utils/window-utils";
 
 type IList = HTMLDivElement;
 interface IListItem extends HTMLDivElement {
@@ -65,7 +65,7 @@ const RULE_ACTION_CHANGES: RuleActionChange[] = [
 ];
 
 export class Menu extends Module implements App.windows.window.IMenu {
-  protected get debugEnabled() { return true; }
+  // protected get debugEnabled() { return true; }
 
   // TODO: Create a "List" class which also contains functions like
   //       _populateList() and emptyList().
@@ -118,7 +118,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   private allRequestsOnDocument: RequestSet;
 
-  private readonly gBrowser = WindowUtils.getTabBrowser(this.window)!;
+  private get gBrowser() { return getTabBrowser(this.window)!; }
 
   private get overlay() { return this.overlayWrapper.module!; }
 
@@ -154,6 +154,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
   }
 
   public prepareMenu() {
+    this.debugLog.log("preparing the menu");
     try {
       this.originItem = this.$id("rpc-origin");
       this.originDomainnameItem = this.$id("rpc-origin-domainname");
@@ -376,8 +377,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
       }
     }
 
-    // remove the children
-    DOMUtils.removeChildren(aList);
+    removeChildren(aList);
   }
 
   // ---------------------------------------------------------------------------
@@ -684,6 +684,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
       value: string,
       numRequests?: number,
   ) {
+    const {document} = this.window;
     const box = document.createElement("div");
     box.setAttribute("class", `${cssClass} listen-click`);
     box.addEventListener("click", this.itemSelected, false);

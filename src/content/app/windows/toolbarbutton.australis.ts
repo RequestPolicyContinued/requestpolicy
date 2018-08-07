@@ -25,6 +25,7 @@ import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { TOOLBARBUTTON_ATTRIBUTES } from "ui/xul-trees";
 
 // -----------------------------------------------------------------------------
 // Australis (Firefox >= 29)
@@ -37,7 +38,6 @@ export class AustralisToolbarButton extends Module {
       parentLog: Common.ILog,
       private readonly mozCustomizableUI: JSMs.CustomizableUI | null,
       private readonly miscInfos: API.IMiscInfos,
-      private readonly xulService: API.services.IXulService,
   ) {
     super(`app.windows.toolbarbutton`, parentLog);
   }
@@ -57,16 +57,12 @@ export class AustralisToolbarButton extends Module {
   }
 
   private removeToolbarButtonFromAustralis() {
-    const {
-      attributes: {id},
-    } = this.xulService.xulTrees.toolbarbutton[0];
+    const {id} = TOOLBARBUTTON_ATTRIBUTES;
     this.mozCustomizableUI!.destroyWidget(id);
   }
 
   private addToolbarButtonToAustralis() {
-    const {
-      attributes: {id, label, tooltiptext},
-    } = this.xulService.xulTrees.toolbarbutton[0];
+    const {id, label, tooltiptext} = TOOLBARBUTTON_ATTRIBUTES;
 
     this.mozCustomizableUI!.createWidget({
       defaultArea: this.mozCustomizableUI!.AREA_NAVBAR,

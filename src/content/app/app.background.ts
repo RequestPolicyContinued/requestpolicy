@@ -495,9 +495,10 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       log,
       windowID,
       window,
-      LegacyApi.xulService,
       mozVersionComparator!,  // fixme
       LegacyApi.miscInfos,
+      LegacyApi.xulService,
+      xulTrees,
   );
   return new WindowModule(
       log,
@@ -524,7 +525,6 @@ const toolbarbuttonAustralis = new AustralisToolbarButton(
     log,
     mozCustomizableUI,
     LegacyApi.miscInfos,
-    LegacyApi.xulService,
 );
 const windows = new Windows(
     log,

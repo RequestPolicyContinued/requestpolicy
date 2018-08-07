@@ -22,21 +22,13 @@
 
 /// <reference path="./xul-service.d.ts" />
 
+import { App } from "app/interfaces";
 import { API, XUL } from "bootstrap/api/interfaces";
 import { matchKeyPattern, updateString } from "legacy/lib/utils/l10n-utils";
+import { objectEntries } from "lib/utils/js-utils";
 import { getMaybeIncompleteXulTreeLists } from "ui/xul-trees";
 
 export class XulService implements API.services.IXulService {
-  public get xulTrees() {
-    if (this.xulTrees_ === null) {
-      this.xulTrees_ = this.getXulTreeLists();
-    }
-    return this.xulTrees_!;
-  }
-
-  // tslint:disable-next-line:variable-name
-  private xulTrees_: IXulTreeLists | null = null;
-
   constructor(
       private i18n: API.i18n.II18n,
   ) {
@@ -45,28 +37,19 @@ export class XulService implements API.services.IXulService {
 
   public addTreeElementsToWindow(
       aWin: XUL.chromeWindow,
-      aTreeName: string,
+      aTree: IXulTree[],
   ) {
-    if (this.xulTrees.hasOwnProperty(aTreeName)) {
-      this.recursivelyAddXULElements(aWin.document, this.xulTrees[aTreeName]);
-    }
+    this.recursivelyAddXULElements(aWin.document, aTree);
   }
 
   public removeTreeElementsFromWindow(
       aWin: XUL.chromeWindow,
-      aTreeName: string,
+      aTree: IXulTree[],
   ) {
-    if (!this.xulTrees.hasOwnProperty(aTreeName)) {
-      console.error(`There's no tree with name '${aTreeName}'.`);
-      return;
-    }
-
     const $id = aWin.document.getElementById.bind(aWin.document);
 
     // Recursively remove all event listeners.
-    const elementSpecs = this.recursivelyGetAllElementSpecs(
-        this.xulTrees[aTreeName],
-    );
+    const elementSpecs = this.recursivelyGetAllElementSpecs(aTree);
     for (const elementSpec of elementSpecs) {
       const {id} = elementSpec.attributes;
       const eventTarget = $id(id);
@@ -78,7 +61,7 @@ export class XulService implements API.services.IXulService {
     }
 
     // Remove the root elements.
-    for (const id of this.getRootElementIDs(aTreeName)) {
+    for (const id of this.getRootElementIDs(aTree)) {
       const node = $id(id);
       if (node && node.parentNode) {
         node.parentNode.removeChild(node);
@@ -86,8 +69,10 @@ export class XulService implements API.services.IXulService {
     }
   }
 
-  private getXulTreeLists(): IXulTreeLists {
-    const maybeIncompleteXulTrees = getMaybeIncompleteXulTreeLists();
+  public getXulTreeLists(
+      overlay: App.windows.window.IOverlay,
+  ): IXulTreeLists {
+    const maybeIncompleteXulTrees = getMaybeIncompleteXulTreeLists(overlay);
 
     // For ensuring that each Element Spec has an ID.
     let nextID = 1;
@@ -220,41 +205,17 @@ export class XulService implements API.services.IXulService {
     }
   }
 
-  private getEventListener(
-      aRootObject: any,
-      aListenerSpec: string[],
-  ): Function | null {
-    let object = aRootObject;
-    for (const propertyName of aListenerSpec) {
-      if (!object.hasOwnProperty(propertyName)) {
-        return null;
-      }
-      object = object[propertyName];
-    }
-    return object;
-  }
-
-  private getEventInfoList(aEventTarget: Element, aEventList: any): any[] {
-    if (!aEventList) {
-      return [];
-    }
-    const rootObject = (
-      aEventTarget.ownerDocument.defaultView as any
-    ).rpcontinued;
-
-    return Object.keys(aEventList).map((eventName) => {
-      return [
-        eventName,
-        this.getEventListener(rootObject, aEventList[eventName]),
-      ];
-    });
+  private getEventInfoList(
+      aEventList: IXulElementSpec["events"],
+  ): Array<[string, () => void]> {
+    return Array.from(objectEntries(aEventList || {}));
   }
 
   private addEventListeners(
       aEventTarget: Element,
       {events}: IXulElementSpec,
   ) {
-    const listeners = this.getEventInfoList(aEventTarget, events);
+    const listeners = this.getEventInfoList(events);
     listeners.forEach(([eventName, listener]) => {
       aEventTarget.addEventListener(eventName, listener, false);
     });
@@ -264,7 +225,7 @@ export class XulService implements API.services.IXulService {
       aEventTarget: Element,
       {events}: IXulElementSpec,
   ) {
-    const listeners = this.getEventInfoList(aEventTarget, events);
+    const listeners = this.getEventInfoList(events);
     listeners.forEach(([eventName, listener]) => {
       aEventTarget.removeEventListener(eventName, listener, false);
     });
@@ -326,8 +287,8 @@ export class XulService implements API.services.IXulService {
   /**
    * Return a list of the IDs of the specified tree's root elements.
    */
-  private getRootElementIDs(aTreeName: string): string[] {
-    const ids = this.xulTrees[aTreeName].map((aElementSpec) => {
+  private getRootElementIDs(aTree: IXulTree[]): string[] {
+    const ids = aTree.map((aElementSpec) => {
       return aElementSpec.attributes.id;
     });
     return ids;

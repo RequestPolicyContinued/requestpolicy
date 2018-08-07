@@ -25,7 +25,9 @@ interface IMaybeIncompleteXulElementSpec {
     [attributeName: string]: string;
   };
   children?: IMaybeIncompleteXulElementSpec[];
-  events?: {};
+  events?: {
+    [eventName: string]: () => void;
+  };
   tag: string;
 }
 interface IMaybeIncompleteXulTree

@@ -24,6 +24,7 @@
 // tslint:disable-next-line:max-line-length
 /// <reference path="../../conditional/legacy/content/bootstrap/api/services/xul-service.d.ts" />
 
+import { App } from "app/interfaces";
 import { JSMs } from "bootstrap/api/interfaces";
 import { C } from "data/constants";
 
@@ -37,7 +38,16 @@ const appID = Services.appinfo.ID;
 // https://developer.mozilla.org/en-US/Add-ons/SeaMonkey_2
 const isSeamonkey = appID === C.SEAMONKEY_ID;
 
-export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists => ({
+export const TOOLBARBUTTON_ATTRIBUTES = {
+  id: "/* @echo ALPHABETICAL_ID */ToolbarButton",
+  label: "RequestPolicy",
+  tooltiptext: "RequestPolicy Continued",
+  popup: "rpc-popup",
+};
+
+export const getMaybeIncompleteXulTreeLists = (
+    overlay: App.windows.window.IOverlay,
+): IMaybeIncompleteXulTreeLists => ({
   toolbarbutton: [
     {
       parent: {
@@ -50,12 +60,7 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
       },
 
       tag: "toolbarbutton",
-      attributes: {
-        id: "/* @echo ALPHABETICAL_ID */ToolbarButton",
-        label: "RequestPolicy",
-        tooltiptext: "RequestPolicy Continued",
-        popup: "rpc-popup",
-      },
+      attributes: TOOLBARBUTTON_ATTRIBUTES,
     },
   ],
 
@@ -74,19 +79,19 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
               tag: "menuitem",
               attributes: {label: "__MSG_managePolicies@menu__",
                           accesskey: "m"},
-              events: {command: ["overlay", "openPolicyManager"]},
+              events: {command: overlay.boundMethods.get(overlay.openPolicyManager) as () => void},
             },
             {
               tag: "menuitem",
               attributes: {label: "__MSG_rp_requestLog_title__",
                           accesskey: "l"},
-              events: {command: ["overlay", "toggleRequestLog"]},
+              events: {command: overlay.boundMethods.get(overlay.toggleRequestLog) as () => void},
             },
             {
               tag: "menuitem",
               attributes: {label: "__MSG_rp_menu_preferences__",
                           accesskey: "p"},
-              events: {command: ["overlay", "openPrefs"]},
+              events: {command: overlay.boundMethods.get(overlay.openPrefs) as () => void},
             },
           ],
         },
@@ -99,7 +104,7 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
       tag: "menuitem",
       attributes: {id: "rpcontinuedContextMenuEntry",
                   label: "RequestPolicy Continued"},
-      events: {command: ["overlay", "toggleMenu"]},
+      events: {command: overlay.boundMethods.get(overlay.toggleMenu) as () => void},
     },
 
     {
@@ -123,8 +128,8 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
           attributes: {id: "rpc-popup",
                       noautohide: "true",
                       position: "after_start"},
-          events: {popupshowing: ["overlay", "onPopupShowing"],
-                  popuphidden: ["overlay", "onPopupHidden"]},
+          events: {popupshowing: overlay.boundMethods.get(overlay.onPopupShowing) as () => void,
+                   popuphidden: overlay.boundMethods.get(overlay.onPopupHidden) as () => void},
           children: [
             {
               tag: "iframe",
@@ -170,7 +175,7 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
                   tag: "button",
                   attributes: {id: "rpcontinued-requestLog-clear",
                               label: "__MSG_rp_requestLog_clear__"},
-                  events: {command: ["overlay", "clearRequestLog"]},
+                  events: {command: overlay.boundMethods.get(overlay.clearRequestLog) as () => void},
                 }, {
                   tag: "vbox",
                   attributes: {flex: "1"},
@@ -178,7 +183,7 @@ export const getMaybeIncompleteXulTreeLists = (): IMaybeIncompleteXulTreeLists =
                   tag: "toolbarbutton",
                   attributes: {id: "rpcontinued-requestLog-close",
                               align: "right"},
-                  events: {command: ["overlay", "toggleRequestLog"]},
+                  events: {command: overlay.boundMethods.get(overlay.toggleRequestLog) as () => void},
                 },
               ],
             },

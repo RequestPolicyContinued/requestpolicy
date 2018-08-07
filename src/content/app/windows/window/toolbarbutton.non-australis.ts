@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import {log} from "app/log";
 import { API, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
@@ -38,22 +39,32 @@ export class NonAustralisToolbarButton extends Module {
 
   private isAustralis = this.miscInfos.isAustralis;
 
+  protected get startupPreconditions() {
+    return [
+      this.xulTrees.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       windowID: number,
       private window: XUL.chromeWindow,
 
-      private readonly xulService: API.services.IXulService,
-
       private readonly vc: XPCOM.nsIVersionComparator,
       private readonly miscInfos: API.IMiscInfos,
+      private readonly xulService: API.services.IXulService,
+
+      private readonly xulTrees: App.windows.window.IXulTrees,
   ) {
     super(`app.windows[${windowID}].toolbarbutton`, parentLog);
   }
 
   protected startupSelf() {
     if (!this.isAustralis) {
-      this.xulService.addTreeElementsToWindow(this.window, "toolbarbutton");
+      this.xulService.addTreeElementsToWindow(
+          this.window,
+          this.xulTrees.xulTreeLists.toolbarbutton,
+      );
       this.addToolbarButtonToNavBar();
     }
     return MaybePromise.resolve(undefined);
@@ -63,7 +74,7 @@ export class NonAustralisToolbarButton extends Module {
     if (!this.isAustralis) {
       this.xulService.removeTreeElementsFromWindow(
           this.window,
-          "toolbarbutton",
+          this.xulTrees.xulTreeLists.toolbarbutton,
       );
     }
     return MaybePromise.resolve(undefined);

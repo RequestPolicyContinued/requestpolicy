@@ -35,6 +35,10 @@ export class XulTrees extends Module {
     ];
   }
 
+  // tslint:disable-next-line:variable-name
+  private xulTreeLists_: IXulTreeLists;
+  public get xulTreeLists() { return this.xulTreeLists_; }
+
   constructor(
       parentLog: Common.ILog,
       protected readonly windowID: number,
@@ -62,15 +66,23 @@ export class XulTrees extends Module {
       overlay: this.overlay,
     };
 
+    this.xulTreeLists_ = this.xulService.getXulTreeLists(this.overlay);
+
     // add all XUL elements
-    this.xulService.addTreeElementsToWindow(this.window, "mainTree");
+    this.xulService.addTreeElementsToWindow(
+        this.window,
+        this.xulTreeLists.mainTree,
+    );
 
     return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf() {
     // remove all XUL elements
-    this.xulService.removeTreeElementsFromWindow(this.window, "mainTree");
+    this.xulService.removeTreeElementsFromWindow(
+        this.window,
+        this.xulTreeLists.mainTree,
+    );
 
     // Remove the scope variable.
     // This wouldn't be needed when the window is closed, but this has to be

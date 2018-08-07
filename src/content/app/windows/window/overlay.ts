@@ -66,13 +66,13 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   // We don't need to worry about setting it here.
   public requestLog: any = null;
 
+  public readonly boundMethods = new BoundMethods(this);
+
   private readonly onOpenLinkViaContextMenu = onOpenLinkViaContextMenu.bind(
       null,
       this.window,
       this.requestProcessor,
   );
-
-  private boundMethods = new BoundMethods(this);
 
   private toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 

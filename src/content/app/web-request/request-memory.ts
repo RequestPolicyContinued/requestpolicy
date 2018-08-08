@@ -30,7 +30,8 @@ import { RequestResult } from "lib/classes/request-result";
 import { RequestSet } from "lib/classes/request-set";
 import { createListenersMap } from "lib/utils/listener-factories";
 
-export class RequestMemory extends Module {
+export class RequestMemory extends Module
+    implements App.webRequest.IRequestMemory {
   public readonly requestSets = {
     allowedRequests: new RequestSet(),
     rejectedRequests: new RequestSet(),

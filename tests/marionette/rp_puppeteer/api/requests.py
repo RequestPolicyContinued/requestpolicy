@@ -64,7 +64,7 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {Requests} = """ + GET_BACKGROUND_PAGE + """;
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.rp.webRequest;
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];
@@ -84,7 +84,7 @@ class Requests(BaseLib):
             return self;
           })(this.requestObserver || {});
 
-          Requests.onRequest.addListener(this.requestObserver.observeRequest);
+          requestMemory.onRequest.addListener(this.requestObserver.observeRequest);
           this.listening = true;
         """, sandbox=self._sandbox, new_sandbox=False)
 
@@ -95,8 +95,8 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {Requests} = """ + GET_BACKGROUND_PAGE + """;
-          Requests.onRequest.removeListener(this.requestObserver.observeRequest);
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.rp.webRequest;
+          requestMemory.onRequest.removeListener(this.requestObserver.observeRequest);
           this.listening = false;
         """, sandbox=self._sandbox, new_sandbox=False)
 

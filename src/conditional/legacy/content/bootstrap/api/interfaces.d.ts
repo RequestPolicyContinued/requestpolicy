@@ -966,6 +966,7 @@ export namespace XPCOM {
     "@mozilla.org/categorymanager;1": XPCOM.nsIJSCID;
     "@mozilla.org/content/style-sheet-service;1": XPCOM.nsIJSCID;
     "@mozilla.org/embedcomp/prompt-service;1": XPCOM.nsIJSCID;
+    "@mozilla.org/globalmessagemanager;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
@@ -1018,6 +1019,7 @@ export namespace XPCOM {
     nsIInterfaceRequestor: XPCOM.nsIJSID;
     nsILineInputStream: XPCOM.nsIJSID;
     nsILoadContext: XPCOM.nsIJSID;
+    nsIMessageListenerManager: XPCOM.nsIJSID;
     nsIObserver: XPCOM.nsIJSID;
     nsIPrefBranch2: XPCOM.nsIJSID;
     nsIPromptService: XPCOM.nsIJSID;
@@ -1048,6 +1050,9 @@ export namespace XPCOM {
   export interface nsXPCComponents_Utils {
     import<T = any>(aResourceURI: string, targetObj?: any): T;
   }
+
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Multiprocess_Firefox/Message_Manager/Message_manager_overview
+  export type GlobalFrameMessageManager = nsIFrameScriptLoader & nsIMessageListenerManager & nsIMessageBroadcaster;
 }
 
 export namespace JSMs {

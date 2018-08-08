@@ -26,7 +26,7 @@ import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-export class Framescripts extends Module {
+export class Framescripts extends Module implements App.IFramescripts {
   private frameScriptURI =
       `chrome://rpcontinued/content/bootstrap-environments/framescript.js` +
       `?${Math.random()}`;
@@ -41,8 +41,7 @@ export class Framescripts extends Module {
   constructor(
       parentLog: Common.ILog,
       private framescriptServices: App.framescripts.IFramescriptServices,
-      private globalFrameMessageManager:
-          XPCOM.nsIMessageBroadcaster & XPCOM.nsIFrameScriptLoader,
+      private globalFrameMessageManager: XPCOM.GlobalFrameMessageManager,
   ) {
     super("app.framescrips", parentLog);
   }

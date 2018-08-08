@@ -39,6 +39,8 @@ interface IEmbeddedWebExtension { browser: typeof browser; }
 declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
+import { FramescriptServices } from "app/framescripts/framescript-services";
+import { Framescripts } from "app/framescripts/framescripts.module";
 import { App } from "app/interfaces";
 import { AboutUri } from "app/runtime/about-uri";
 import { HttpChannelService } from "app/services/http-channel-service";
@@ -196,6 +198,8 @@ const mozCategoryManager = whenLegacy(() =>
     xpconnectService!.getCategoryManager());
 const mozComponentRegistrar = whenLegacy(() =>
     xpconnectService!.getComponentRegistrar());
+const mozGlobalFrameMessageManager =
+    whenLegacy(() => xpconnectService!.getGlobalFrameMessageManager());
 const mozIDNService = whenLegacy(() => xpconnectService!.getIDNService());
 const mozPromptService = whenLegacy(() => xpconnectService!.getPromptService());
 const mozStyleSheetService = whenLegacy(() =>
@@ -265,6 +269,21 @@ const browserSettings = new BrowserSettings(
     (browser as any).privacy.network,
 );
 
+const requestSetService = new RequestSetService(log, uriService);
+const requestMemory = new RequestMemory(log, requestSetService, uriService);
+const framescriptServices = new FramescriptServices(
+    log, browser.
+    runtime,
+    requestMemory,
+    uriService,
+    cachedSettings,
+);
+const framescripts = new Framescripts(
+    log,
+    framescriptServices,
+    mozGlobalFrameMessageManager!,
+);
+
 const httpChannelService = new HttpChannelService(
     log,
     mozServices!.io,
@@ -278,7 +297,6 @@ const privateBrowsingService = new PrivateBrowsingService(
 const requestService = new RequestService(
     log, httpChannelService, uriService, cachedSettings,
 );
-const requestSetService = new RequestSetService(log, uriService);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -335,7 +353,6 @@ const initialSetup = new InitialSetup(
 const ui = new Ui(log, initialSetup, notifications);
 
 const metadataMemory = new MetadataMemory(log);
-const requestMemory = new RequestMemory(log, requestSetService, uriService);
 const requestProcessor = new RequestProcessor(
     log,
     Ci,
@@ -538,6 +555,7 @@ const windows = new Windows(
 export const rp = new AppBackground(
     log,
     browserSettings,
+    framescripts,
     migration,
     policy,
     runtime,

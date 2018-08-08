@@ -29,6 +29,7 @@ export class AppBackground extends Module {
   constructor(
       log: Common.ILog,
       public readonly browserSettings: App.IBrowserSettings,
+      public readonly framescripts: App.IFramescripts,
       public readonly migration: App.IMigration,
       public readonly policy: App.IPolicy,
       public readonly runtime: Runtime,
@@ -44,6 +45,7 @@ export class AppBackground extends Module {
   protected get subModules() {
     return {
       browserSettings: this.browserSettings,
+      framescripts: this.framescripts,
       migration: this.migration,
       policy: this.policy,
       runtime: this.runtime,

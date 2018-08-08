@@ -58,6 +58,11 @@ export class XPConnectService {
         getService<XPCOM.nsICategoryManager>(Ci.nsICategoryManager);
   }
 
+  public getGlobalFrameMessageManager(): XPCOM.GlobalFrameMessageManager {
+    return Cc["@mozilla.org/globalmessagemanager;1"].
+        getService(Ci.nsIMessageListenerManager);
+  }
+
   public getIDNService(): XPCOM.nsIIDNService {
     return Cc["@mozilla.org/network/idn-service;1"].
           getService<XPCOM.nsIIDNService>(Ci.nsIIDNService);

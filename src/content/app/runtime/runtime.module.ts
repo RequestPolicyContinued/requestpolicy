@@ -26,28 +26,38 @@ import { Connection } from "lib/classes/connection";
 import { IModule, Module } from "lib/classes/module";
 
 export class Runtime extends Module {
+  // protected get debugEnabled() { return true; }
+
   protected get startupPreconditions() {
     return [
-      this.pEWEConnection,
+      this.pGotEWEConnection,
     ] as Array<Promise<any>>;
   }
 
   private eweConnection: Connection<any, any> | null;
+  private pGotEWEConnection: Promise<void>;
+  private gotEWEConnection = false;
 
   constructor(
       log: Common.ILog,
-      public readonly pEWEConnection: Promise<Connection<any, any> | null>,
+      pEWEConnection: Promise<Connection<any, any> | null>,
       private readonly aboutUri: App.runtime.IAboutUri,
   ) {
     super("app.runtime", log);
-    pEWEConnection.then((m) => this.eweConnection = m).
-        catch(this.log.onError("pEWEConnection"));
+    this.pGotEWEConnection = pEWEConnection.then((m) => {
+      this.eweConnection = m;
+      this.gotEWEConnection = true;
+    });
+    this.pGotEWEConnection.catch(this.log.onError("pGotEWEConnection"));
   }
 
   protected get subModules() {
     const rv: {[k: string]: IModule} = {
       aboutUri: this.aboutUri,
     };
+    if (!this.gotEWEConnection) {
+      throw new Error(`startup preconditions not finished yet!`);
+    }
     if (this.eweConnection) { rv.eweConnection = this.eweConnection; }
     return rv;
   }

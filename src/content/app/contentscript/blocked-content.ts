@@ -93,9 +93,9 @@ export class ManagerForBlockedContent extends Module {
         if (!img.height) {
           img.height = 50;
         }
-        img.title = `[${blockedURIs[img.src].identifier}]${
-          img.title ? ` ${img.title}` : ""
-        }${img.alt ? ` ${img.alt}` : ""}`;
+        img.title = `[${blockedURIs[img.src].identifier}]` +
+            img.title ? ` ${img.title}` : "" +
+            img.alt ? ` ${img.alt}` : "";
         img.src = this.TRANSPARENT_IMAGE_DATA_URI;
       }
     }

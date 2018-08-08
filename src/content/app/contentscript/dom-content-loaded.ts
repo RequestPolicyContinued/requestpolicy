@@ -25,7 +25,9 @@ import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
+import { BoundMethods } from "lib/classes/bound-methods";
 import { EventListenerModule } from "lib/classes/event-listener-module";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {parseRefresh} from "lib/utils/html-utils";
 
@@ -38,9 +40,18 @@ interface IDocumentInfo {
 export class ManagerForDOMContentLoaded extends Module {
   private contentWindow = this.cfmm.content;
 
-  private eventListeners = {
-    htmlAnchorTagClicked: this.htmlAnchorTagClicked.bind(this),
-  };
+  private boundMethods = new BoundMethods(this);
+
+  private eventListener = new EventListenerModule(
+      this.moduleName,
+      this.parentLog,
+  );
+
+  protected get subModules() {
+    return {
+      eventListener: this.eventListener,
+    };
+  }
 
   private documents: Map<Document, IDocumentInfo> = new Map();
 
@@ -56,7 +67,7 @@ export class ManagerForDOMContentLoaded extends Module {
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
       private ci: XPCOM.nsXPCComponents_Interfaces,
-      private cfmm: XPCOM.nsIContentFrameMessageManager,
+      private cfmm: XPCOM.ContentFrameMessageManager,
       private bgCommunication: App.contentSide.ICommunicationToBackground,
       private blockedContent: App.contentSide.IManagerForBlockedContent,
       private uriServices: App.services.IUriService,
@@ -67,7 +78,27 @@ export class ManagerForDOMContentLoaded extends Module {
     );
   }
 
-  public htmlAnchorTagClicked(event: any) {
+  protected startupSelf() {
+    this.eventListener.addListener(
+        this.cfmm,
+        "DOMContentLoaded",
+        this.boundMethods.get(this.onDOMContentLoaded),
+        true,
+    );
+
+    // DOMFrameContentLoaded is same DOMContentLoaded but also fires for
+    // enclosed frames.
+    this.eventListener.addListener(
+        this.cfmm,
+        "DOMFrameContentLoaded",
+        this.boundMethods.get(this.onDOMFrameContentLoaded),
+        true,
+    );
+
+    return MaybePromise.resolve(undefined);
+  }
+
+  private htmlAnchorTagClicked(event: any) {
     // Notify the main thread that a link has been clicked.
     // Note: The <a> element is `currentTarget`! See:
     // https://developer.mozilla.org/en-US/docs/Web/API/Event.currentTarget
@@ -86,14 +117,14 @@ export class ManagerForDOMContentLoaded extends Module {
    * Determine if documentToCheck is the main document loaded in the currently
    * active tab.
    */
-  public isActiveTopLevelDocument(documentToCheck: Document): boolean {
+  private isActiveTopLevelDocument(documentToCheck: Document): boolean {
     return documentToCheck === this.contentWindow.document;
   }
 
   /**
    * Things to do when a page has loaded (after images, etc., have been loaded).
    */
-  public onDOMContentLoaded(event: any) {
+  private onDOMContentLoaded(event: any) {
     // TODO: This is getting called multiple times for a page, should only be
     // called once.
     //    <--- the above comment is very old – is it (still) true that
@@ -104,7 +135,7 @@ export class ManagerForDOMContentLoaded extends Module {
       return;
     }
 
-    this.onDocumentLoaded(doc);
+    this.loadIntoDocument(doc);
 
     const pBlockedURIs = browser.runtime.sendMessage({
       documentURI: doc.documentURI,
@@ -152,7 +183,7 @@ export class ManagerForDOMContentLoaded extends Module {
   /**
    * Things to do when a page or a frame within the page has loaded.
    */
-  public onDOMFrameContentLoaded(event: any) {
+  private onDOMFrameContentLoaded(event: any) {
     // TODO: This only works for (i)frames that are direct children of the main
     // document, not (i)frames within those (i)frames.
     const iframe = event.target;
@@ -179,7 +210,7 @@ export class ManagerForDOMContentLoaded extends Module {
    * Perform the actions required once the DOM is loaded. This may be being
    * called for more than just the page content DOM. It seems to work for now.
    */
-  public onDocumentLoaded(doc: Document) {
+  private loadIntoDocument(doc: Document) {
     // Create a new environment for this Document and shut it down when
     // the document is unloaded.
 
@@ -188,7 +219,7 @@ export class ManagerForDOMContentLoaded extends Module {
     const docInfo: IDocumentInfo = {
       anchorTags: new Set(),
       eventListeners,
-      onDocumentUnload: this.onDocumentUnload.bind(this, doc),
+      onDocumentUnload: this.unloadFromDocument.bind(this, doc),
     };
     eventListeners.startup().
         catch(this.log.onError("eventListeners.startup()"));
@@ -274,9 +305,10 @@ export class ManagerForDOMContentLoaded extends Module {
     // TODO: is it possible to implement this differently?
     const anchorTags = Array.from(doc.getElementsByTagName("a"));
     for (const anchorTag of anchorTags) {
-      anchorTag.addEventListener(
+      eventListeners.addListener(
+          anchorTag,
           "click",
-          this.eventListeners.htmlAnchorTagClicked,
+          this.boundMethods.get(this.htmlAnchorTagClicked),
           false,
       );
       docInfo.anchorTags.add(anchorTag);
@@ -288,19 +320,13 @@ export class ManagerForDOMContentLoaded extends Module {
     // wrapWindowFunctions(doc.defaultView);
   }
 
-  private onDocumentUnload(doc: Document) {
+  private unloadFromDocument(doc: Document) {
     const docInfo = this.documents.get(doc)!;
 
     docInfo.eventListeners.shutdown().
         catch(this.log.onError("eventListeners.shutdown()"));
 
-    for (const anchorTag of docInfo.anchorTags.values()) {
-      anchorTag.removeEventListener(
-          "click",
-          this.eventListeners.htmlAnchorTagClicked,
-          false,
-      );
-    }
+    this.documents.delete(doc);
 
     // unwrapWindowFunctions(doc.defaultView);
   }

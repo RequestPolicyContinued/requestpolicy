@@ -73,7 +73,7 @@ export class FramescriptToBackgroundCommunication extends Module {
   constructor(
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
-      private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
+      private readonly cfmm: XPCOM.ContentFrameMessageManager,
       private readonly msgListener: App.contentSide.IMessageListenerModule,
   ) {
     super(

@@ -41,7 +41,7 @@ import { Storage } from "./storage/storage.module";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Services: JSMs.Services;
-declare const cfmm: XPCOM.nsIContentFrameMessageManager;
+declare const cfmm: XPCOM.ContentFrameMessageManager;
 
 const domWindowUtils = getDOMWindowUtils(cfmm.content);
 const {outerWindowID} = domWindowUtils;

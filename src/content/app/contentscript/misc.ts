@@ -58,7 +58,7 @@ export class ContentscriptMisc extends Module {
   constructor(
       parentLog: Common.ILog,
       protected readonly outerWindowID: number,
-      private readonly cfmm: XPCOM.nsIContentFrameMessageManager,
+      private readonly cfmm: XPCOM.ContentFrameMessageManager,
       private readonly bgCommunication:
           App.contentSide.ICommunicationToBackground,
       private readonly msgListener: App.contentSide.IMessageListenerModule,

@@ -27,7 +27,7 @@ import "ui-testing/services";
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { contentWindowHasAssociatedTab } from "lib/utils/window-utils";
 
-declare const cfmm: XPCOM.nsIContentFrameMessageManager;
+declare const cfmm: XPCOM.ContentFrameMessageManager;
 declare const Services: JSMs.Services;
 
 function logSevereError(aMessage: string, aError: any) {

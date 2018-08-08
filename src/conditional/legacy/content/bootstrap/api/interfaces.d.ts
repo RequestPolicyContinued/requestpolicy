@@ -183,6 +183,8 @@ export namespace XPCOM {
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMElement.idl
   export interface nsIDOMElement extends nsIDOMNode {}
 
+  export interface nsIDOMEventTarget extends nsISupports, EventTarget {}
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMNode.idl
   export interface nsIDOMNode extends nsISupports {
     readonly localName: string;
@@ -1052,7 +1054,16 @@ export namespace XPCOM {
   }
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Multiprocess_Firefox/Message_Manager/Message_manager_overview
-  export type GlobalFrameMessageManager = nsIFrameScriptLoader & nsIMessageListenerManager & nsIMessageBroadcaster;
+  export type ContentFrameMessageManager =
+      nsIDOMEventTarget &
+      nsIMessageListenerManager &
+      nsIMessageSender &
+      nsISyncMessageSender &
+      nsIContentFrameMessageManager;
+  export type GlobalFrameMessageManager =
+      nsIFrameScriptLoader &
+      nsIMessageListenerManager &
+      nsIMessageBroadcaster;
 }
 
 export namespace JSMs {

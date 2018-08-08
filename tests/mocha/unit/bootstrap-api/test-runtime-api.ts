@@ -17,10 +17,10 @@ import * as sinon from "sinon";
 import {NetUtil as MockNetUtil} from "./lib/mock-netutil";
 import {Services as MockServices} from "./lib/mock-services";
 import {Components as MockComponents} from "./lib/mock-components";
-import { Runtime } from "bootstrap/api/runtime";
+import { RuntimeApi } from "bootstrap/api/runtime-api";
 
 describe("browser.runtime", function() {
-  let backgroundRuntime: Runtime["backgroundApi"];
+  let backgroundRuntime: RuntimeApi["backgroundApi"];
 
   before(function() {
     let mockComp = new MockComponents();
@@ -50,7 +50,7 @@ describe("browser.runtime", function() {
     const log = new Log();
     const {AsyncLocaleData} = require("bootstrap/api/i18n/async-locale-data");
     sinon.stub(AsyncLocaleData.prototype, "startup").resolves();
-    const runtime = new Runtime(log, mockServices as any);
+    const runtime = new RuntimeApi(log, mockServices as any);
     backgroundRuntime = runtime.backgroundApi;
   });
 

@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { JSMService } from "bootstrap/api/services/jsm-service";
-import { XulService } from "bootstrap/api/services/xul-service";
 import { Log } from "lib/classes/log";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { Api } from "./api/api.module";
@@ -36,10 +34,12 @@ import {
   NetworkPredictionEnabledSetting,
 } from "./api/privacy/network-prediction-enabled";
 import { PrivacyApi } from "./api/privacy/privacy.module";
-import { Runtime } from "./api/runtime";
+import { RuntimeApi } from "./api/runtime-api";
 import { ChromeFileService } from "./api/services/chrome-file-service";
 import { FileService } from "./api/services/file-service";
+import { JSMService } from "./api/services/jsm-service";
 import { XPConnectService } from "./api/services/xpconnect-service";
+import { XulService } from "./api/services/xul-service";
 import { JsonStorage } from "./api/storage/json-storage";
 import { PrefBranch } from "./api/storage/pref-branch";
 import { PrefObserver } from "./api/storage/pref-observer";
@@ -69,7 +69,7 @@ const i18n = new I18n(log, localeData);
 const xulService = new XulService(i18n);
 const management = new Management(log, mozAddonManager);
 const manifest = new Manifest(log, chromeFileService);
-const runtime = new Runtime(log, Services.appinfo);
+const runtimeApi = new RuntimeApi(log, Services.appinfo);
 
 const createPrefBranch = (
     branchRoot: string,
@@ -101,7 +101,7 @@ export const api = new Api(
     management,
     manifest,
     privacy,
-    runtime,
+    runtimeApi,
     storage,
     Services.prefs,
     miscInfos,

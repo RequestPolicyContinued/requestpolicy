@@ -1360,7 +1360,7 @@ import { Manifest } from "./manifest";
 import { MiscInfos } from "./misc-infos";
 import { NetworkPredictionEnabledSetting } from "./privacy/network-prediction-enabled";
 import { PrivacyApi } from "./privacy/privacy.module";
-import { Runtime } from "./runtime";
+import { RuntimeApi } from "./runtime-api";
 import { ChromeFileService } from "./services/chrome-file-service";
 import { FileService } from "./services/file-service";
 import { XPConnectService } from "./services/xpconnect-service";
@@ -1401,7 +1401,7 @@ export namespace API {
   }
 
   export namespace runtime {
-    export type IRuntime = Runtime;
+    export type IRuntime = RuntimeApi;
   }
 
   export namespace services {

@@ -27,7 +27,7 @@ import {MaybePromise} from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
 
-export class Runtime extends Module {
+export class RuntimeApi extends Module {
   // protected get debugEnabled() { return true; }
 
   private events = createListenersMap(["onMessage"]);

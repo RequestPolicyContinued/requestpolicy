@@ -114,7 +114,7 @@ export class Windows extends Module {
     const {outerWindowID} = domWindowUtils;
     this.debugLog.log(`unloadFromWindow(), windowID=${outerWindowID}`);
     if (!this.windowModules.has(outerWindowID)) {
-      this.log.error(`Window #${outerWindowID} not loaded.`);
+      this.log.warn(`Window #${outerWindowID} not loaded.`);
       return MaybePromise.resolve(undefined);
     }
     const windowModule = this.windowModules.get(outerWindowID)!;

@@ -26,6 +26,8 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class AppContent extends Module {
+  // protected get debugEnabled() { return true; }
+
   constructor(
       log: Common.ILog,
       protected readonly outerWindowID: number,

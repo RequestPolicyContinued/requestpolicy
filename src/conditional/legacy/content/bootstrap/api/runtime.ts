@@ -28,6 +28,8 @@ import {Module} from "lib/classes/module";
 import {createListenersMap} from "lib/utils/listener-factories";
 
 export class Runtime extends Module {
+  // protected get debugEnabled() { return true; }
+
   private events = createListenersMap(["onMessage"]);
 
   constructor(
@@ -103,10 +105,12 @@ export class Runtime extends Module {
     const callback = (aResponse: any) => {
       responses.push(aResponse);
     };
+    this.debugLog.log("sending message from content", aMessage);
     return MaybePromise.resolve(
         this.events.listenersMap.onMessage.emit(aMessage, null, callback),
     ).then(() => {
       if (responses.length === 0) return;
+      this.debugLog.log("responses to content:", responses);
       if (responses.length === 1) return responses[0];
       throw new Error("Got multiple responses!");
     }).toPromise();

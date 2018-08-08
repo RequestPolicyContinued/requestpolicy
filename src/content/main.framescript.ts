@@ -35,19 +35,25 @@ function logSevereError(aMessage: string, aError: any) {
   console.dir(aError);
 }
 
-if (contentWindowHasAssociatedTab(cfmm.content)) {
-  Promise.all([
+// FIXME: wait until 'tab.linkedBrowser' is available
+Promise.resolve().then(() => {
+  if (!contentWindowHasAssociatedTab(cfmm.content)) {
+    // tslint:disable-next-line:no-string-throw
+    throw "content window has no associated tab";
+  }
+  return Promise.all([
     import("legacy/lib/commonjs-unload-subject"),
     import("app/app.content"),
     import("app/log"),
-  ]).then(([
-    { COMMONJS_UNLOAD_SUBJECT },
-    { rp },
-    { log },
-  ]) => {
-    // =========================================================================
+  ]);
+}).then(([
+  { COMMONJS_UNLOAD_SUBJECT },
+  { rp },
+  { log },
+]) => {
+  // =========================================================================
   // shutdown
-    // =========================================================================
+  // =========================================================================
 
   // shut down the framescript on the message manager"s
   // `unload`. That event will occur when the browsing context
@@ -67,13 +73,13 @@ if (contentWindowHasAssociatedTab(cfmm.content)) {
 
   Services.obs.addObserver(observer, "sdk:loader:destroy", false);
 
-    // =========================================================================
+  // =========================================================================
   // start up
-    // =========================================================================
+  // =========================================================================
 
   rp.startup().catch(log.onError("framescript startup failed"));
-  }).catch((e) => {
-    console.error("framescript startup failed");
-    console.dir(e);
-  });
-}
+}).catch((e) => {
+  if (e === "content window has no associated tab") return;
+  console.error("framescript startup failed");
+  console.dir(e);
+});

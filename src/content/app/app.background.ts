@@ -43,6 +43,7 @@ import { FramescriptServices } from "app/framescripts/framescript-services";
 import { Framescripts } from "app/framescripts/framescripts.module";
 import { App } from "app/interfaces";
 import { AboutUri } from "app/runtime/about-uri";
+import { OtherRPInstallations } from "app/runtime/other-rp-installations";
 import { HttpChannelService } from "app/services/http-channel-service";
 import { PrivateBrowsingService } from "app/services/private-browsing-service";
 import { RequestSetService } from "app/services/request-set-service";
@@ -350,7 +351,8 @@ const initialSetup = new InitialSetup(
     notifications,
     xpcApi!,  // FIXME
 );
-const ui = new Ui(log, initialSetup, notifications);
+const otherRPInstallations = new OtherRPInstallations(log, notifications);
+const ui = new Ui(log, initialSetup, otherRPInstallations, notifications);
 
 const metadataMemory = new MetadataMemory(log);
 const requestProcessor = new RequestProcessor(

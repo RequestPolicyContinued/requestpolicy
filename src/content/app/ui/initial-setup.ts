@@ -28,7 +28,7 @@ import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-export class InitialSetup extends Module {
+export class InitialSetup extends Module implements App.ui.IInitialSetup {
   protected get startupPreconditions() {
     return [
       this.cachedSettings.whenReady,

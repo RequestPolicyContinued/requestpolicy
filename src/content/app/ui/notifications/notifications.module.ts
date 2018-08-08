@@ -45,12 +45,12 @@ export class Notifications extends Module implements App.ui.INotifications {
   }
 
   protected startupSelf() {
+    const openTabPromises: Array<Promise<void>> = [];
     const showNotification = (id: NotificationID) => {
-      this.notifications.openTab(id);
+      openTabPromises.push(this.notifications.openTab(id));
     };
     this.notifications.forEach(showNotification);
     this.notifications.onAdded.addListener(showNotification);
-
-    return MaybePromise.resolve(undefined);
+    return MaybePromise.all(openTabPromises) as MaybePromise<any>;
   }
 }

@@ -45,7 +45,8 @@ function isRP(aAddon: browser.management.ExtensionInfo)  {
   return ADDON_IDS.has(aAddon.id);
 }
 
-export class OtherRPInstallations extends Module {
+export class OtherRPInstallations extends Module
+    implements App.ui.IOtherRPInstallations {
   private rpManagement = new FilteredManagement(isRP);
 
   constructor(

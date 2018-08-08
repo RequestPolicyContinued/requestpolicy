@@ -73,9 +73,9 @@ export class NotificationsSet extends OverridableSet<NotificationID> {
     return true;
   }
 
-  public openTab(aID: NotificationID): void {
+  public async openTab(aID: NotificationID): Promise<void> {
     const win = this.windowService.getMostRecentBrowserWindow();
-    const tabbrowser = win.getBrowser();
+    const tabbrowser = await this.windowService.promiseTabBrowser(win);
     tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID)!);
     this.eventListenersMap.onTabOpened.emit(aID);
   }

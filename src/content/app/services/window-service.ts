@@ -104,6 +104,11 @@ export class WindowService extends Module
   public promiseTabBrowser(
       aChromeWindow: XUL.chromeWindow,
   ): Promise<XUL.tabBrowser> {
+    //
+    // FIXME!
+    // (what is the event we need to listen for?)
+    //
+
     const d = defer<XUL.tabBrowser>();
     let n = 100;
 

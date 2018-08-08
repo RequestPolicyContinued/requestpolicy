@@ -43,6 +43,7 @@ import { StorageMigration } from "./migration/storage/storage-migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
+import { OtherRPInstallations } from "./runtime/other-rp-installations";
 import { HttpChannelService } from "./services/http-channel-service";
 import { PrivateBrowsingService } from "./services/private-browsing-service";
 import { RequestService } from "./services/request-service";
@@ -55,6 +56,7 @@ import { WindowService } from "./services/window-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
 import { Storage } from "./storage/storage.module";
+import { InitialSetup } from "./ui/initial-setup";
 import { Notifications } from "./ui/notifications/notifications.module";
 import { Ui } from "./ui/ui.module";
 import { RPChannelEventSink } from "./web-request/channel-event-sink";
@@ -128,7 +130,9 @@ export namespace App {
   }
 
   export namespace ui {
+    export type IInitialSetup = InitialSetup;
     export type INotifications = Notifications;
+    export type IOtherRPInstallations = OtherRPInstallations;
   }
 
   export namespace webRequest {

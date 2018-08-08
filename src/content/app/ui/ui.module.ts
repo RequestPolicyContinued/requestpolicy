@@ -23,12 +23,12 @@
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
-import { InitialSetup } from "./initial-setup";
 
-export class Ui extends Module {
+export class Ui extends Module implements App.IUi {
   constructor(
       log: Common.ILog,
-      private readonly initialSetup: InitialSetup,
+      private readonly initialSetup: App.ui.IInitialSetup,
+      private readonly otherRPInstallations: App.ui.IOtherRPInstallations,
       private readonly notifications: App.ui.INotifications,
   ) {
     super("app.ui", log);
@@ -38,6 +38,7 @@ export class Ui extends Module {
     return {
       initialSetup: this.initialSetup,
       notifications: this.notifications,
+      otherRPInstallations: this.otherRPInstallations,
     };
   }
 }

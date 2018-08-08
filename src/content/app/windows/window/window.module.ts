@@ -43,9 +43,7 @@ export class WindowModule extends Module {
 
   protected get startupPreconditions() {
     return [
-      // FIXME !! (promiseTabBrowser)
-      // (what is the event we need to listen for?)
-      this.windowService.promiseTabBrowser(this.window),
+      this.windowService.promiseTabBrowser(this.window), // FIXME !!
     ] as Array<Promise<any>>;
   }
 

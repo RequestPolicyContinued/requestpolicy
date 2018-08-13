@@ -47,18 +47,6 @@ import { IClassicmenuRuleSpec } from "./classicmenu";
 const {LOG_FLAG_STATE} = C;
 declare const XPCOMUtils: JSMs.XPCOMUtils;
 
-function onOpenLinkViaContextMenu(
-    this: XUL.nsContextMenu,
-    window: XUL.chromeWindow,
-    requestProcessor: App.webRequest.IRequestProcessor,
-) {
-  const origin = window.gContextMenuContentData ?
-    window.gContextMenuContentData.docLocation :
-    this.target.ownerDocument.URL;
-  const dest = this.linkURL;
-  requestProcessor.registerLinkClicked(origin, dest);
-}
-
 export class Overlay extends Module implements App.windows.window.IOverlay {
   // protected get debugEnabled() { return true; }
 
@@ -67,12 +55,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   public requestLog: any = null;
 
   public readonly boundMethods = new BoundMethods(this);
-
-  private readonly onOpenLinkViaContextMenu = onOpenLinkViaContextMenu.bind(
-      null,
-      this.window,
-      this.requestProcessor,
-  );
 
   private toolbarButtonId = "/* @echo ALPHABETICAL_ID */ToolbarButton";
 
@@ -924,6 +906,15 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private wrapFunctionErrorCallback(aMessage: string, aError: any) {
     this.log.error(aMessage, aError);
+  }
+
+  private onOpenLinkViaContextMenu() {
+    const contextMenu = this.window.gContextMenu;
+    const origin = this.window.gContextMenuContentData ?
+      this.window.gContextMenuContentData.docLocation :
+      contextMenu.target.ownerDocument.URL;
+    const dest = contextMenu.linkURL;
+    this.requestProcessor.registerLinkClicked(origin, dest);
   }
 
   /**

@@ -795,7 +795,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
    * notifications.
    */
   private updateBlockedContentState(browser: XUL.browser) {
-    this.requestProcessor.whenReady.then(() => {
+    try {
+      if (!browser.currentURI) {
+        this.setContentBlockedState(false);
+        return;
+      }
       const uri = this.uriService.stripFragment(browser.currentURI.spec);
       if (LOG_FLAG_STATE) {
         this.log.log(
@@ -815,15 +819,13 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
           "No requests have been blocked.";
         this.log.log(logText);
       }
-
-      return Promise.resolve();
-    }).catch((e) => {
+    } catch (e) {
       this.log.error(
           "[SEVERE] " +
           "Unable to complete 'updateBlockedContentState' actions. Details:",
           e,
       );
-    });
+    }
   }
 
   /**

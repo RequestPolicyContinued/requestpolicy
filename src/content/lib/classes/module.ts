@@ -91,6 +91,10 @@ export abstract class Module implements IModule {
     ]),
   } as {[name: string]: MaybePromise<any>};
 
+  private preconditionStates: Array<
+      "not awaiting" | "awaiting" | "done" | "failed"
+  > = [];
+
   protected get startupPreconditions(): Array<Promise<void>> {
     return [];
   }
@@ -125,13 +129,21 @@ export abstract class Module implements IModule {
       return MaybePromise.resolve(undefined);
     }
     this._startupState = "starting up";
+    this.startupPreconditions.forEach((_, index) => {
+      this.preconditionStates[index] = "not awaiting";
+    });
 
     let timedOutStartingUp = false;
     setTimeout(() => {
       if (this.ready) return;
       timedOutStartingUp = true;
-      this.log.error(`startup didn't finish ` +
-          `even after ${MAX_STARTUP_SECONDS} seconds!`);
+      this.log.error(
+          `startup didn't finish ` +
+          `even after ${MAX_STARTUP_SECONDS} seconds!`,
+          {
+            preconditionStates: this.preconditionStates,
+          },
+      );
     }, 1000 * MAX_STARTUP_SECONDS);
     const startupStartTime = new Date().getTime();
     if (this.timedOutWaitingForStartup) {
@@ -201,7 +213,16 @@ export abstract class Module implements IModule {
       this.debugLog.log(
           `awaiting ${nPrecond} precondition${ nPrecond > 1 ? "s" : "" }...`,
       );
-      pPrecond = MaybePromise.all(this.startupPreconditions).then(() => {
+      const preconditionsMapped = this.startupPreconditions.map((p, index) => {
+        this.preconditionStates[index] = "awaiting";
+        return p.then(() => {
+          this.preconditionStates[index] = "done";
+        }).catch((e) => {
+          this.preconditionStates[index] = "failed";
+          return Promise.reject(e);
+        });
+      });
+      pPrecond = MaybePromise.all(preconditionsMapped).then(() => {
         this.debugLog.log("done awaiting preconditions");
       });
     } else {

@@ -47,8 +47,10 @@ export class StorageMigrationFromXpcom extends Module {
   ) {
     super("ewe.storageMigrationFromXpcom", log);
 
-    pConnectionToLegacy.then((c) => this.connectionToLegacy = c).
-        catch(this.log.onError("connectionToLegacy"));
+    pConnectionToLegacy.then((c) => {
+      this.debugLog.log(`got "IConnection"`);
+      this.connectionToLegacy = c;
+    }).catch(this.log.onError("connectionToLegacy"));
   }
 
   protected startupSelf() {
@@ -75,8 +77,7 @@ export class StorageMigrationFromXpcom extends Module {
       ready: true,
     });
     p.catch((e) => {
-      console.error("Failed to send webex-side startup message");
-      console.dir(e);
+      this.log.error("Failed to send webex-side startup message", e);
       return Promise.reject(e);
     });
     return p;

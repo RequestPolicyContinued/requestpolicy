@@ -44,8 +44,16 @@ export class StorageMigration extends Module
           Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage", log);
-    pStorageMigrationToWE.then((m) => this.storageMigrationToWE = m).
-        catch(this.log.onError("pStorageMigrationToWE"));
+    pStorageMigrationToWE.then((m) => {
+      if (this.debugEnabled) {
+        if (m === null) {
+          this.debugLog.log(`"IStorageMigrationToWebExtension" n/a`);
+        } else {
+          this.debugLog.log(`got "IStorageMigrationToWebExtension"`);
+        }
+      }
+      this.storageMigrationToWE = m;
+    }).catch(this.log.onError("pStorageMigrationToWE"));
   }
 
   protected get subModules() {

@@ -424,6 +424,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
   const classicMenu = new ClassicMenu(
       log,
       windowID,
+      window,
       policy,
   );
   const overlayWrapper: {

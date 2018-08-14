@@ -46,6 +46,7 @@ export class ClassicMenu extends Module {
   constructor(
       parentLog: Common.ILog,
       windowID: number,
+      private readonly window: XUL.chromeWindow,
       private readonly policy: App.IPolicy,
   ) {
     super(
@@ -72,7 +73,7 @@ export class ClassicMenu extends Module {
   }
 
   public addMenuSeparator(menu: XUL.menupopup) {
-    const separator = document.createElement("menuseparator");
+    const separator = this.window.document.createElement("menuseparator");
     menu.insertBefore(separator, menu.firstChild);
     return separator;
   }
@@ -82,7 +83,7 @@ export class ClassicMenu extends Module {
       label: string,
       aCallback: () => void,
   ) {
-    const menuItem = document.createElement("menuitem");
+    const menuItem = this.window.document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     menuItem.addEventListener("command", aCallback, false);
     (menuItem as any).rpListener = aCallback;

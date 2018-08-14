@@ -452,8 +452,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private handleMetaRefreshes(message: any) {
     this.log.log("Handling meta refreshes...");
 
-    const {documentURI, metaRefreshes} = message.data;
-    const browser = message.target;
+    const {documentURI, metaRefreshes} = message.data as IMetaRefreshes;
+    const browser = message.target as XUL.browser;
 
     for (let i = 0, len = metaRefreshes.length; i < len; ++i) {
       const {delay, destURI, originalDestURI} = metaRefreshes[i];
@@ -485,7 +485,11 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
           continue;
         }
         // The request will be blocked by shouldLoad.
-        this.redirectionNotifications.showNotification(browser, destURI, delay);
+        this.redirectionNotifications.showNotification(
+            browser,
+            { target: destURI },
+            delay,
+        );
       }
     }
   }

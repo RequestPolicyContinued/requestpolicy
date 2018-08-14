@@ -92,9 +92,11 @@ export class RedirectionService extends Module
       // intermediate URI of a redirection chain, not a real site.
       return windowModule.r21n.showNotification(
           browser,
-          request.destURIWithRef,
+          {
+            origin: request.originURI,
+            target: request.destURIWithRef,
+          },
           0,
-          request.originURI,
           true,
       );
     });

@@ -233,7 +233,7 @@ export class ManagerForDOMContentLoaded extends Module {
 
     const documentURI = (doc as any).documentURI as string;
 
-    const metaRefreshes: any[] = [];
+    const metaRefreshes: IMetaRefresh[] = [];
 
     // Find all meta redirects.
     const metaTags = doc.getElementsByTagName("meta");
@@ -261,8 +261,11 @@ export class ManagerForDOMContentLoaded extends Module {
             resolve(destURI);
       }
 
-      metaRefreshes.push({delay, destURI,
-        originalDestURI});
+      metaRefreshes.push({
+        delay,
+        destURI,
+        originalDestURI,
+      });
     }
 
     if (metaRefreshes.length > 0) {

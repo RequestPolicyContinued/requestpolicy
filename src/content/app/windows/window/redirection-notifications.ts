@@ -33,9 +33,14 @@ import { IClassicmenuRuleSpec } from "./classicmenu";
 const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
 const notificationValue = "request-policy-meta-redirect";
 
+interface IOriginAndTarget {
+  origin?: string;
+  target: string;
+}
+
 export class RedirectionNotifications extends Module
     implements App.windows.window.IRedirectionNotifications {
-  protected get debugEnabled() { return true; }
+  // protected get debugEnabled() { return true; }
 
   private addRulePopup: XUL.menupopup;
 
@@ -76,16 +81,14 @@ export class RedirectionNotifications extends Module
 
   public asyncShowNotification(
       vBrowser: XUL.browser,
-      redirectTargetUri: string,
+      originAndTarget: IOriginAndTarget,
       delay: number,
-      aRedirectOriginUri?: string,
       replaceIfPossible?: boolean,
   ): Promise<boolean> {
     const p = Promise.resolve().then(() => this.showNotification(
         vBrowser,
-        redirectTargetUri,
+        originAndTarget,
         delay,
-        aRedirectOriginUri,
         replaceIfPossible,
     ));
     p.catch(this.log.onError("failed to show redirection notification"));
@@ -100,11 +103,15 @@ export class RedirectionNotifications extends Module
    */
   public showNotification(
       vBrowser: XUL.browser,
-      redirectTargetUri: string,
+      {
+        origin: aRedirectOriginUri,
+        target: redirectTargetUri,
+      }: IOriginAndTarget,
       delay: number,
-      aRedirectOriginUri?: string,
       replaceIfPossible?: boolean,
   ): boolean {
+    const originalRedirectOriginUri = aRedirectOriginUri;
+
     this.debugLog.log("going to show a redirection notification");
 
     // TODO: Do something with the delay. Not sure what the best thing to do is
@@ -144,7 +151,7 @@ export class RedirectionNotifications extends Module
     this.populateMenu(origin, dest, allowRedirectionCallback);
     this.populateNotificationBox(
         vBrowser,
-        aRedirectOriginUri,
+        originalRedirectOriginUri,
         redirectOriginUri,
         redirectTargetUri,
         allowRedirectionCallback,
@@ -196,6 +203,14 @@ export class RedirectionNotifications extends Module
       replaceIfPossible?: boolean,
   ) {
     return () => {
+      this.debugLog.log(
+          `Going to allow redirection`,
+          {
+            origin: redirectOriginUri,
+            target: redirectTargetUri,
+          },
+      );
+
       // Fx 3.7a5+ calls shouldLoad for location.href changes.
 
       // TODO: currently the allow button ignores any additional

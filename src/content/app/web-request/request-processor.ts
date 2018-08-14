@@ -57,7 +57,7 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 // =============================================================================
 
 export class RequestProcessor extends Module {
-  protected get debugEnabled() { return true; }
+  // protected get debugEnabled() { return true; }
 
   private readonly CP_OK = this.ci.nsIContentPolicy.ACCEPT;
   private readonly CP_REJECT = this.ci.nsIContentPolicy.REJECT_SERVER;
@@ -192,9 +192,11 @@ export class RequestProcessor extends Module {
       } else {
         windowModule!.r21n.asyncShowNotification(
             browser,
-            request.originURI!,
+            {
+              origin: request.originURI!,
+              target: request.destURIWithRef,
+            },
             0,
-            request.destURIWithRef,
         ).catch(this.log.onError(
             "redirectionNotifications.asyncShowNotification",
         ));

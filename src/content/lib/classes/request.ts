@@ -30,7 +30,7 @@ import {RequestResult} from "lib/classes/request-result";
 // Request
 // =============================================================================
 
-export class Request {
+export abstract class Request {
   // TODO: save a nsIURI objects here instead of strings
   public originURI?: string;
   public destURI: string;
@@ -46,13 +46,8 @@ export class Request {
     this.destURI = destURI;
   }
 
-  get originUriObj(): XPCOM.nsIURI | null {
-    throw new Error("Not implemented!");
-  }
-
-  get destUriObj(): XPCOM.nsIURI {
-    throw new Error("Not implemented!");
-  }
+  public abstract get originUriObj(): XPCOM.nsIURI | null;
+  public abstract get destUriObj(): XPCOM.nsIURI;
 
   public setOriginURI(originURI: string, _: App.services.IUriService) {
     this.originURI = originURI;
@@ -119,6 +114,29 @@ export class NormalRequest extends Request {
 
   get destURIWithRef() {
     return this.aContentLocation.spec;
+  }
+}
+
+// =============================================================================
+// SimpleRedirectRequest
+// =============================================================================
+
+// tslint:disable-next-line max-classes-per-file
+export class SimpleRedirectRequest extends Request {
+  constructor(
+      originURI: string,
+      destURI: string,
+      private uriService: App.services.IUriService,
+  ) {
+    super(originURI, destURI);
+  }
+
+  public get originUriObj() {
+    return this.uriService.getUriObject(this.originURI!);
+  }
+
+  public get destUriObj() {
+    return this.uriService.getUriObject(this.destURI);
   }
 }
 

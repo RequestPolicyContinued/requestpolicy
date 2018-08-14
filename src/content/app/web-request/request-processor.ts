@@ -27,7 +27,12 @@ import { App } from "app/interfaces";
 import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import {NormalRequest, RedirectRequest, Request} from "lib/classes/request";
+import {
+  NormalRequest,
+  RedirectRequest,
+  Request,
+  SimpleRedirectRequest,
+} from "lib/classes/request";
 import {
   RequestReason,
   RequestResult,
@@ -986,7 +991,11 @@ export class RequestProcessor extends Module {
   }
 
   public isAllowedRedirect(originURI: string, destURI: string) {
-    const request = new Request(originURI, destURI);
+    const request = new SimpleRedirectRequest(
+        originURI,
+        destURI,
+        this.uriService,
+    );
     return true === this.checkRedirect(request).isAllowed;
   }
 

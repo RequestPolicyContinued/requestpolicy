@@ -25,13 +25,19 @@ import { App } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { getTabBrowser } from "lib/utils/window-utils";
 import { IClassicmenuRuleSpec } from "./classicmenu";
 
+const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
+const notificationValue = "request-policy-meta-redirect";
+
 export class RedirectionNotifications extends Module
     implements App.windows.window.IRedirectionNotifications {
   protected get debugEnabled() { return true; }
+
+  private addRulePopup: XUL.menupopup;
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
   private get $str() { return this.i18n.getMessage.bind(browser.i18n); }
@@ -116,32 +122,58 @@ export class RedirectionNotifications extends Module
     // Line: 260
 
     // redirectOriginUri is optional and is not necessary for <meta> redirects.
-    const isOriginUndefined = aRedirectOriginUri === undefined;
     const redirectOriginUri = aRedirectOriginUri ||
         this.windowService.getTopLevelDocumentUri(this.window);
 
     if (this.runtime.isFennec) {
       this.log.warn(
-          `Should have shown redirect notification to <${redirectTargetUri
-          }>, but it's not implemented yet on Fennec.`,
+          `Should have shown a redirection notification ` +
+          `(redirection to <${redirectTargetUri}>), ` +
+          `but it's not implemented yet on Fennec.`,
       );
       return false;
     }
 
-    const notificationBox = this.gBrowser.getNotificationBox(vBrowser);
-    const notificationValue = "request-policy-meta-redirect";
+    const origin = this.getDisplayStringFromUri(redirectOriginUri);
+    const dest = this.getDisplayStringFromUri(redirectTargetUri);
 
-    // prepare the notification's label
-    let notificationLabel;
-    if (isOriginUndefined) {
-      notificationLabel = this.$str(
+    const allowRedirectionCallback = this.genOnAllowRedirection(
+        vBrowser, redirectOriginUri, redirectTargetUri, replaceIfPossible,
+    );
+
+    this.populateMenu(origin, dest, allowRedirectionCallback);
+    this.populateNotificationBox(
+        vBrowser,
+        aRedirectOriginUri,
+        redirectOriginUri,
+        redirectTargetUri,
+        allowRedirectionCallback,
+    );
+    return true;
+  }
+
+  protected startupSelf() {
+    this.addRulePopup = this.windowService.$id(
+        this.window,
+        addRuleMenuName,
+    ) as any;
+    return MaybePromise.resolve(undefined);
+  }
+
+  private prepareNotificationLabel(
+      originalRedirectOriginUri: string | undefined,
+      redirectOriginUri: string,
+      redirectTargetUri: string,
+  ) {
+    if (originalRedirectOriginUri === undefined) {
+      return this.$str(
           "redirectNotification",
           [
             this.cropUri(redirectTargetUri, 50),
           ],
       );
     } else {
-      notificationLabel = this.$str(
+      return this.$str(
           "redirectNotificationWithOrigin",
           [
             this.cropUri(redirectOriginUri, 50),
@@ -149,27 +181,21 @@ export class RedirectionNotifications extends Module
           ],
       );
     }
+  }
 
-    const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
-    const addRulePopup: XUL.menupopup = this.$id(addRuleMenuName) as any;
-    this.classicmenu.emptyMenu(addRulePopup);
+  private getDisplayStringFromUri(uri: string) {
+    const baseDomain = this.uriService.getBaseDomain(uri);
+    if (baseDomain === null) return null;
+    return this.menu.addWildcard(baseDomain);
+  }
 
-    const originBaseDomain = this.uriService.getBaseDomain(redirectOriginUri);
-    const destBaseDomain = this.uriService.getBaseDomain(redirectTargetUri);
-
-    let origin = null;
-    let dest = null;
-    if (originBaseDomain !== null) {
-      origin = this.menu.addWildcard(originBaseDomain);
-    }
-    if (destBaseDomain !== null) {
-      dest = this.menu.addWildcard(destBaseDomain);
-    }
-
-    const mayPermRulesBeAdded = this.privateBrowsingService.
-        mayPermanentRulesBeAdded(this.window);
-
-    const allowRedirection = () => {
+  private genOnAllowRedirection(
+      vBrowser: XUL.browser,
+      redirectOriginUri: string,
+      redirectTargetUri: string,
+      replaceIfPossible?: boolean,
+  ) {
+    return () => {
       // Fx 3.7a5+ calls shouldLoad for location.href changes.
 
       // TODO: currently the allow button ignores any additional
@@ -195,22 +221,27 @@ export class RedirectionNotifications extends Module
           data,
       );
     };
+  }
 
-    const addMenuItem = (aRuleSpec: IClassicmenuRuleSpec) => {
-      this.classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
-        if (this.cachedSettings.get("autoReload")) {
-          allowRedirection();
-        }
-      });
-    };
-    const addMenuSeparator = () => {
-      this.classicmenu.addMenuSeparator(addRulePopup);
-    };
+  private populateMenu(
+      origin: string | null,
+      dest: string | null,
+      allowRedirection: () => void,
+  ) {
+    const mayPermRulesBeAdded = this.privateBrowsingService.
+        mayPermanentRulesBeAdded(this.window);
+
+    // shortcut functions
+    const addMenuItem = this.addMenuItem.bind(this, allowRedirection);
+    const addSeparator = this.addMenuSeparator.bind(this);
+
+    // empty menu
+    this.classicmenu.emptyMenu(this.addRulePopup);
 
     {
       // allow ALL
       const label = this.$str("allowAllRedirections");
-      this.classicmenu.addCustomMenuItem(addRulePopup, label, () => {
+      this.classicmenu.addCustomMenuItem(this.addRulePopup, label, () => {
         this.windowService.openTabWithUrl(
             this.window,
             browser.runtime.getURL("settings/defaultpolicy.html"),
@@ -218,106 +249,122 @@ export class RedirectionNotifications extends Module
             true,
         );
       });
-      addMenuSeparator();
+      addSeparator();
     }
 
-    if (destBaseDomain !== null) {
+    if (dest !== null) {
       addMenuItem({allow: true, dest});
       if (mayPermRulesBeAdded) {
         addMenuItem({allow: true, dest});
       }
     }
 
-    if (originBaseDomain !== null && destBaseDomain !== null) {
-      addMenuSeparator();
+    if (origin !== null && dest !== null) {
+      addSeparator();
     }
 
-    if (originBaseDomain !== null) {
+    if (origin !== null) {
       addMenuItem({allow: true, origin, temp: true});
       if (mayPermRulesBeAdded) {
         addMenuItem({allow: true, origin});
       }
     }
 
-    if (originBaseDomain !== null && destBaseDomain !== null) {
-      addMenuSeparator();
+    if (origin !== null && dest !== null) {
+      addSeparator();
 
       addMenuItem({allow: true, origin, dest, temp: true});
       if (mayPermRulesBeAdded) {
         addMenuItem({allow: true, origin, dest});
       }
     }
-
-    const notification = notificationBox.
-        getNotificationWithValue(notificationValue);
-    if (notification) {
-      notification.label = notificationLabel;
-    } else {
-      const buttons = [
-        {
-          accessKey: this.$str("allow_accesskey"),
-          callback: allowRedirection,
-          label: this.$str("allow"),
-          popup: null,
-        },
-        {
-          accessKey: this.$str("deny_accesskey"),
-          label: this.$str("deny"),
-          popup: null,
-          callback() {
-            // Do nothing. The notification closes when this is called.
-          },
-        },
-        {
-          accessKey: this.$str("addRule_accesskey"),
-          callback: null,
-          label: this.$str("addRule"),
-          popup: addRuleMenuName,
-        },
-        // TODO: add a "read more about URL redirection" button, targetting to
-        //       https://en.wikipedia.org/wiki/URL_redirection
-      ];
-      const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-
-      const notificationElem = notificationBox.appendNotification(
-          notificationLabel, notificationValue,
-          "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
-          priority, buttons,
-      );
-
-      // Let the notification persist at least 300ms. This is needed in the
-      // following scenario:
-      //     If an URL is entered on an empty tab (e.g. "about:blank"),
-      //     and that URL redirects to another URL with a different
-      //     host, and that redirect is blocked by RequestPolicy,
-      //     then immediately after blocking the redirect Firefox will make
-      //     a location change, maybe back from the blocked URL to
-      //     "about:blank". In any case, when the location changes, the
-      //     function `notificationbox.removeTransientNotifications()`
-      //     is called. It checks for the `persistence` and `timeout`
-      //     properties. See MDN documentation:
-      // tslint:disable-next-line:max-line-length
-      //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
-      // See also issue #722.
-      (notificationElem as any).timeout = Date.now() + 300;
-    }
-    return true;
   }
 
-  /**
-   * Return a DOM element by its id. First search in the main document,
-   * and if not found search in the document included in the frame.
-   */
-  private $id(id: string): HTMLElement | null {
-    let element = this.window.top.document.getElementById(id);
-    if (!element) {
-      const popupframe = this.window.top.document.
-          getElementById("rpc-popup-frame") as HTMLFrameElement;
-      if (popupframe && popupframe.contentDocument) {
-        element = popupframe.contentDocument.getElementById(id);
-      }
+  private populateNotificationBox(
+      vBrowser: XUL.browser,
+      originalRedirectOriginUri: string | undefined,
+      redirectOriginUri: string,
+      redirectTargetUri: string,
+      allowRedirectionCallback: () => void,
+  ) {
+    const notificationBox = this.gBrowser.getNotificationBox(vBrowser);
+
+    const notificationLabel = this.prepareNotificationLabel(
+        originalRedirectOriginUri,
+        redirectOriginUri,
+        redirectTargetUri,
+    );
+
+    const notification = notificationBox.getNotificationWithValue(
+        notificationValue,
+    );
+    if (notification) {
+      notification.label = notificationLabel;
+      return;
     }
-    return element;
+
+    const buttons = [
+      {
+        accessKey: this.$str("allow_accesskey"),
+        callback: allowRedirectionCallback,
+        label: this.$str("allow"),
+        popup: null,
+      },
+      {
+        accessKey: this.$str("deny_accesskey"),
+        label: this.$str("deny"),
+        popup: null,
+        callback() {
+          // Do nothing. The notification closes when this is called.
+        },
+      },
+      {
+        accessKey: this.$str("addRule_accesskey"),
+        callback: null,
+        label: this.$str("addRule"),
+        popup: addRuleMenuName,
+      },
+      // TODO: add a "read more about URL redirection" button, targetting to
+      //       https://en.wikipedia.org/wiki/URL_redirection
+    ];
+    const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
+
+    const notificationElem = notificationBox.appendNotification(
+        notificationLabel, notificationValue,
+        "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
+        priority, buttons,
+    );
+
+    // Let the notification persist at least 300ms. This is needed in the
+    // following scenario:
+    //     If an URL is entered on an empty tab (e.g. "about:blank"),
+    //     and that URL redirects to another URL with a different
+    //     host, and that redirect is blocked by RequestPolicy,
+    //     then immediately after blocking the redirect Firefox will make
+    //     a location change, maybe back from the blocked URL to
+    //     "about:blank". In any case, when the location changes, the
+    //     function `notificationbox.removeTransientNotifications()`
+    //     is called. It checks for the `persistence` and `timeout`
+    //     properties. See MDN documentation:
+    // tslint:disable-next-line:max-line-length
+    //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
+    // See also issue #722.
+    (notificationElem as any).timeout = Date.now() + 300;
+  }
+
+  private addMenuItem(
+      allowRedirection: () => void,
+      aRuleSpec: IClassicmenuRuleSpec,
+  ) {
+    this.classicmenu.addMenuItem(this.addRulePopup, aRuleSpec, () => {
+      if (this.cachedSettings.get("autoReload")) {
+        allowRedirection();
+      }
+    });
+  }
+
+  private addMenuSeparator() {
+    this.classicmenu.addMenuSeparator(this.addRulePopup);
   }
 
   /**

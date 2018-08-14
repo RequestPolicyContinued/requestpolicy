@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { promiseObserverTopic } from "legacy/lib/utils/xpcom-utils";
+import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {
@@ -58,7 +59,8 @@ export class WindowService extends Module
 
   private windows = new Set<XPCOM.nsIDOMWindow>();
 
-  private progressEventListener = this.onProgressEvent.bind(this);
+  private boundMethods = new BoundMethods(this);
+
   private windowMediatorListener: (
       XPCOM.nsIWindowMediatorListener_without_nsISupports
   ) = {
@@ -66,8 +68,9 @@ export class WindowService extends Module
     onOpenWindow: (xulWindow: XPCOM.nsIXULWindow) => {
       const domWindow = getDOMWindowFromXULWindow(xulWindow);
       this.windows.add(domWindow);
-      domWindow.addEventListener("load", this.progressEventListener, false);
-      domWindow.addEventListener("unload", this.progressEventListener, false);
+      const progressEventListener = this.boundMethods.get(this.onProgressEvent);
+      domWindow.addEventListener("load", progressEventListener, false);
+      domWindow.addEventListener("unload", progressEventListener, false);
     },
     onWindowTitleChange: (
         xulWindow: XPCOM.nsIXULWindow,
@@ -214,9 +217,10 @@ export class WindowService extends Module
   protected shutdownSelf() {
     this.windowMediator.removeListener(this.windowMediatorListener);
 
+    const progressEventListener = this.boundMethods.get(this.onProgressEvent);
     for (const window of this.windows.values()) {
-      window.removeEventListener("load", this.progressEventListener, false);
-      window.removeEventListener("unload", this.progressEventListener, false);
+      window.removeEventListener("load", progressEventListener, false);
+      window.removeEventListener("unload", progressEventListener, false);
     }
     this.windows.clear();
 
@@ -224,13 +228,18 @@ export class WindowService extends Module
   }
 
   private onProgressEvent(event: ProgressEvent) {
-    const domWindow = event.target as XPCOM.nsIDOMWindow;
+    const window = event.target as XUL.chromeWindow;
 
     if (event.type in ["load", "unload"]) {
-      domWindow.removeEventListener(
-          event.type, this.progressEventListener, false,
+      window.removeEventListener(
+          event.type,
+          this.boundMethods.get(this.onProgressEvent),
+          false,
       );
     }
+
+    if (window.windowtype !== "navigator:browser") return;
+
     switch (event.type) {
       case "load":
         this.debugLog.log(
@@ -246,7 +255,7 @@ export class WindowService extends Module
             `#listeners=${ this.events.listenersMap.onWindowUnloaded.size }`,
         );
         this.events.listenersMap.onWindowUnloaded.emit(event);
-        this.windows.delete(domWindow);
+        this.windows.delete(window);
         break;
 
       default:

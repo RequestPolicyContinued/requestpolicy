@@ -1210,6 +1210,8 @@ export namespace XUL {
         XPCOM.nsIFrameScriptLoader &
         XPCOM.nsIMessageListenerManager &
         XPCOM.nsIMessageBroadcaster;
+    // https://dxr.mozilla.org/comm-esr45/search?q=regexp%3A%22%5Cbwindowtype%5Cb%22&redirect=false
+    windowtype: "navigator:browser" | "devtools:scratchpad" | "navigator:view-source";  // ...
   }
 
   export type contentWindow = XPCOM.nsIDOMWindow & Window & {

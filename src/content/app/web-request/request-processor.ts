@@ -101,6 +101,8 @@ export class RequestProcessor extends Module {
       this.observerService!,
   );
 
+  private get windowsModule() { return this.windowsModuleWrapper.module!; }
+
   protected get subModules() {
     return {
       observer: this.observer,
@@ -131,6 +133,7 @@ export class RequestProcessor extends Module {
       private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly mm: App.webRequest.IMetadataMemory,
+      private readonly windowsModuleWrapper: {module: App.IWindows | null},
   ) {
     super("webRequest.requestProcessor", parentLog);
   }
@@ -1174,6 +1177,7 @@ export class RequestProcessor extends Module {
   }
 
   private showRedirectNotification(request: RedirectRequest) {
+    this.debugLog.log("going to show a redirection notification");
     const browser = this.requestService.getBrowser(request);
     if (browser === null) {
       return false;
@@ -1182,21 +1186,26 @@ export class RequestProcessor extends Module {
     const window = browser.ownerGlobal;
 
     Utils.tryMultipleTimes(() => {
-      const showNotification = Utils.getObjectPath(window, "rpcontinued",
-          "overlay", "_showRedirectNotification");
-      if (!showNotification) {
-        return false;
-      }
+      const windowModule = this.windowsModule.getWindowModule(window);
+      if (!windowModule) return false;
+      const {overlay} = windowModule;
+
       // Parameter "replaceIfPossible" is set to true, because the "origin" of
       // redirections going through "nsIChannelEventSink" is just an
       // intermediate URI of a redirection chain, not a real site.
-      return showNotification(browser, request.destURIWithRef, 0,
-          request.originURI, true);
+      return overlay._showRedirectNotification(
+          browser,
+          request.destURIWithRef,
+          0,
+          request.originURI,
+          true,
+      );
     });
     return true;
   }
 
   private maybeShowRedirectNotification(aRequest: RedirectRequest) {
+    this.debugLog.log("maybe going to show a redirection notification");
     // Check if the request corresponds to a top-level document load.
     {
       const {loadFlags} = aRequest;
@@ -1211,9 +1220,9 @@ export class RequestProcessor extends Module {
     const rv = this.showRedirectNotification(aRequest);
     if (true !== rv) {
       this.log.warn(
-          `${"A redirection of a top-level document has been observed, " +
-          "but it was not possible to notify the user! The redirection " +
-          "was from page <"}${aRequest.originURI}> ` +
+          `A redirection of a top-level document has been observed, ` +
+          `but it was not possible to notify the user! The redirection ` +
+          `was from page <${aRequest.originURI}> ` +
           `to <${aRequest.destURI}>.`,
       );
     }

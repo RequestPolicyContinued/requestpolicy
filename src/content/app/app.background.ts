@@ -355,6 +355,7 @@ const otherRPInstallations = new OtherRPInstallations(log, notifications);
 const ui = new Ui(log, initialSetup, otherRPInstallations, notifications);
 
 const metadataMemory = new MetadataMemory(log);
+const windowsModuleWrapper: { module: App.IWindows | null } = { module: null };
 const requestProcessor = new RequestProcessor(
     log,
     Ci,
@@ -367,6 +368,7 @@ const requestProcessor = new RequestProcessor(
     cachedSettings,
     requestMemory,
     metadataMemory,
+    windowsModuleWrapper,
 );
 const redirectRequestFactory = (
     aOldChannel: HttpChannelWrapper,
@@ -524,8 +526,8 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       log,
       windowID,
       window,
-      classicMenu,
       eventListener,
+      classicMenu,
       keyboardShortcuts,
       menu,
       msgListener,
@@ -554,6 +556,7 @@ const windows = new Windows(
     chromeStyleSheets,
     toolbarbuttonAustralis,
 );
+windowsModuleWrapper.module = windows;
 
 export const rp = new AppBackground(
     log,

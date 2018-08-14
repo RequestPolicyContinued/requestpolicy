@@ -76,23 +76,6 @@ export function tryMultipleTimes(
 }
 
 /**
- * Return a nested property or `undefined` if it does not exist.
- * Any element in the object chain may be undefined.
- *
- * Other implementations at https://stackoverflow.com/q/2631001/307637
- */
-export function getObjectPath(object: any, ...properties: string[]) {
-  return properties.reduce(getObjectProperty, object);
-}
-
-function getObjectProperty(object: any, property: string) {
-  if (!!object && object.hasOwnProperty(property)) {
-    return object[property];
-  }
-  return undefined;
-}
-
-/**
  * Return a module's `internal` object, which is a singleton.
  * The `internal` can be accessed from all submodules of that module.
  */

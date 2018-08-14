@@ -122,6 +122,22 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     super(`app.windows[${windowID}].overlay`, parentLog);
   }
 
+  public _showRedirectNotification(
+      vBrowser: XUL.browser,
+      redirectTargetUri: string,
+      delay: number,
+      aRedirectOriginUri?: string,
+      replaceIfPossible?: boolean,
+  ): boolean {
+    return this.showRedirectNotification(
+        vBrowser,
+        redirectTargetUri,
+        delay,
+        aRedirectOriginUri,
+        replaceIfPossible,
+    );
+  }
+
   /**
    * This function is called when any requests happen. This must be as
    * fast as possible because request processing blocks until this function

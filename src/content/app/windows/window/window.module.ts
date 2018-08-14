@@ -25,7 +25,7 @@ import { API, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-export class WindowModule extends Module {
+export class WindowModule extends Module implements App.windows.IWindowModule {
   // protected get debugEnabled() { return true; }
 
   protected get subModules() {
@@ -52,14 +52,15 @@ export class WindowModule extends Module {
       public readonly windowID: number,
       private window: XUL.chromeWindow,
 
-      private readonly classicMenu: App.windows.window.IClassicMenu,
       private readonly eventListener: App.common.IEventListenerModule,
-      private readonly keyboardShortcuts: API.windows.window.IKeyboardShortcuts,
-      private readonly menu: App.windows.window.IMenu,
-      private readonly msgListener: App.windows.window.IMessageListenerModule,
-      private readonly overlay: App.windows.window.IOverlay,
-      private readonly toolbarButton: App.windows.window.IToolbarButton,
-      private readonly xulTrees: App.windows.window.IXulTrees,
+
+      public readonly classicMenu: App.windows.window.IClassicMenu,
+      public readonly keyboardShortcuts: API.windows.window.IKeyboardShortcuts,
+      public readonly menu: App.windows.window.IMenu,
+      public readonly msgListener: App.windows.window.IMessageListenerModule,
+      public readonly overlay: App.windows.window.IOverlay,
+      public readonly toolbarButton: App.windows.window.IToolbarButton,
+      public readonly xulTrees: App.windows.window.IXulTrees,
 
       private readonly windowService: App.services.IWindowService,
   ) {

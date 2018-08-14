@@ -21,7 +21,6 @@
  */
 
 import { App } from "app/interfaces";
-import { WindowModule } from "app/windows/window/window.module";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { BoundMethods } from "lib/classes/bound-methods";
@@ -29,10 +28,10 @@ import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { getDOMWindowUtils } from "lib/utils/window-utils";
 
-export class Windows extends Module {
+export class Windows extends Module implements App.IWindows {
   // protected get debugEnabled() { return true; }
 
-  private windowModules = new Map<number, WindowModule>();
+  private windowModules = new Map<number, App.windows.IWindowModule>();
   private boundMethods = new BoundMethods(this);
 
   protected get startupPreconditions() {
@@ -60,6 +59,14 @@ export class Windows extends Module {
       private toolbarbutton: App.windows.IToolbarButton,
   ) {
     super("app.windows", parentLog);
+  }
+
+  public getWindowModule(
+      window: XUL.chromeWindow,
+  ): App.windows.IWindowModule | undefined {
+    const domWindowUtils = getDOMWindowUtils(window);
+    const {outerWindowID} = domWindowUtils;
+    return this.windowModules.get(outerWindowID);
   }
 
   protected startupSelf() {

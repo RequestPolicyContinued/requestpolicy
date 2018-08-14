@@ -30,10 +30,7 @@ import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import * as DOMUtils from "lib/utils/dom-utils";
 import {
-  arrayIncludes,
   defer,
-  leftRotateArray,
-  range,
 } from "lib/utils/js-utils";
 import * as Utils from "lib/utils/misc-utils";
 import {
@@ -41,8 +38,6 @@ import {
   removeSessionHistoryListener,
 } from "lib/utils/try-catch-utils";
 import { getTabBrowser } from "lib/utils/window-utils";
-import {CompatibilityRules} from "models/compatibility-rules";
-import { IClassicmenuRuleSpec } from "./classicmenu";
 
 const {LOG_FLAG_STATE} = C;
 declare const XPCOMUtils: JSMs.XPCOMUtils;
@@ -65,8 +60,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   // private statusbar = null;
   // private toolbox = null;
 
-  private isFennec = false;
-
   private locationListener: XPCOM.nsIWebProgressListener;
   private historyListener:
       XPCOM.nsISHistoryListener &
@@ -75,19 +68,20 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   private needsReloadOnMenuClose: boolean;
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
-  private get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
   protected get startupPreconditions() {
     return [
+      this.msgListener.whenReady,
+      this.redirectionNotifications.whenReady,
+
       this.eventListener.whenReady,
-      this.privateBrowsingService.whenReady,
       this.uriService.whenReady,
+      this.windowService.whenReady,
       this.policy.whenReady,
+      this.runtime.whenReady,
       this.cachedSettings.whenReady,
       this.requestMemory.whenReady,
       this.requestProcessor.whenReady,
-      this.msgListener.whenReady,
-      this.xulTrees.whenReady,
     ];
   }
 
@@ -99,43 +93,24 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly cc: XPCOM.nsXPCComponents_Classes,
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,
       private readonly cr: XPCOM.nsXPCComponents_Results,
-      private readonly xulAppInfo: XPCOM.nsIXULAppInfo,
 
-      private readonly i18n: typeof browser.i18n,
-      private readonly runtime: typeof browser.runtime,
       private readonly storageApi: typeof browser.storage,
 
-      private readonly classicmenu: App.windows.window.IClassicMenu,
       private readonly menu: App.windows.window.IMenu,
+      private readonly msgListener: App.windows.window.IMessageListenerModule,
+      public readonly redirectionNotifications:
+          App.windows.window.IRedirectionNotifications,
 
       private readonly eventListener: App.common.IEventListenerModule,
-      private readonly privateBrowsingService:
-          App.services.IPrivateBrowsingService,
       private readonly uriService: App.services.IUriService,
+      private readonly windowService: App.services.IWindowService,
       private readonly policy: App.IPolicy,
+      private readonly runtime: App.IRuntime,
       private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly requestProcessor: App.webRequest.IRequestProcessor,
-      private readonly msgListener: App.windows.window.IMessageListenerModule,
-      private readonly xulTrees: App.windows.window.IXulTrees,
   ) {
     super(`app.windows[${windowID}].overlay`, parentLog);
-  }
-
-  public _showRedirectNotification(
-      vBrowser: XUL.browser,
-      redirectTargetUri: string,
-      delay: number,
-      aRedirectOriginUri?: string,
-      replaceIfPossible?: boolean,
-  ): boolean {
-    return this.showRedirectNotification(
-        vBrowser,
-        redirectTargetUri,
-        delay,
-        aRedirectOriginUri,
-        replaceIfPossible,
-    );
   }
 
   /**
@@ -165,29 +140,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   /**
-   * This function gets called when a top-level document request has been
-   * blocked.
-   * This function is called during shouldLoad(). As shouldLoad shoudn't be
-   * blocked, it's better to set a timeout here.
-   */
-  public observeBlockedTopLevelDocRequest(
-      browser: XUL.browser,
-      originUri: string,
-      destUri: string,
-  ) {
-    // This function is called during shouldLoad() so set a timeout to
-    // avoid blocking shouldLoad.
-    this.setTimeout(() => {
-      this.showRedirectNotification(
-          browser,
-          destUri,
-          0,
-          originUri,
-      );
-    }, 0);
-  }
-
-  /**
    * Called before the popup menu is shown.
    */
   public onPopupShowing(event: Event) {
@@ -212,17 +164,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   /**
-   * Get the top-level document's uri.
-   *
-   * @return {string}
-   */
-  public getTopLevelDocumentUri() {
-    const uri = this.gBrowser.selectedBrowser.currentURI.spec;
-    return CompatibilityRules.getTopLevelDocTranslation(uri) ||
-        this.uriService.stripFragment(uri);
-  }
-
-  /**
    * Toggle disabling of all blocking for the current session.
    */
   public toggleTemporarilyAllowAll(): boolean {
@@ -238,7 +179,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   public revokeTemporaryPermissions(event: Event) {
     this.policy.revokeTemporaryRules();
     this.needsReloadOnMenuClose = true;
-    this.popupElement.hidePopup();
+    this.windowService.closeMenu(this.window);
   }
 
   public toggleMenu() {
@@ -263,11 +204,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       url = browser.runtime.getURL("settings/basicprefs.html");
     }
 
-    this.maybeOpenLinkInNewTab(url, equivalentURLs, relatedToCurrent);
+    this.windowService.openTabWithUrl(
+        this.window, url, equivalentURLs, relatedToCurrent,
+    );
   }
 
   public openPolicyManager() {
-    this.maybeOpenLinkInNewTab(
+    this.windowService.openTabWithUrl(
+        this.window,
         browser.runtime.getURL("settings/yourpolicy.html"),
         [],
         true,
@@ -275,7 +219,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
   }
 
   public openHelp() {
-    this.maybeOpenLinkInNewTab(
+    this.windowService.openTabWithUrl(
+        this.window,
         "https://github.com/" +
         "RequestPolicyContinued/requestpolicy/wiki/Help-and-Support",
         [],
@@ -376,20 +321,12 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // statusbar = $id("status-bar");
     // toolbox = $id("navigator-toolbox");
 
-    this.isFennec = this.xulAppInfo.name === "Fennec";
-
-    const p = this.runtime.getBrowserInfo().then((appInfo) => {
-      if (appInfo.name === "Fennec") {
+    if (this.runtime.isFennec) {
         this.log.log("Detected Fennec.");
         // Set an attribute for CSS usage.
         popupElement.setAttribute("fennec", "true");
         popupElement.setAttribute("position", "after_end");
       }
-      return;
-    }).catch((e) => {
-      this.log.error("Error on Fennec detection. Details:", e);
-    });
-    promises.push(p);
 
     // Register this window with the requestpolicy service so that we can be
     // notified of blocked requests. When blocked requests happen, this
@@ -451,20 +388,8 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     }, aDelay);
   }
 
-  /**
-   * Return a DOM element by its id. First search in the main document,
-   * and if not found search in the document included in the frame.
-   */
-  private $id(id: string): HTMLElement | null {
-    let element = this.window.top.document.getElementById(id);
-    if (!element) {
-      const popupframe = this.window.top.document.
-          getElementById("rpc-popup-frame") as HTMLFrameElement;
-      if (popupframe && popupframe.contentDocument) {
-        element = popupframe.contentDocument.getElementById(id);
-      }
-    }
-    return element;
+  private $id(id: string) {
+    return this.windowService.$id(this.window, id);
   }
 
   private setContextMenuEntryEnabled(isEnabled: boolean) {
@@ -477,7 +402,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // http://developer.mozilla.org/En/Code_snippets/On_page_load
     const appcontent = this.$id("appcontent"); // browser
     if (appcontent) {
-      if (this.isFennec) {
+      if (this.runtime.isFennec) {
         this.eventListener.addListener(
             appcontent, "TabSelect",
             this.boundMethods.get(this.tabChanged), false,
@@ -507,7 +432,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     const promises: Array<MaybePromise<void>> = [];
     // Listen for the user changing tab so we can update any notification or
     // indication of blocked requests.
-    if (!this.isFennec) {
+    if (!this.runtime.isFennec) {
       const container = this.gBrowser.tabContainer;
 
       this.eventListener.addListener(
@@ -560,240 +485,9 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
           continue;
         }
         // The request will be blocked by shouldLoad.
-        this.showRedirectNotification(browser, destURI, delay);
+        this.redirectionNotifications.showNotification(browser, destURI, delay);
       }
     }
-  }
-
-  /**
-   * Takes an URI, crops it if necessary, and returns it.
-   * It's ensured that the returned URI isn't longer than a specified length,
-   * but the prePath is never cropped, so that the resulting string might be
-   * longer than aMaxLength.
-   *
-   * (There doesn't seem to be a way to use the xul crop attribute with the
-   * notification.)
-   *
-   */
-  private cropUri(aUri: string, aMaxLength: number): string {
-    if (aUri.length < aMaxLength) {
-      return aUri;
-    } else {
-      const prePathLength = this.uriService.getPrePath(aUri).length + 1;
-      const len = Math.max(prePathLength, aMaxLength);
-      return `${aUri.substring(0, len)}...`;
-    }
-  }
-
-  /**
-   * Shows a notification that a redirect was requested by a page (meta refresh
-   * or with headers).
-   *
-   * @return {boolean} whether showing the notification succeeded
-   */
-  private showRedirectNotification(
-      vBrowser: XUL.browser,
-      redirectTargetUri: string,
-      delay: number,
-      aRedirectOriginUri?: string,
-      replaceIfPossible?: boolean,
-  ): boolean {
-    // TODO: Do something with the delay. Not sure what the best thing to do is
-    // without complicating the UI.
-
-    // TODO: The following error seems to be resulting when the notification
-    // goes away with a redirect, either after clicking "allow" or if the
-    // redirect is allowed and happens automatically.
-    //
-    // Source file: chrome://browser/content/browser.js
-    // Line: 3704
-    // ----------
-    // Error: this._closedNotification.parentNode is null
-    // Source file: chrome://global/content/bindings/notification.xml
-    // Line: 260
-
-    // redirectOriginUri is optional and is not necessary for <meta> redirects.
-    const isOriginUndefined = aRedirectOriginUri === undefined;
-    const redirectOriginUri =
-        aRedirectOriginUri || this.getTopLevelDocumentUri();
-
-    if (this.isFennec) {
-      this.log.warn(
-          `Should have shown redirect notification to <${redirectTargetUri
-          }>, but it's not implemented yet on Fennec.`,
-      );
-      return false;
-    }
-
-    const notificationBox = this.gBrowser.getNotificationBox(vBrowser);
-    const notificationValue = "request-policy-meta-redirect";
-
-    // prepare the notification's label
-    let notificationLabel;
-    if (isOriginUndefined) {
-      notificationLabel = this.$str("redirectNotification",
-          [this.cropUri(redirectTargetUri, 50)]);
-    } else {
-      notificationLabel = this.$str(
-          "redirectNotificationWithOrigin",
-          [
-            this.cropUri(redirectOriginUri, 50),
-            this.cropUri(redirectTargetUri, 50),
-          ],
-      );
-    }
-
-    const addRuleMenuName = "rpcontinuedRedirectAddRuleMenu";
-    const addRulePopup: XUL.menupopup = this.$id(addRuleMenuName) as any;
-    this.classicmenu.emptyMenu(addRulePopup);
-
-    const m = this.menu;
-    const originBaseDomain = this.uriService.getBaseDomain(redirectOriginUri);
-    const destBaseDomain = this.uriService.getBaseDomain(redirectTargetUri);
-
-    let origin = null;
-    let dest = null;
-    if (originBaseDomain !== null) {
-      origin = m.addWildcard(originBaseDomain);
-    }
-    if (destBaseDomain !== null) {
-      dest = m.addWildcard(destBaseDomain);
-    }
-
-    const mayPermRulesBeAdded = this.privateBrowsingService.
-        mayPermanentRulesBeAdded(this.window);
-
-    const allowRedirection = () => {
-      // Fx 3.7a5+ calls shouldLoad for location.href changes.
-
-      // TODO: currently the allow button ignores any additional
-      //       HTTP response headers [1]. Maybe there is a way to take
-      //       those headers into account (e.g. `Set-Cookie`?), or maybe
-      //       this is not necessary at all.
-      // tslint:disable-next-line:max-line-length
-      // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
-
-      this.requestProcessor.registerAllowedRedirect(
-          redirectOriginUri,
-          redirectTargetUri,
-      );
-
-      const data: any = {
-        uri: redirectTargetUri,
-      };
-      if (replaceIfPossible) {
-        data.replaceUri = redirectOriginUri;
-      }
-      vBrowser.messageManager.sendAsyncMessage(
-          `${C.MM_PREFIX}setLocation`,
-          data,
-      );
-    };
-
-    const addMenuItem = (aRuleSpec: IClassicmenuRuleSpec) => {
-      this.classicmenu.addMenuItem(addRulePopup, aRuleSpec, () => {
-        if (this.cachedSettings.get("autoReload")) {
-          allowRedirection();
-        }
-      });
-    };
-    const addMenuSeparator = () => {
-      this.classicmenu.addMenuSeparator(addRulePopup);
-    };
-
-    {
-      // allow ALL
-      const label = this.$str("allowAllRedirections");
-      this.classicmenu.addCustomMenuItem(addRulePopup, label, () => {
-        this.maybeOpenLinkInNewTab(
-            browser.runtime.getURL("settings/defaultpolicy.html"),
-            [], true,
-        );
-      });
-      addMenuSeparator();
-    }
-
-    if (destBaseDomain !== null) {
-      addMenuItem({allow: true, dest});
-      if (mayPermRulesBeAdded) {
-        addMenuItem({allow: true, dest});
-      }
-    }
-
-    if (originBaseDomain !== null && destBaseDomain !== null) {
-      addMenuSeparator();
-    }
-
-    if (originBaseDomain !== null) {
-      addMenuItem({allow: true, origin, temp: true});
-      if (mayPermRulesBeAdded) {
-        addMenuItem({allow: true, origin});
-      }
-    }
-
-    if (originBaseDomain !== null && destBaseDomain !== null) {
-      addMenuSeparator();
-
-      addMenuItem({allow: true, origin, dest, temp: true});
-      if (mayPermRulesBeAdded) {
-        addMenuItem({allow: true, origin, dest});
-      }
-    }
-
-    const notification = notificationBox.
-        getNotificationWithValue(notificationValue);
-    if (notification) {
-      notification.label = notificationLabel;
-    } else {
-      const buttons = [
-        {
-          accessKey: this.$str("allow_accesskey"),
-          callback: allowRedirection,
-          label: this.$str("allow"),
-          popup: null,
-        },
-        {
-          accessKey: this.$str("deny_accesskey"),
-          label: this.$str("deny"),
-          popup: null,
-          callback() {
-            // Do nothing. The notification closes when this is called.
-          },
-        },
-        {
-          accessKey: this.$str("addRule_accesskey"),
-          callback: null,
-          label: this.$str("addRule"),
-          popup: addRuleMenuName,
-        },
-        // TODO: add a "read more about URL redirection" button, targetting to
-        //       https://en.wikipedia.org/wiki/URL_redirection
-      ];
-      const priority = notificationBox.PRIORITY_WARNING_MEDIUM;
-
-      const notificationElem = notificationBox.appendNotification(
-          notificationLabel, notificationValue,
-          "chrome://rpcontinued/skin/requestpolicy-icon-blocked.png",
-          priority, buttons,
-      );
-
-      // Let the notification persist at least 300ms. This is needed in the
-      // following scenario:
-      //     If an URL is entered on an empty tab (e.g. "about:blank"),
-      //     and that URL redirects to another URL with a different
-      //     host, and that redirect is blocked by RequestPolicy,
-      //     then immediately after blocking the redirect Firefox will make
-      //     a location change, maybe back from the blocked URL to
-      //     "about:blank". In any case, when the location changes, the
-      //     function `notificationbox.removeTransientNotifications()`
-      //     is called. It checks for the `persistence` and `timeout`
-      //     properties. See MDN documentation:
-      // tslint:disable-next-line:max-line-length
-      //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
-      // See also issue #722.
-      (notificationElem as any).timeout = Date.now() + 300;
-    }
-    return true;
   }
 
   /**
@@ -1204,44 +898,5 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     return DOMUtils.isElementVisible(
         this.$id("/* @echo ALPHABETICAL_ID */ToolbarButton")!,
     );
-  }
-
-  private openLinkInNewTab(url: string, relatedToCurrent?: boolean) {
-    this.window.openUILinkIn(
-        url,
-        "tab",
-        {relatedToCurrent: !!relatedToCurrent},
-    );
-    this.popupElement.hidePopup();
-  }
-
-  private maybeOpenLinkInNewTab(
-      url: string,
-      equivalentURLs: string[],
-      relatedToCurrent: boolean = false,
-  ) {
-    const possibleURLs = equivalentURLs.concat(url);
-    const tabbrowser = this.gBrowser;
-
-    const selectedTabIndex = tabbrowser.tabContainer.selectedIndex;
-    const numTabs = tabbrowser.tabs.length;
-
-    // Start iterating at the currently selected tab.
-    const indexes = leftRotateArray(
-        range(numTabs),
-        selectedTabIndex,
-    );
-    for (const index of indexes) {
-      const currentBrowser = tabbrowser.getBrowserAtIndex(index);
-      const currentURI = currentBrowser.currentURI.spec;
-      if (arrayIncludes(possibleURLs, currentURI)) {
-        // The URL is already opened. Select this tab.
-        tabbrowser.selectedTab = tabbrowser.tabContainer.childNodes[index];
-        this.popupElement.hidePopup();
-        return;
-      }
-    }
-
-    this.openLinkInNewTab(url, relatedToCurrent);
   }
 }

@@ -21,7 +21,7 @@
  */
 
 import { App } from "app/interfaces";
-import { API, JSMs } from "bootstrap/api/interfaces";
+import { API, JSMs, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -34,10 +34,17 @@ import { TOOLBARBUTTON_ATTRIBUTES } from "ui/xul-trees";
 export class AustralisToolbarButton extends Module {
   private isAustralis = this.miscInfos.isAustralis;
 
+  protected get startupPreconditions() {
+    return [
+      this.windowModuleMap.whenReady,
+    ];
+  }
+
   constructor(
       parentLog: Common.ILog,
       private readonly mozCustomizableUI: JSMs.CustomizableUI | null,
       private readonly miscInfos: API.IMiscInfos,
+      private readonly windowModuleMap: App.windows.IWindowModuleMap,
   ) {
     super(`app.windows.toolbarbutton`, parentLog);
   }
@@ -70,9 +77,11 @@ export class AustralisToolbarButton extends Module {
       label,
       onCommand: (aEvent: Event) => {
         // Bad smell
-        const win: any = (aEvent.target as Element).ownerDocument.defaultView;
-        const overlay = win.rpcontinued.overlay as App.windows.window.IOverlay;
-        overlay.toggleMenu();
+        const doc =
+            (aEvent.target as Element).ownerDocument as XUL.chromeDocument;
+        const win = doc.defaultView as XUL.chromeWindow;
+        const windowModule = this.windowModuleMap.get(win);
+        windowModule!.overlay.toggleMenu();
       },
       tooltiptext,
     });

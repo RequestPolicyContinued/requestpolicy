@@ -33,7 +33,6 @@ import {
   RequestResult,
 } from "lib/classes/request-result";
 import { XPCOMObserverModule } from "lib/classes/xpcom-observer-module";
-import * as Utils from "lib/utils/misc-utils";
 import {
   getRequestHeaderFromHttpChannel,
   queryInterface,
@@ -53,6 +52,8 @@ const CP_MAPPEDDESTINATION = 0x178c40bf;
 // =============================================================================
 
 export class RequestProcessor extends Module {
+  protected get debugEnabled() { return true; }
+
   private readonly CP_OK = this.ci.nsIContentPolicy.ACCEPT;
   private readonly CP_REJECT = this.ci.nsIContentPolicy.REJECT_SERVER;
 
@@ -101,8 +102,6 @@ export class RequestProcessor extends Module {
       this.observerService!,
   );
 
-  private get windowsModule() { return this.windowsModuleWrapper.module!; }
-
   protected get subModules() {
     return {
       observer: this.observer,
@@ -118,6 +117,7 @@ export class RequestProcessor extends Module {
       this.cachedSettings.whenReady,
       this.requestMemory.whenReady,
       this.mm.whenReady,
+      this.windowModuleMap.whenReady,
     ];
   }
 
@@ -128,12 +128,13 @@ export class RequestProcessor extends Module {
       private readonly observerService: XPCOM.nsIObserverService | null,
       private readonly rpPolicy: App.IPolicy,
       private readonly httpChannelService: App.services.IHttpChannelService,
+      private readonly redirectionService: App.services.IRedirectionService,
       private readonly requestService: App.services.IRequestService,
       private readonly uriService: App.services.IUriService,
       private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly mm: App.webRequest.IMetadataMemory,
-      private readonly windowsModuleWrapper: {module: App.IWindows | null},
+      private readonly windowModuleMap: App.windows.IWindowModuleMap,
   ) {
     super("webRequest.requestProcessor", parentLog);
   }
@@ -177,22 +178,21 @@ export class RequestProcessor extends Module {
 
       const browser = this.requestService.getBrowser(request);
       const window: any = this.requestService.getChromeWindow(request);
+      const windowModule = window ? this.windowModuleMap.get(window) :
+          undefined;
 
-      if (
-          !browser ||
-          !window ||
-          typeof window.rpcontinued === "undefined"
-      ) {
+      if (!browser || !windowModule) {
         this.log.warn("The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
-        const overlay: App.windows.window.IOverlay =
-            window.rpcontinued.overlay;
-        overlay.observeBlockedTopLevelDocRequest(
+        windowModule!.r21n.asyncShowNotification(
             browser,
             request.originURI!,
+            0,
             request.destURIWithRef,
-        );
+        ).catch(this.log.onError(
+            "redirectionNotifications.asyncShowNotification",
+        ));
       }
     }
 
@@ -1105,7 +1105,7 @@ export class RequestProcessor extends Module {
         return this.CP_OK;
       }
 
-      this.maybeShowRedirectNotification(request);
+      this.redirectionService.maybeShowNotification(request);
 
       // We try to trace the blocked redirect back to a link click or form
       // submission if we can. It may indicate, for example, a link that
@@ -1173,58 +1173,6 @@ export class RequestProcessor extends Module {
       }
       this.log.warn("Rejecting request due to internal error.");
       return this.CP_REJECT;
-    }
-  }
-
-  private showRedirectNotification(request: RedirectRequest) {
-    this.debugLog.log("going to show a redirection notification");
-    const browser = this.requestService.getBrowser(request);
-    if (browser === null) {
-      return false;
-    }
-
-    const window = browser.ownerGlobal;
-
-    Utils.tryMultipleTimes(() => {
-      const windowModule = this.windowsModule.getWindowModule(window);
-      if (!windowModule) return false;
-      const {overlay} = windowModule;
-
-      // Parameter "replaceIfPossible" is set to true, because the "origin" of
-      // redirections going through "nsIChannelEventSink" is just an
-      // intermediate URI of a redirection chain, not a real site.
-      return overlay._showRedirectNotification(
-          browser,
-          request.destURIWithRef,
-          0,
-          request.originURI,
-          true,
-      );
-    });
-    return true;
-  }
-
-  private maybeShowRedirectNotification(aRequest: RedirectRequest) {
-    this.debugLog.log("maybe going to show a redirection notification");
-    // Check if the request corresponds to a top-level document load.
-    {
-      const {loadFlags} = aRequest;
-      const topLevelDocFlag = this.ci.nsIChannel.LOAD_INITIAL_DOCUMENT_URI;
-
-      // tslint:disable-next-line:no-bitwise
-      if ((loadFlags & topLevelDocFlag) !== topLevelDocFlag) {
-        return;
-      }
-    }
-
-    const rv = this.showRedirectNotification(aRequest);
-    if (true !== rv) {
-      this.log.warn(
-          `A redirection of a top-level document has been observed, ` +
-          `but it was not possible to notify the user! The redirection ` +
-          `was from page <${aRequest.originURI}> ` +
-          `to <${aRequest.destURI}>.`,
-      );
     }
   }
 

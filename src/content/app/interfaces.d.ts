@@ -43,9 +43,12 @@ import { StorageMigration } from "./migration/storage/storage-migration.module";
 import { Policy } from "./policy/policy.module";
 import { RulesetStorage } from "./policy/ruleset-storage";
 import { Subscriptions } from "./policy/subscriptions";
+import { AboutUri } from "./runtime/about-uri";
 import { OtherRPInstallations } from "./runtime/other-rp-installations";
+import { Runtime } from "./runtime/runtime.module";
 import { HttpChannelService } from "./services/http-channel-service";
 import { PrivateBrowsingService } from "./services/private-browsing-service";
+import { RedirectionService } from "./services/redirection-service";
 import { RequestService } from "./services/request-service";
 import { RequestSetService } from "./services/request-set-service";
 import { RulesServices } from "./services/rules/rules-services.module";
@@ -70,11 +73,12 @@ import { AustralisToolbarButton } from "./windows/toolbarbutton.australis";
 import { ClassicMenu } from "./windows/window/classicmenu";
 import { Menu } from "./windows/window/menu";
 import { Overlay } from "./windows/window/overlay";
+import { RedirectionNotifications } from "./windows/window/redirection-notifications";
 import { NonAustralisToolbarButton } from "./windows/window/toolbarbutton.non-australis";
 import { WindowModule } from "./windows/window/window.module";
 import { XulTrees } from "./windows/window/xul-trees";
+import { WindowModuleMap } from "./windows/window-module-map";
 import { Windows } from "./windows/windows.module";
-import { AboutUri } from "app/runtime/about-uri";
 import { EventListenerModule } from "lib/classes/event-listener-module";
 
 export interface IVersionComparator {
@@ -112,6 +116,7 @@ export namespace App {
   export namespace services {
     export type IHttpChannelService = HttpChannelService;
     export type IPrivateBrowsingService = PrivateBrowsingService;
+    export type IRedirectionService = RedirectionService;
     export type IRequestService = RequestService;
     export type IRequestSetService = RequestSetService;
     export type IRulesServices = RulesServices;
@@ -151,9 +156,11 @@ export namespace App {
       export type IToolbarButton = NonAustralisToolbarButton;
       export type IXulTrees = XulTrees;
       export type IMessageListenerModule = MessageListenerModule<XUL.chromeWindow["messageManager"]>;
+      export type IRedirectionNotifications = RedirectionNotifications;
     }
 
     export type IChromeStyleSheets = ChromeStyleSheets;
+    export type IWindowModuleMap = WindowModuleMap;
     export type IWindowModule = WindowModule;
     export type IToolbarButton = AustralisToolbarButton;
     export type WindowModuleFactory = (
@@ -169,6 +176,7 @@ export namespace App {
   export type IRPServices = RPServices;
   export type IStorage = Storage;
   export type IUi = Ui;
+  export type IRuntime = Runtime;
   export type IWebRequest = WebRequest;
   export type IWindows = Windows;
 

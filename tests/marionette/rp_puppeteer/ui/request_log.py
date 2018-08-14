@@ -6,6 +6,13 @@ from firefox_puppeteer.base import BaseLib
 from contextlib import contextmanager
 
 
+GET_BACKGROUND_PAGE = """
+    Components.utils.
+        import("chrome://rpcontinued/content/bootstrap.jsm", {}).
+        FakeWebExt.api.backgroundApi.extension.getBackgroundPage()
+"""
+
+
 class RequestLog(BaseLib):
 
     #################################
@@ -123,7 +130,10 @@ class RequestLog(BaseLib):
             trigger()
         elif trigger == "api":
             self.marionette.execute_script("""
-              window.rpcontinued.overlay.toggleRequestLog();
+              const windowModuleMap = """ + GET_BACKGROUND_PAGE + """.
+                  rp.windows.windowModules;
+              const windowModule = windowModuleMap.get(window);
+              windowModule.overlay.toggleRequestLog();
             """)
         else:
             raise ValueError("Unknown trigger method: \"{}\"".format(trigger))

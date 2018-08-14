@@ -36,6 +36,7 @@ export class WindowModule extends Module implements App.windows.IWindowModule {
       menu: this.menu,
       msgListener: this.msgListener,
       overlay: this.overlay,
+      r21n: this.r21n,
       toolbarButton: this.toolbarButton,
       xulTrees: this.xulTrees,
     };
@@ -59,6 +60,7 @@ export class WindowModule extends Module implements App.windows.IWindowModule {
       public readonly menu: App.windows.window.IMenu,
       public readonly msgListener: App.windows.window.IMessageListenerModule,
       public readonly overlay: App.windows.window.IOverlay,
+      public readonly r21n: App.windows.window.IRedirectionNotifications,
       public readonly toolbarButton: App.windows.window.IToolbarButton,
       public readonly xulTrees: App.windows.window.IXulTrees,
 

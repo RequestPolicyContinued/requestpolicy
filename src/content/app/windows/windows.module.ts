@@ -26,12 +26,10 @@ import { Common } from "common/interfaces";
 import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
-import { getDOMWindowUtils } from "lib/utils/window-utils";
 
 export class Windows extends Module implements App.IWindows {
   // protected get debugEnabled() { return true; }
 
-  private windowModules = new Map<number, App.windows.IWindowModule>();
   private boundMethods = new BoundMethods(this);
 
   protected get startupPreconditions() {
@@ -45,28 +43,22 @@ export class Windows extends Module implements App.IWindows {
     const subModules: {[name: string]: Module} = {
       chromeStyleSheets: this.chromeStyleSheets,
       toolbarbutton: this.toolbarbutton,
+      windowModules: this.windowModules,
     };
     return subModules;
   }
 
   constructor(
       parentLog: Common.ILog,
-      private cachedSettings: App.storage.ICachedSettings,
-      private createWindowModule: App.windows.WindowModuleFactory,
-      private windowService: App.services.IWindowService,
+      private readonly cachedSettings: App.storage.ICachedSettings,
+      private readonly createWindowModule: App.windows.WindowModuleFactory,
+      private readonly windowService: App.services.IWindowService,
 
-      private chromeStyleSheets: App.windows.IChromeStyleSheets,
-      private toolbarbutton: App.windows.IToolbarButton,
+      public readonly chromeStyleSheets: App.windows.IChromeStyleSheets,
+      public readonly toolbarbutton: App.windows.IToolbarButton,
+      public readonly windowModules: App.windows.IWindowModuleMap,
   ) {
     super("app.windows", parentLog);
-  }
-
-  public getWindowModule(
-      window: XUL.chromeWindow,
-  ): App.windows.IWindowModule | undefined {
-    const domWindowUtils = getDOMWindowUtils(window);
-    const {outerWindowID} = domWindowUtils;
-    return this.windowModules.get(outerWindowID);
   }
 
   protected startupSelf() {
@@ -104,27 +96,25 @@ export class Windows extends Module implements App.IWindows {
   }
 
   private loadIntoWindow(window: XUL.chromeWindow): MaybePromise<void> {
-    const domWindowUtils = getDOMWindowUtils(window);
-    const {outerWindowID} = domWindowUtils;
-    this.debugLog.log(`loadIntoWindow(), windowID=${outerWindowID}`);
-    if (this.windowModules.has(outerWindowID)) {
-      this.log.error(`Window #${outerWindowID} already loaded.`);
+    const windowID = this.windowModules.getWindowId(window);
+    this.debugLog.log(`loadIntoWindow(), windowID=${windowID}`);
+    if (this.windowModules._map.has(windowID)) {
+      this.log.error(`Window #${windowID} already loaded.`);
       return MaybePromise.reject(undefined) as MaybePromise<any>;
     }
     const windowModule = this.createWindowModule(window);
-    this.windowModules.set(outerWindowID, windowModule);
+    this.windowModules._map.set(windowID, windowModule);
     return windowModule.startup();
   }
 
   private unloadFromWindow(window: XUL.chromeWindow): MaybePromise<void> {
-    const domWindowUtils = getDOMWindowUtils(window);
-    const {outerWindowID} = domWindowUtils;
-    this.debugLog.log(`unloadFromWindow(), windowID=${outerWindowID}`);
-    if (!this.windowModules.has(outerWindowID)) {
-      this.log.warn(`Window #${outerWindowID} not loaded.`);
+    const windowID = this.windowModules.getWindowId(window);
+    this.debugLog.log(`unloadFromWindow(), windowID=${windowID}`);
+    if (!this.windowModules._map.has(windowID)) {
+      this.log.warn(`Window #${windowID} not loaded.`);
       return MaybePromise.resolve(undefined);
     }
-    const windowModule = this.windowModules.get(outerWindowID)!;
+    const windowModule = this.windowModules._map.get(windowID)!;
     return windowModule.shutdown();
   }
 }

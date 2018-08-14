@@ -62,8 +62,8 @@ export class MaybePromise<T> {
     }
   }
 
-  public static reject<U>(aRejectValue: U) {
-    return new MaybePromise({
+  public static reject<TResolve, TReject = any>(aRejectValue: TReject) {
+    return new MaybePromise<TResolve>({
       rejectionValue: aRejectValue,
       status: "rejected",
     });

@@ -29,6 +29,7 @@ export class RPServices extends Module {
       log: Common.ILog,
       public readonly httpChannel: App.services.IHttpChannelService,
       public readonly privateBrowsing: App.services.IPrivateBrowsingService,
+      public readonly redirections: App.services.IRedirectionService,
       public readonly request: App.services.IRequestService,
       public readonly requestSet: App.services.IRequestSetService,
       public readonly rules: App.services.IRulesServices,
@@ -43,6 +44,7 @@ export class RPServices extends Module {
     return {
       httpChannel: this.httpChannel,
       privateBrowsing: this.privateBrowsing,
+      redirections: this.redirections,
       request: this.request,
       requestSet: this.requestSet,
       rules: this.rules,

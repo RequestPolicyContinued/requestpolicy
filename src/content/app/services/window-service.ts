@@ -26,10 +26,18 @@ import { Common } from "common/interfaces";
 import { promiseObserverTopic } from "legacy/lib/utils/xpcom-utils";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
-import { defer } from "lib/utils/js-utils";
+import {
+  arrayIncludes,
+  defer,
+  leftRotateArray,
+  range,
+} from "lib/utils/js-utils";
 import { createListenersMap } from "lib/utils/listener-factories";
-import { getDOMWindowFromXULWindow } from "lib/utils/window-utils";
-import * as WindowUtils from "lib/utils/window-utils";
+import {
+  getDOMWindowFromXULWindow,
+  getTabBrowser,
+} from "lib/utils/window-utils";
+import {CompatibilityRules} from "models/compatibility-rules";
 
 export class WindowService extends Module
     implements App.services.IWindowService {
@@ -70,6 +78,7 @@ export class WindowService extends Module
   protected get startupPreconditions() {
     return [
       this.pWindowsAvailable,
+      this.uriService.whenReady,
     ];
   }
 
@@ -77,8 +86,34 @@ export class WindowService extends Module
       parentLog: Common.ILog,
       private ci: XPCOM.nsXPCComponents_Interfaces,
       private windowMediator: XPCOM.nsIWindowMediator,
+
+      private readonly uriService: App.services.IUriService,
   ) {
     super("app.services.windows", parentLog);
+  }
+
+  /**
+   * Return a DOM element by its id. First search in the main document,
+   * and if not found search in the document included in the frame.
+   */
+  public $id(aChromeWindow: XUL.chromeWindow, id: string): HTMLElement | null {
+    let element = aChromeWindow.top.document.getElementById(id);
+    if (!element) {
+      const popupframe = aChromeWindow.top.document.
+          getElementById("rpc-popup-frame") as HTMLFrameElement;
+      if (popupframe && popupframe.contentDocument) {
+        element = popupframe.contentDocument.getElementById(id);
+      }
+    }
+    return element;
+  }
+
+  public $menupopup(aChromeWindow: XUL.chromeWindow): XUL.menupopup {
+    return this.$id(aChromeWindow, "rpc-popup") as any;
+  }
+
+  public closeMenu(aChromeWindow: XUL.chromeWindow) {
+    this.$menupopup(aChromeWindow).hidePopup();
   }
 
   public forEachOpenWindow<Tthis, Trv = void>(
@@ -113,7 +148,7 @@ export class WindowService extends Module
     let n = 100;
 
     const step = () => {
-      const tabBrowser = WindowUtils.getTabBrowser(aChromeWindow);
+      const tabBrowser = getTabBrowser(aChromeWindow);
       if (tabBrowser === null) {
         if (n-- === 0) {
           this.log.error(`window has no tabBrowser`);
@@ -127,6 +162,48 @@ export class WindowService extends Module
     step();
 
     return d.promise;
+  }
+
+  /**
+   * Get the top-level document's uri.
+   *
+   * @return {string}
+   */
+  public getTopLevelDocumentUri(aChromeWindow: XUL.chromeWindow) {
+    const uri = getTabBrowser(aChromeWindow)!.selectedBrowser.currentURI.spec;
+    return CompatibilityRules.getTopLevelDocTranslation(uri) ||
+        this.uriService.stripFragment(uri);
+  }
+
+  public openTabWithUrl(
+      aChromeWindow: XUL.chromeWindow,
+      url: string,
+      equivalentURLs: string[],
+      relatedToCurrent: boolean = false,
+  ) {
+    const possibleURLs = equivalentURLs.concat(url);
+    const tabbrowser = getTabBrowser(aChromeWindow)!;
+
+    const selectedTabIndex = tabbrowser.tabContainer.selectedIndex;
+    const numTabs = tabbrowser.tabs.length;
+
+    // Start iterating at the currently selected tab.
+    const indexes = leftRotateArray(
+        range(numTabs),
+        selectedTabIndex,
+    );
+    for (const index of indexes) {
+      const currentBrowser = tabbrowser.getBrowserAtIndex(index);
+      const currentURI = currentBrowser.currentURI.spec;
+      if (arrayIncludes(possibleURLs, currentURI)) {
+        // The URL is already opened. Select this tab.
+        tabbrowser.selectedTab = tabbrowser.tabContainer.childNodes[index];
+        this.closeMenu(aChromeWindow);
+        return;
+      }
+    }
+
+    this.openLinkInNewTab(aChromeWindow, url, relatedToCurrent);
   }
 
   protected startupSelf() {
@@ -182,7 +259,7 @@ export class WindowService extends Module
       return false;
     }
     try {
-      this.forEachOpenWindow((win) => WindowUtils.getTabBrowser(win));
+      this.forEachOpenWindow((win) => getTabBrowser(win));
     } catch (e) {
       return false;
     }
@@ -192,5 +269,18 @@ export class WindowService extends Module
   private promiseSessionstoreWindowsRestored() {
     const p = promiseObserverTopic("sessionstore-windows-restored");
     return p as Promise<any>;
+  }
+
+  private openLinkInNewTab(
+      aChromeWindow: XUL.chromeWindow,
+      url: string,
+      relatedToCurrent?: boolean,
+  ) {
+    aChromeWindow.openUILinkIn(
+        url,
+        "tab",
+        {relatedToCurrent: !!relatedToCurrent},
+    );
+    this.closeMenu(aChromeWindow);
   }
 }

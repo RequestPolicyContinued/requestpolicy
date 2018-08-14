@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Connection } from "lib/classes/connection";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { IModule, Module } from "lib/classes/module";
 
 export class Runtime extends Module {
@@ -38,10 +39,20 @@ export class Runtime extends Module {
   private pGotEWEConnection: Promise<void>;
   private gotEWEConnection = false;
 
+  // tslint:disable-next-line:variable-name
+  private _browserInfo: {
+    name: string,
+    vendor: string,
+    version: string,
+    buildID: string,
+  };
+  public get browserInfo() { return this._browserInfo; }
+
   constructor(
       log: Common.ILog,
       pEWEConnection: Promise<Connection<any, any> | null>,
       private readonly aboutUri: App.runtime.IAboutUri,
+      private readonly runtimeApi: typeof browser.runtime,
   ) {
     super("app.runtime", log);
     this.pGotEWEConnection = pEWEConnection.then((m) => {
@@ -50,6 +61,8 @@ export class Runtime extends Module {
     });
     this.pGotEWEConnection.catch(this.log.onError("pGotEWEConnection"));
   }
+
+  public get isFennec() { return this.browserInfo.name === "Fennec"; }
 
   protected get subModules() {
     const rv: {[k: string]: IModule} = {
@@ -60,5 +73,13 @@ export class Runtime extends Module {
     }
     if (this.eweConnection) { rv.eweConnection = this.eweConnection; }
     return rv;
+  }
+
+  protected startupSelf() {
+    const p = this.runtimeApi.getBrowserInfo().then((browserInfo) => {
+      this._browserInfo = browserInfo;
+      return;
+    });
+    return MaybePromise.resolve(p);
   }
 }

@@ -46,10 +46,12 @@ import { AboutUri } from "app/runtime/about-uri";
 import { OtherRPInstallations } from "app/runtime/other-rp-installations";
 import { HttpChannelService } from "app/services/http-channel-service";
 import { PrivateBrowsingService } from "app/services/private-browsing-service";
+import { RedirectionService } from "app/services/redirection-service";
 import { RequestSetService } from "app/services/request-set-service";
 import { MetadataMemory } from "app/web-request/metadata-memory";
 import { ChromeStyleSheets } from "app/windows/stylesheets";
 import { AustralisToolbarButton } from "app/windows/toolbarbutton.australis";
+import { WindowModuleMap } from "app/windows/window-module-map";
 import { ClassicMenu } from "app/windows/window/classicmenu";
 import {
   KeyboardShortcutModule,
@@ -104,6 +106,9 @@ import { RPContentPolicy } from "./web-request/content-policy";
 import { RequestMemory } from "./web-request/request-memory";
 import {RequestProcessor} from "./web-request/request-processor";
 import { WebRequest } from "./web-request/web-request.module";
+import {
+  RedirectionNotifications,
+} from "./windows/window/redirection-notifications";
 import { Windows } from "./windows/windows.module";
 
 const outerWindowID: number | null = null; // contentscripts only
@@ -205,7 +210,6 @@ const mozIDNService = whenLegacy(() => xpconnectService!.getIDNService());
 const mozPromptService = whenLegacy(() => xpconnectService!.getPromptService());
 const mozStyleSheetService = whenLegacy(() =>
     xpconnectService!.getStyleSheetService());
-const mozXulAppInfo = whenLegacy(() => xpconnectService!.getXULAppInfo());
 
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
@@ -239,7 +243,7 @@ const aboutUri = new AboutUri(
     LegacyApi.miscInfos,
     mozIOService!,  // fixme
 );
-const runtime = new Runtime(log, pEWEConnection, aboutUri);
+const runtime = new Runtime(log, pEWEConnection, aboutUri, browser.runtime);
 
 const asyncSettings = new AsyncSettings(
     log,
@@ -270,6 +274,8 @@ const browserSettings = new BrowserSettings(
     (browser as any).privacy.network,
 );
 
+const windowModuleMap = new WindowModuleMap(log);
+
 const requestSetService = new RequestSetService(log, uriService);
 const requestMemory = new RequestMemory(log, requestSetService, uriService);
 const framescriptServices = new FramescriptServices(
@@ -298,6 +304,12 @@ const privateBrowsingService = new PrivateBrowsingService(
 const requestService = new RequestService(
     log, httpChannelService, uriService, cachedSettings,
 );
+const redirectionService = new RedirectionService(
+    log,
+    Ci,
+    requestService,
+    windowModuleMap,
+);
 const v0RulesService = new V0RulesService(
     log,
     uriService,
@@ -314,11 +326,13 @@ const windowService = new WindowService(
     log,
     Ci,
     mozWindowMediator!,
+    uriService,
 );
 const rpServices = new RPServices(
     log,
     httpChannelService,
     privateBrowsingService,
+    redirectionService,
     requestService,
     requestSetService,
     rulesServices,
@@ -355,7 +369,6 @@ const otherRPInstallations = new OtherRPInstallations(log, notifications);
 const ui = new Ui(log, initialSetup, otherRPInstallations, notifications);
 
 const metadataMemory = new MetadataMemory(log);
-const windowsModuleWrapper: { module: App.IWindows | null } = { module: null };
 const requestProcessor = new RequestProcessor(
     log,
     Ci,
@@ -363,12 +376,13 @@ const requestProcessor = new RequestProcessor(
     mozObserverService,
     policy,
     httpChannelService,
+    redirectionService,
     requestService,
     uriService,
     cachedSettings,
     requestMemory,
     metadataMemory,
-    windowsModuleWrapper,
+    windowModuleMap,
 );
 const redirectRequestFactory = (
     aOldChannel: HttpChannelWrapper,
@@ -440,9 +454,9 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       window,
       mozPromptService!,  // fixme
       browser.i18n,
-      overlayWrapper,
       privateBrowsingService,
       uriService,
+      windowService,
       policy,
       cachedSettings,
       requestMemory,
@@ -464,6 +478,20 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       window.messageManager,
   );
 
+  const redirectionNotifications = new RedirectionNotifications(
+      log,
+      windowID,
+      window,
+      browser.i18n,
+      classicMenu,
+      menu,
+      runtime,
+      privateBrowsingService,
+      uriService,
+      windowService,
+      cachedSettings,
+      requestProcessor,
+  );
   const overlay = new Overlay(
       log,
       windowID,
@@ -471,21 +499,18 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       Cc,
       Ci,
       Cr,
-      mozXulAppInfo!,  // fixme
-      browser.i18n,
-      browser.runtime,
       browser.storage,
-      classicMenu,
       menu,
+      msgListener,
+      redirectionNotifications,
       eventListener,
-      privateBrowsingService,
       uriService,
+      windowService,
       policy,
+      runtime,
       cachedSettings,
       requestMemory,
       requestProcessor,
-      msgListener,
-      xulTrees,
   );
   overlayWrapper.module = overlay;
   const keyboardShortcutFactory: API.windows.window.KeyboardShortcutFactory = (
@@ -532,6 +557,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       menu,
       msgListener,
       overlay,
+      redirectionNotifications,
       nonAustralisToolbarButton,
       xulTrees,
       windowService,
@@ -547,6 +573,7 @@ const toolbarbuttonAustralis = new AustralisToolbarButton(
     log,
     mozCustomizableUI,
     LegacyApi.miscInfos,
+    windowModuleMap,
 );
 const windows = new Windows(
     log,
@@ -555,8 +582,8 @@ const windows = new Windows(
     windowService,
     chromeStyleSheets,
     toolbarbuttonAustralis,
+    windowModuleMap,
 );
-windowsModuleWrapper.module = windows;
 
 export const rp = new AppBackground(
     log,

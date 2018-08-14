@@ -120,7 +120,16 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
-  private get overlay() { return this.overlayWrapper.module!; }
+  protected get startupPreconditions() {
+    return [
+      this.privateBrowsingService.whenReady,
+      this.uriService.whenReady,
+      this.windowService.whenReady,
+      this.policy.whenReady,
+      this.cachedSettings.whenReady,
+      this.requestMemory.whenReady,
+    ];
+  }
 
   constructor(
       parentLog: Common.ILog,
@@ -131,13 +140,10 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
       private i18n: typeof browser.i18n,
 
-      private readonly overlayWrapper: {
-        module: App.windows.window.IOverlay | null;
-      },
-
       private readonly privateBrowsingService:
           App.services.IPrivateBrowsingService,
       private readonly uriService: App.services.IUriService,
+      private readonly windowService: App.services.IWindowService,
       private readonly policy: App.IPolicy,
       private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly requestMemory: App.webRequest.IRequestMemory,
@@ -182,7 +188,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
         tempPermLink.className = "rpc-revoke-temporary-permissions-disable";
       }
 
-      this.currentUri = this.overlay.getTopLevelDocumentUri();
+      this.currentUri = this.windowService.getTopLevelDocumentUri(this.window);
 
       try {
         this.currentBaseDomain =
@@ -240,7 +246,7 @@ export class Menu extends Module implements App.windows.window.IMenu {
   }
 
   public close() {
-    ((this.$id("rpc-popup") as any) as XUL.menupopup).hidePopup();
+    this.windowService.closeMenu(this.window);
   }
 
   public itemSelected(event: MouseEvent) {
@@ -302,21 +308,8 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   // ---------------------------------------------------------------------------
 
-  /**
-   * Return a DOM element by its id. First search in the document included
-   * in the frame, and if not found search in the main document.
-   */
-  private $id(id: string): HTMLElement | null {
-    let element = null;
-    const popupframe = this.window.top.document.
-        getElementById("rpc-popup-frame") as HTMLFrameElement | null;
-    if (popupframe && popupframe.contentDocument) {
-      element = popupframe.contentDocument.getElementById(id);
-    }
-    if (!element) {
-      element = this.window.top.document.getElementById(id);
-    }
-    return element;
+  private $id(id: string) {
+    return this.windowService.$id(this.window, id);
   }
 
   /**
@@ -818,7 +811,9 @@ private maybeOpenSiteInfoTab(item: IListItem) {
     const alwaysAskPrefName = "confirmSiteInfo";
     const confirmed = this.confirm(dialogMessage, alwaysAskPrefName, {
       // close the menu if the dialog needs to be shown
-      onBeforeDialog: this.close,
+      onBeforeDialog: () => {
+        this.windowService.closeMenu(this.window);
+      },
     });
     if (confirmed) {
       this.openSiteInfoTab(domain);

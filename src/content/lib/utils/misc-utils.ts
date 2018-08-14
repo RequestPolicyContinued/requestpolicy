@@ -33,24 +33,26 @@ declare const Services: JSMs.Services;
  */
 export function runAsync<T>(
     this: T,
-    callback: () => void,
+    callback: () => void | Promise<void>,
     thisPtr: T | null = null,
-    ...params: any[]) {
-  const runnable = {
-    run() {
-      try {
-        callback.apply(thisPtr, params);
-      } catch (e) {
-        console.error("Asynchronous callback failed unexpectly. Details:");
-        console.dir(e);
-        throw e;
-      }
-    },
-  };
-  Services.tm.currentThread.dispatch(
-      runnable,
-      Ci.nsIEventTarget.DISPATCH_NORMAL,
-  );
+    ...params: any[]): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const runnable = {
+      run() {
+        try {
+          resolve(callback.apply(thisPtr, params));
+        } catch (e) {
+          console.error("Asynchronous callback failed unexpectly. Details:");
+          console.dir(e);
+          reject(e);
+        }
+      },
+    };
+    Services.tm.currentThread.dispatch(
+        runnable,
+        Ci.nsIEventTarget.DISPATCH_NORMAL,
+    );
+  });
 }
 
 /**
@@ -61,16 +63,17 @@ export function runAsync<T>(
  * @param {number} aTries - The number of tries.
  */
 export function tryMultipleTimes(
-    aFunction: () => boolean,
+    aFunction: (triesLeft: number) => boolean,
     aTries: number = 10,
-) {
+): Promise<void> {
   if (aTries <= 0) {
-    return;
+    return Promise.reject();
   }
   const triesLeft = aTries - 1;
-  runAsync(() => {
-    if (aFunction.call(null, triesLeft) !== true) {
-      tryMultipleTimes(aFunction, triesLeft);
+  return runAsync(() => {
+    const rv = aFunction(triesLeft);
+    if (rv !== true) {
+      return tryMultipleTimes(aFunction, triesLeft);
     }
   });
 }

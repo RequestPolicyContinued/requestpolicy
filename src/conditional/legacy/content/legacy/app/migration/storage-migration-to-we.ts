@@ -52,7 +52,7 @@ export class StorageMigrationToWebExtension extends Module {
       private onStorageChanged: typeof browser.storage.onChanged,
       private pConnectionToEWE: Promise<IConnection>,
   ) {
-    super("app.migration.xpcomToWE", log);
+    super("app.migration.storage.xpcomToWE", log);
 
     pConnectionToEWE.then((c) => this.connectionToEWE = c).
         catch(this.log.onError("connectionToEWE"));

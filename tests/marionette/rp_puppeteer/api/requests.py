@@ -64,7 +64,8 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.rp.webRequest;
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.
+              rp.webRequest;
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];
@@ -95,7 +96,8 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.rp.webRequest;
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.
+              rp.webRequest;
           requestMemory.onRequest.removeListener(this.requestObserver.observeRequest);
           this.listening = false;
         """, sandbox=self._sandbox, new_sandbox=False)

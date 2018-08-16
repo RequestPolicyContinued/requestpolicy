@@ -28,7 +28,6 @@ import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
 import { Module } from "lib/classes/module";
-import { defer } from "lib/utils/js-utils";
 import { NonDI } from "non-di-interfaces";
 
 export class RPContentPolicy extends XpcomClassFactoryModule {
@@ -43,8 +42,6 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
 
   // FIXME: suspend all requests before this module is ready
   private forcedReturnValue: number | null = this.CP_OK;
-
-  private dCapturing = defer();
 
   protected get dependencies(): Module[] {
     return [
@@ -105,12 +102,7 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
   }
 
   protected startupSelf() {
-    const pCapturing = this.requestProcessor.whenReady.then(() => {
-      this.forcedReturnValue = null;
-    });
-    this.dCapturing.resolve(pCapturing);
-    pCapturing.catch(this.log.onError("pCapturing"));
-
+    this.forcedReturnValue = null;
     return super.startupSelf();
   }
 

@@ -22,7 +22,7 @@
 
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
-import { defer, IDeferred } from "lib/utils/js-utils";
+import { defer } from "lib/utils/js-utils";
 
 const MAX_WAIT_FOR_STARTUP_SECONDS = 15;
 const MAX_STARTUP_SECONDS = 15;
@@ -69,28 +69,6 @@ export abstract class Module implements IModule {
     return this.shutdownState === "not yet shut down";
   }
 
-  private dSelfBootstrap: {[key: string]: IDeferred<void, any>} = {
-    shutdown: defer(),
-    startup: defer(),
-  };
-
-  private dChildBootstrap = {
-    shutdown: defer(),
-    startup: defer(),
-  };
-
-  private pBootstrap: {[name: string]: MaybePromise<void>} = {
-    shutdown: MaybePromise.all([
-      this.dChildBootstrap.shutdown.promise,
-      this.dSelfBootstrap.shutdown.promise,
-    ]),
-
-    startup: MaybePromise.all([
-      this.dChildBootstrap.startup.promise,
-      this.dSelfBootstrap.startup.promise,
-    ]),
-  } as {[name: string]: MaybePromise<any>};
-
   private preconditionStates: Array<
       "not awaiting" | "awaiting" | "done" | "failed"
   > = [];
@@ -106,8 +84,6 @@ export abstract class Module implements IModule {
   protected get shutdownPreconditions(): Array<Promise<void>> {
     return [];
   }
-
-  public get pStartup() { return this.pBootstrap.startup; }
 
   private timedOutWaitingForStartup = false;
   private creationTime: number;
@@ -287,7 +263,6 @@ export abstract class Module implements IModule {
         map((m) => m[fnName]!()),
     ) as MaybePromise<any>;
     p.catch(this.log.onError(`submodule ${fnName}`));
-    this.dChildBootstrap[fnName].resolve(p.toPromise());
     return p;
   }
 
@@ -298,7 +273,6 @@ export abstract class Module implements IModule {
         this[selfFnName]() :
         MaybePromise.resolve(undefined);
     p.catch(this.log.onError(`self-${fnName}`));
-    this.dSelfBootstrap[fnName].resolve(p.toPromise());
     return p;
   }
 

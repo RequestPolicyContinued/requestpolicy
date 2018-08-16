@@ -69,6 +69,8 @@ export abstract class Module implements IModule {
     return this.shutdownState === "not yet shut down";
   }
 
+  private mpShutdownDone: MaybePromise<void>;
+
   private preconditionStates: Array<
       "not awaiting" | "awaiting" | "done" | "failed"
   > = [];
@@ -76,6 +78,8 @@ export abstract class Module implements IModule {
   protected get dependencies(): Module[] {
     return [];
   }
+
+  private dependents: Module[] = [];
 
   protected get startupPreconditions(): Array<Promise<void>> {
     return [];
@@ -152,19 +156,16 @@ export abstract class Module implements IModule {
   }
 
   public shutdown(): MaybePromise<void> {
-    if (this.shutdownState !== "not yet shut down") {
-      this.log.error("shutdown() has already been called!");
-      return MaybePromise.resolve(undefined);
+    if (this.shutdownState === "not yet shut down") {
+      this._shutdownState = "shutting down";
+      this.debugLog.log("shutting down...");
+      this.mpShutdownDone = this.shutdown_().then(() => {
+        this._shutdownState = "shutdown done";
+        this.debugLog.log("done shutting down");
+      });
+      this.mpShutdownDone.catch(this.log.onError("error on shutdown"));
     }
-    this._shutdownState = "shutting down";
-
-    this.debugLog.log("shutting down...");
-    const p = this.shutdown_();
-    p.catch(this.log.onError("error on shutdown"));
-    return p.then(() => {
-      this._shutdownState = "shutdown done";
-      this.debugLog.log("done shutting down");
-    });
+    return this.mpShutdownDone;
   }
 
   public isReady() { return this.ready; }
@@ -230,6 +231,9 @@ export abstract class Module implements IModule {
       return this.runSubmoduleFns("startup");
     }).then(() => {
       this.debugLog.log(`starting up self...`);
+      for (const m of this.dependencies) {
+        m.registerDependent(this);
+      }
       return this.runSelfFn("startup");
     }).then(() => {
       this.debugLog.log("done starting up self and submodules");
@@ -237,8 +241,7 @@ export abstract class Module implements IModule {
   }
 
   private shutdown_(): MaybePromise<void> {
-    return MaybePromise.
-        all(this.shutdownPreconditions).
+    return this.ensureDependentsAreShutDown().
         then(() => this.runSelfFn("shutdown")).
         then(() => this.runSubmoduleFns("shutdown"));
   }
@@ -279,5 +282,15 @@ export abstract class Module implements IModule {
   private getStartupPreconditions() {
     return this.dependencies.map((m) => m.whenReady).
         concat(this.startupPreconditions);
+  }
+
+  private registerDependent(dependent: Module) {
+    this.dependents.push(dependent);
+  }
+
+  private ensureDependentsAreShutDown(): MaybePromise<void> {
+    return MaybePromise.all(this.dependents.map(
+        (m) => m.shutdown(),
+    )) as MaybePromise<any>;
   }
 }

@@ -58,6 +58,7 @@ import { VersionInfoService } from "./services/version-info-service";
 import { WindowService } from "./services/window-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
+import { StorageApiWrapper } from "./storage/storage-api-wrapper";
 import { Storage } from "./storage/storage.module";
 import { InitialSetup } from "./ui/initial-setup";
 import { Notifications } from "./ui/notifications/notifications.module";
@@ -132,6 +133,7 @@ export namespace App {
   export namespace storage {
     export type IAsyncSettings = AsyncSettings;
     export type ICachedSettings = CachedSettings;
+    export type IStorageApiWrapper = StorageApiWrapper;
   }
 
   export namespace ui {

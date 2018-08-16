@@ -37,7 +37,7 @@ export class AsyncSettings extends Module
     implements App.storage.IAsyncSettings {
   protected get startupPreconditions() {
     return [
-      this.pStorageApiReady,
+      this.storageApi.whenReady,
     ];
   }
 
@@ -47,15 +47,12 @@ export class AsyncSettings extends Module
   // tslint:disable-next-line:member-ordering
   public onChanged = this.events.interfaces.onChanged;
 
-  // tslint:disable-next-line:max-line-length
-  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
-  private pStorageApiReady: Promise<void>;
   private get storageArea() { return this.storageApi.local; }
 
   constructor(
       log: Common.ILog,
       protected readonly outerWindowID: number | null,
-      pStorageApi: API.storage.StorageApiPromise,
+      private storageApi: App.storage.IStorageApiWrapper,
       private defaultSettings: IDefaultSettings,
   ) {
     super(
@@ -63,9 +60,6 @@ export class AsyncSettings extends Module
         `.storage.asyncSettings`,
         log,
     );
-    this.pStorageApiReady = pStorageApi.then((api) => {
-      this.storageApi = api;
-    });
   }
 
   public get(aKeys: "" | string | string[]): Promise<any> {

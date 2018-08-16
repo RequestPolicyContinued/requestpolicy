@@ -98,6 +98,7 @@ import { WindowService } from "./services/window-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
+import { StorageApiWrapper } from "./storage/storage-api-wrapper";
 import { Storage } from "./storage/storage.module";
 import { InitialSetup } from "./ui/initial-setup";
 import { Notifications } from "./ui/notifications/notifications.module";
@@ -127,8 +128,11 @@ const outerWindowID: number | null = null; // contentscripts only
 //
 
 const dStorageReadyForAccess = defer<void>();
-const pStorageApi = dStorageReadyForAccess.promise.then(
-    () => browser.storage,  // badword-linter:allow:browser.storage:
+const storageApiWrapper = new StorageApiWrapper(
+    outerWindowID,
+    log,
+    browser.storage,  // badword-linter:allow:browser.storage:
+    dStorageReadyForAccess.promise,
 );
 
 const {pEWEConnection, pWebextStorageMigration}: {
@@ -232,10 +236,10 @@ const uriService = new UriService(
     mozIDNService!,  // fixme
     mozIOService!,  // fixme
 );
-const rulesetStorage = new RulesetStorage(log, pStorageApi, uriService);
+const rulesetStorage = new RulesetStorage(log, storageApiWrapper, uriService);
 const subscriptions = new Subscriptions(
     log,
-    pStorageApi,
+    storageApiWrapper,
     rulesetStorage,
     uriService,
 );
@@ -256,19 +260,20 @@ const runtime = new Runtime(log, pEWEConnection, aboutUri, browser.runtime);
 const asyncSettings = new AsyncSettings(
     log,
     outerWindowID,
-    pStorageApi,
+    storageApiWrapper,
     SETTING_SPECS.defaultValues,
 );
 dAsyncSettings.resolve(asyncSettings);
 const cachedSettings = new CachedSettings(
     log,
     SETTING_SPECS,
-    pStorageApi,
+    storageApiWrapper,
     LegacyApi.rpPrefBranch, /* FIXME */
 );
 const storage = new Storage(
     log,
     outerWindowID,
+    storageApiWrapper,
     asyncSettings,
     cachedSettings,
 );
@@ -503,7 +508,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       Cc,
       Ci,
       Cr,
-      pStorageApi,
+      storageApiWrapper,
       menu,
       msgListener,
       redirectionNotifications,

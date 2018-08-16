@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
@@ -34,7 +35,7 @@ export class CachedSettings extends Module {
 
   protected get startupPreconditions() {
     return [
-      this.pStorageApiReady,
+      this.storageApi.whenReady,
     ];
   }
 
@@ -42,9 +43,6 @@ export class CachedSettings extends Module {
   private cachedKeysSet: Set<string>;
   private defaultValues: IDefaultValues;
 
-  // tslint:disable-next-line:max-line-length
-  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
-  private pStorageApiReady: Promise<void>;
   private get storageArea() { return this.storageApi.local; }
 
   constructor(
@@ -58,7 +56,7 @@ export class CachedSettings extends Module {
           boolAliases: Array<[string, string]>,
           defaultValues: IDefaultValues,
       },
-      pStorageApi: API.storage.StorageApiPromise,
+      private storageApi: App.storage.IStorageApiWrapper,
       private rpPrefBranch: API.storage.IPrefBranch,
   ) {
     super("app.storage.cachedSettings", log);
@@ -70,10 +68,6 @@ export class CachedSettings extends Module {
     boolAliases.forEach(([storageKey, alias]) => {
       this.alias[`is${alias}`] = () => this.get(storageKey);
       this.alias[`set${alias}`] = (value) => this.set({[storageKey]: value});
-    });
-
-    this.pStorageApiReady = pStorageApi.then((api) => {
-      this.storageApi = api;
     });
   }
 
@@ -116,7 +110,6 @@ export class CachedSettings extends Module {
 
   public set_(aKeys: {[key: string]: any}): Promise<void> {
     this.assertReady();
-    aKeys.lastStorageChange = new Date().toISOString();
     return this.storageArea.set(aKeys);
   }
 

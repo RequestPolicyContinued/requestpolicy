@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { StorageApiWrapper } from "app/storage/storage-api-wrapper";
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { MessageListenerModule } from "lib/classes/message-listener-module";
@@ -48,7 +49,12 @@ const {outerWindowID} = domWindowUtils;
 
 // FIXME: ask the background if the storage is indeed ready
 // tslint:disable-next-line:max-line-length
-const pStorageApi = Promise.resolve(browser.storage);  // badword-linter:allow:browser.storage:
+const storageApiWrapper = new StorageApiWrapper(
+    outerWindowID,
+    log,
+    browser.storage,  // badword-linter:allow:browser.storage:
+    Promise.resolve(), // <-- FIXME
+);
 
 const msgListener = new MessageListenerModule(
     `AppContent[${outerWindowID}].contentSide`,
@@ -100,13 +106,14 @@ const rpServices = new RPContentServices(log, outerWindowID, uriService);
 const asyncSettings = new AsyncSettings(
     log,
     outerWindowID,
-    pStorageApi,
+    storageApiWrapper,
     SETTING_SPECS.defaultValues,
 );
 dAsyncSettings.resolve(asyncSettings);
 const storage = new Storage(
     log,
     outerWindowID,
+    storageApiWrapper,
     asyncSettings,
     null,
 );

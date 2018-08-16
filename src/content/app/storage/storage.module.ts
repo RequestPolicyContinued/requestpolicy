@@ -28,6 +28,7 @@ export class Storage extends Module implements App.IStorage {
   constructor(
       log: Common.ILog,
       protected readonly outerWindowID: number | null,
+      public readonly apiWrapper: App.storage.IStorageApiWrapper,
       public readonly asyncSettings: App.storage.IAsyncSettings,
       public readonly cachedSettings: App.storage.ICachedSettings | null,
   ) {
@@ -41,6 +42,7 @@ export class Storage extends Module implements App.IStorage {
 
   protected get subModules() {
     const rv: {[k: string]: IModule} = {
+      apiWrapper: this.apiWrapper,
       asyncSettings: this.asyncSettings,
     };
     if (this.cachedSettings !== null) {

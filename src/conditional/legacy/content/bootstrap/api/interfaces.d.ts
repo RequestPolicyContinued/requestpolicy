@@ -1436,7 +1436,6 @@ export namespace API {
     ) => IPrefBranch;
     export type PrefObserverFactory = () => PrefObserver;
 
-    export type StorageApiPromise = Promise<typeof browser.storage>;  // badword-linter:allow:browser.storage:
     export namespace api {
       export type ChangeDict = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
       export type StorageName = browser.storage.StorageName;  // badword-linter:allow:browser.storage:

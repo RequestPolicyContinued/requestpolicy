@@ -30,6 +30,8 @@ type StorageArea = browser.storage.StorageArea;  // badword-linter:allow:browser
 
 export class StorageApiWrapper extends Module
     implements App.storage.IStorageApiWrapper {
+  // protected get debugEnabled() { return true; }
+
   public readonly local: StorageArea = Object.assign(
       Object.create(this.api.local),
       { set: this._set.bind(this) },
@@ -60,6 +62,7 @@ export class StorageApiWrapper extends Module
 
   private _set(keys: API.storage.api.StorageObject) {
     keys.lastStorageChange = new Date().toISOString();
+    if (this.debugEnabled) this.debugLog.dir(keys);
     return this.api.local.set(keys);
   }
 }

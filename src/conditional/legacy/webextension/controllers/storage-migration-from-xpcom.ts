@@ -69,6 +69,9 @@ export class StorageMigrationFromXpcom extends Module {
     ).then((result) => {
       this.lastStorageChange =
           (result.lastStorageChange as string | undefined) || null;
+      this.debugLog.log(
+          `got "lastStorageChange": ${result.lastStorageChange}`,
+      );
       return this.pConnectionToLegacy;
     }).then(() => {
       this.connectionToLegacy.onMessage.addListener(

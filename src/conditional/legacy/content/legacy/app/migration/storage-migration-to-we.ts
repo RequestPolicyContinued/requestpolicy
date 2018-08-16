@@ -45,6 +45,7 @@ export class StorageMigrationToWebExtension extends Module
 
   private dStorageReadyForAccess = defer<void>();
   private dInitialSync = defer<void>();
+  private initialSyncState: "not started" | "started" | "done" = "not started";
 
   private connectionToEWE: IConnection;
 
@@ -75,7 +76,9 @@ export class StorageMigrationToWebExtension extends Module
         this.storageArea.get("lastStorageChange").then((result) => {
           this.lastStorageChange =
               (result.lastStorageChange as string | undefined) || null;
-          this.debugLog.log(`got "lastStorageChange"`);
+          this.debugLog.log(
+              `got "lastStorageChange": ${result.lastStorageChange}`,
+          );
         }).catch(this.log.onError("get lastStorageChange"));
     const pGotConnectionToEWE = this.debugEnabled ?
         this.pConnectionToEWE.then(() => {
@@ -208,6 +211,11 @@ export class StorageMigrationToWebExtension extends Module
     if (aMessage.target !== "legacy-side-storage-migration-controller") return;
     if (aMessage.type !== "startup") return;
     if (!aMessage.value.ready) return;
+    if (this.initialSyncState !== "not started") return;
+    this.initialSyncState = "started";
+    this.debugLog.log(
+        `got EWE-side lastStorageChange: ${aMessage.value.lastStorageChange}`,
+    );
     const isPull =
         !aMessage.value.lastStorageChange ? false :
         !this.lastStorageChange ? true :
@@ -225,7 +233,9 @@ export class StorageMigrationToWebExtension extends Module
     pInitialSync.catch((e: any) => {
       this.log.error(`Error on initial sync (${pushOrPull}):`, e);
     });
-    this.dInitialSync.resolve(pInitialSync);
+    this.dInitialSync.resolve(pInitialSync.then(() => {
+      this.initialSyncState = "done";
+    }));
     if (isPull) {
       this.dStorageReadyForAccess.resolve(pInitialSync);
     } else {

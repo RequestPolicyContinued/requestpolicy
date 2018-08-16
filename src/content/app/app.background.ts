@@ -136,7 +136,12 @@ const {pEWEConnection, pWebextStorageMigration}: {
   const getEWEModules = (ewe: IEmbeddedWebExtension) => {
     const eweBrowser = ewe.browser;
     const promiseEwePort = () => {
-      return getPortFromSlaveConnectable(eweBrowser.runtime);
+      const portGetterLog = log.extend({name: "app.getPortFromConnectable"});
+      return getPortFromSlaveConnectable(
+          portGetterLog,
+          portGetterLog,
+          eweBrowser.runtime,
+      );
     };
     const rvEWEConnection = new Connection(
         C.EWE_CONNECTION_LEGACY_ID,

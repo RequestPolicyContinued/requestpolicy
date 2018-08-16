@@ -37,6 +37,8 @@ type IStorageChanges = browser.storage.ChangeDict;
 // =============================================================================
 
 export class StorageMigrationFromXpcom extends Module {
+  // protected get debugEnabled() { return true; }
+
   private lastStorageChange: string | null = null;
   private connectionToLegacy: IConnection;
 
@@ -92,6 +94,7 @@ export class StorageMigrationFromXpcom extends Module {
   }
 
   private applyStorageChanges(aStorageChanges: IStorageChanges) {
+    this.debugLog.log("going to apply storage changes...");
     const keysToRemove: string[] = [];
     let hasKeysToSet = false;
     const keysToSet: {[key: string]: any} = {};
@@ -109,7 +112,9 @@ export class StorageMigrationFromXpcom extends Module {
     const promises: Array<Promise<void>> = [];
     if (hasKeysToRemove) promises.push(this.storage.local.remove(keysToRemove));
     if (hasKeysToSet) promises.push(this.storage.local.set(keysToSet));
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => {
+      this.debugLog.log("done applying storage changes.");
+    });
   }
 
   private receiveMessage(
@@ -136,6 +141,7 @@ export class StorageMigrationFromXpcom extends Module {
             () => this.setFullStorage(aMessage.value),
         );
       case "storage-changes":
+        this.debugLog.log("obtained storage changes");
         return this.respond(
             "storage-changes",
             () => this.applyStorageChanges(aMessage.value as IStorageChanges));

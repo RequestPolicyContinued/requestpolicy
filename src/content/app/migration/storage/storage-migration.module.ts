@@ -26,6 +26,8 @@ import { IModule, Module } from "lib/classes/module";
 
 export class StorageMigration extends Module
     implements App.migration.IStorageMigration {
+  // protected get debugEnabled() { return true; }
+
   protected get startupPreconditions() {
     return [
       this.pStorageMigrationToWE,

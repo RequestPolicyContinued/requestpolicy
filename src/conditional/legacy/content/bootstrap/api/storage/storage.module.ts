@@ -31,6 +31,8 @@ type xpcomPrefBranch = XPCOM.nsIPrefBranch;
 type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
 
 export class Storage extends Module {
+  // protected get debugEnabled() { return true; }
+
   private events = createListenersMap(["onChanged"]);
 
   private ignorePrefObserverChangesTemporarily = false;
@@ -44,7 +46,7 @@ export class Storage extends Module {
       private slsa: API.storage.ISyncLocalStorageArea,
       private rpPrefBranch: API.storage.IPrefBranch,
   ) {
-    super("browser.storage", log);
+    super("API.storage", log);
   }
 
   public get backgroundApi() {
@@ -121,12 +123,12 @@ export class Storage extends Module {
     const changes: browser.storage.ChangeDict = {
       [prefName]: newValue === undefined ? {} : {newValue},
     };
-    this.debugLog.log(`pref changes:`, changes);
+    this.debugLog.log(`emitting pref changes:`, changes);
     this.events.listenersMap.onChanged.emit(changes);
   }
 
   private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
-    this.debugLog.log(`pref changes:`, aChanges);
+    this.debugLog.log(`emitting pref changes:`, aChanges);
     this.events.listenersMap.onChanged.emit(aChanges);
   }
 }

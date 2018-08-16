@@ -71,7 +71,10 @@ var console = (function() {
   return Cu.import(uri, {}).console;
 })();
 
-var {clearTimeout, setTimeout} = Cu.import("resource://gre/modules/Timer.jsm");
+var {
+  clearTimeout,
+  setTimeout, // badword-linter:allow: setTimeout:
+} = Cu.import("resource://gre/modules/Timer.jsm");
 
 // =============================================================================
 // Globals
@@ -87,7 +90,7 @@ function getGlobals() {
 
     clearTimeout,
     console,
-    setTimeout,
+    setTimeout, // badword-linter:allow: setTimeout:
   };
 }
 

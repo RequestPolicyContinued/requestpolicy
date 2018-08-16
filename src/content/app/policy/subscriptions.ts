@@ -363,7 +363,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
         i; // tslint:disable-line
         return; // What's that??
       }
-      setTimeout(() => callback(updateResults), 0);
+      this.setTimeout(() => callback(updateResults), 0);
     };
 
     let listCount = 0;
@@ -444,7 +444,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
 
     if (listCount === 0) {
       this.log.info("No lists to update.");
-      setTimeout(() => callback(updateResults), 0);
+      this.setTimeout(() => callback(updateResults), 0);
     }
   }
 
@@ -461,13 +461,13 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
         slist.data = JSON.parse(req.responseText);
         // Maybe we don't need to write this to a file since we never read it
         // back again (we always grab new metadata when updating).
-        setTimeout(() => successCallback(), 0);
+        this.setTimeout(() => successCallback(), 0);
       } catch (e) {
-        setTimeout(() => errorCallback(e.toString()), 0);
+        this.setTimeout(() => errorCallback(e.toString()), 0);
       }
     });
     req.onerror = this.maybeCallback((event) => {
-      setTimeout(() => errorCallback(req.statusText), 0);
+      this.setTimeout(() => errorCallback(req.statusText), 0);
     });
     req.open("GET", slist.url);
     req.send(null);
@@ -502,13 +502,13 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
         } else {
           this.log.info("No update needed for " + slist.name + " " + subName);
           const curSub = sub;
-          setTimeout(() => {
+          this.setTimeout(() => {
             successCallback(curSub, SUBSCRIPTION_UPDATE_NOT_NEEDED);
           }, 0);
         }
       } catch (e) {
         const curSub = sub;
-        setTimeout(() => errorCallback(curSub, e.toString()), 0);
+        this.setTimeout(() => errorCallback(curSub, e.toString()), 0);
       }
     }
   }
@@ -530,7 +530,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
         const rawData = req.responseText;
         if (!rawData) {
           const error = "Empty response when requesting subscription file";
-          setTimeout(() => errorCallback(sub, error), 0);
+          this.setTimeout(() => errorCallback(sub, error), 0);
           return;
         }
         sub.data = JSON.parse(rawData);
@@ -542,12 +542,12 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
           serial = sub.data.metadata.serial;
         } else {
           const error = "Ruleset has no serial number";
-          setTimeout(() => errorCallback(sub, error), 0);
+          this.setTimeout(() => errorCallback(sub, error), 0);
           return;
         }
         if (typeof serial !== "number" || serial % 1 !== 0) {
           const error = "Ruleset has invalid serial number: " + serial;
-          setTimeout(() => errorCallback(sub, error), 0);
+          this.setTimeout(() => errorCallback(sub, error), 0);
           return;
         }
         // The rest of the sanity checking is done by RawRuleset.
@@ -561,7 +561,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
               rawRuleset, sub.name, sub.list,
           );
         } catch (e) {
-          setTimeout(() => errorCallback(sub, e.toString()), 0);
+          this.setTimeout(() => errorCallback(sub, e.toString()), 0);
           return;
         }
         const subInfo: ISubsObject<true> = {};
@@ -569,15 +569,15 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
         subInfo[sub.list][sub.name] = true;
         Services.obs.notifyObservers(null, SUBSCRIPTION_UPDATED_TOPIC,
             JSON.stringify(subInfo));
-        setTimeout(() => {
+        this.setTimeout(() => {
           successCallback(sub, SUBSCRIPTION_UPDATE_SUCCESS);
         }, 0);
       } catch (e) {
-        setTimeout(() => errorCallback(sub, e.toString()), 0);
+        this.setTimeout(() => errorCallback(sub, e.toString()), 0);
       }
     });
     req.onerror = this.maybeCallback((event) => {
-      setTimeout(() => errorCallback(sub, req.statusText), 0);
+      this.setTimeout(() => errorCallback(sub, req.statusText), 0);
     });
     req.open("GET", sub.url);
     req.send(null);

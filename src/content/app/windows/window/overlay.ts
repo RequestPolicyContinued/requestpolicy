@@ -385,19 +385,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     return (this.$id("rpc-popup") as any) as XUL.menupopup;
   }
 
-  private setTimeout(aFn: () => void, aDelay: number) {
-    return setTimeout(() => {
-      if (this.shutdownState !== "not yet shut down") {
-        console.log(
-            "[RequestPolicy] Not calling delayed function " +
-            "because of add-on shutdown.",
-        );
-        return;
-      }
-      aFn.call(null);
-    }, aDelay);
-  }
-
   private $id(id: string) {
     return this.windowService.$id(this.window, id);
   }
@@ -891,7 +878,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // is actually hidden. For example, it can reside in the Australis
     // menu. By delaying "openMenu" the menu will be closed in the
     // meantime, and the toolbar button will be detected as invisible.
-    setTimeout(() => {
+    this.setTimeout(() => {
       this.debugLog.log("opening the menu");
       if (this.isToolbarButtonVisible()) {
         this.openMenuAtToolbarButton();

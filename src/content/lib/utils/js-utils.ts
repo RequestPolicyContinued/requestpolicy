@@ -139,18 +139,6 @@ export function objectValues(obj: any): any[] {
   return resArray;
 }
 
-export function promiseTimeout<T = any>(
-    timeout: number,
-    fn?: () => T,
-): Promise<T> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const rv: any = fn ? fn() : undefined;
-      resolve(rv);
-    }, timeout);
-  });
-}
-
 /**
  * Create an array containing the elements [0, ..., n-1].
  *

@@ -116,7 +116,7 @@ export abstract class Module implements IModule {
     this.debugLog = this.log.extend({enabled: this.debugEnabled, level: "all"});
 
     this.creationTime = new Date().getTime();
-    setTimeout(() => {
+    this.setTimeout(() => {
       if (this.startupCalled) return;
       this.log.error(`[severe] startup() hasn't been invoked ` +
           `even after ${MAX_WAIT_FOR_STARTUP_SECONDS} seconds!`);
@@ -134,7 +134,7 @@ export abstract class Module implements IModule {
     });
 
     let timedOutStartingUp = false;
-    setTimeout(() => {
+    this.setTimeout(() => {
       if (this.ready) return;
       timedOutStartingUp = true;
       this.log.error(
@@ -204,6 +204,22 @@ export abstract class Module implements IModule {
       console.trace();
       throw new Error(msg);
     }
+  }
+
+  // utility
+  protected setTimeout(  // badword-linter:allow: setTimeout:
+      aFn: () => void,
+      aDelay: number,
+  ) {
+    return setTimeout(() => {  // badword-linter:allow: setTimeout:
+      if (this.shutdownState !== "not yet shut down") {
+        this.log.warn(
+            "Not calling delayed function because of module shutdown.",
+        );
+        return;
+      }
+      aFn.call(null);
+    }, aDelay);
   }
 
   private startup_(): MaybePromise<void> {

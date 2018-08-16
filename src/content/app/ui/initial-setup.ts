@@ -29,10 +29,10 @@ import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class InitialSetup extends Module implements App.ui.IInitialSetup {
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.cachedSettings.whenReady,
-      this.versionInfo.whenReady,
+      this.cachedSettings,
+      this.versionInfo,
     ];
   }
 

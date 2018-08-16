@@ -74,10 +74,10 @@ export class KeyboardShortcutModule extends Module
   private boundMethods = new BoundMethods(this);
   private prefObserver = this.createPrefObserver();
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.cachedSettings.whenReady,
-      this.xulTrees.whenReady,
+      this.cachedSettings,
+      this.xulTrees,
     ];
   }
 

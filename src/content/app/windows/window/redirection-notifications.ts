@@ -47,14 +47,14 @@ export class RedirectionNotifications extends Module
   private get gBrowser() { return getTabBrowser(this.window)!; }
   private get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.runtime.whenReady,
-      this.privateBrowsingService.whenReady,
-      this.uriService.whenReady,
-      this.windowService.whenReady,
-      this.cachedSettings.whenReady,
-      this.requestProcessor.whenReady,
+      this.runtime,
+      this.privateBrowsingService,
+      this.uriService,
+      this.windowService,
+      this.cachedSettings,
+      this.requestProcessor,
     ];
   }
 

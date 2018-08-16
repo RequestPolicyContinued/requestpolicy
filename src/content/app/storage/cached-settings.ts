@@ -30,12 +30,13 @@ interface IDefaultValues {
   [key: string]: string | number | boolean;
 }
 
-export class CachedSettings extends Module {
+export class CachedSettings extends Module
+implements App.storage.ICachedSettings {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.storageApi.whenReady,
+      this.storageApi,
     ];
   }
 

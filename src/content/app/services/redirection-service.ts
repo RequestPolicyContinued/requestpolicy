@@ -33,10 +33,10 @@ export class RedirectionService extends Module
     implements App.services.IRedirectionService {
   // protected get debugEnabled() { return true; }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.requestService.whenReady,
-      this.windowModuleMap.whenReady,
+      this.requestService,
+      this.windowModuleMap,
     ];
   }
 

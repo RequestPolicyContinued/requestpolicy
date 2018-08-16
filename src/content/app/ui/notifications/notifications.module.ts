@@ -30,9 +30,14 @@ export class Notifications extends Module implements App.ui.INotifications {
   public readonly notifications = new NotificationsSet(this.windowService);
   public readonly IDs = NotificationID;
 
+  protected get dependencies(): Module[] {
+    return [
+      this.windowService,
+    ];
+  }
+
   protected get startupPreconditions() {
     return [
-      this.windowService.whenReady,
       this.windowService.pWindowsAvailable,
     ];
   }

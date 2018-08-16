@@ -72,9 +72,9 @@ export class VersionInfoService extends Module {
     super("app.services.versionInfo", log);
   }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.cachedSettings.whenReady,
+      this.cachedSettings,
     ];
   }
 

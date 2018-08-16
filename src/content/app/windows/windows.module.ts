@@ -32,10 +32,10 @@ export class Windows extends Module implements App.IWindows {
 
   private boundMethods = new BoundMethods(this);
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.cachedSettings.whenReady,
-      this.windowService.whenReady,
+      this.cachedSettings,
+      this.windowService,
     ];
   }
 

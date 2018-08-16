@@ -39,9 +39,9 @@ export class NonAustralisToolbarButton extends Module {
 
   private isAustralis = this.miscInfos.isAustralis;
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.xulTrees.whenReady,
+      this.xulTrees,
     ];
   }
 

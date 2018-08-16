@@ -37,9 +37,9 @@ export interface IClassicmenuRuleSpec {
 // tslint:disable:member-ordering
 
 export class ClassicMenu extends Module {
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.policy.whenReady,
+      this.policy,
     ];
   }
 

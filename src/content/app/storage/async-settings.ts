@@ -35,9 +35,9 @@ type IDefaultSettings = IObject<tSettingValue>;
 
 export class AsyncSettings extends Module
     implements App.storage.IAsyncSettings {
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.storageApi.whenReady,
+      this.storageApi,
     ];
   }
 

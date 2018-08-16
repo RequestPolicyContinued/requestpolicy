@@ -55,11 +55,11 @@ export class ManagerForDOMContentLoaded extends Module {
 
   private documents: Map<Document, IDocumentInfo> = new Map();
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.bgCommunication.whenReady,
-      this.blockedContent.whenReady,
-      this.uriServices.whenReady,
+      this.bgCommunication,
+      this.blockedContent,
+      this.uriServices,
     ];
   }
 

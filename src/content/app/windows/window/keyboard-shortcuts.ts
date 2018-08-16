@@ -50,9 +50,9 @@ export class KeyboardShortcuts extends Module {
     return this._subModules;
   }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.rpOverlay.whenReady,
+      this.rpOverlay,
     ];
   }
 

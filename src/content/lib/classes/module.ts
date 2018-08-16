@@ -95,6 +95,10 @@ export abstract class Module implements IModule {
       "not awaiting" | "awaiting" | "done" | "failed"
   > = [];
 
+  protected get dependencies(): Module[] {
+    return [];
+  }
+
   protected get startupPreconditions(): Array<Promise<void>> {
     return [];
   }
@@ -129,7 +133,7 @@ export abstract class Module implements IModule {
       return MaybePromise.resolve(undefined);
     }
     this._startupState = "starting up";
-    this.startupPreconditions.forEach((_, index) => {
+    this.getStartupPreconditions().forEach((_, index) => {
       this.preconditionStates[index] = "not awaiting";
     });
 
@@ -223,13 +227,14 @@ export abstract class Module implements IModule {
   }
 
   private startup_(): MaybePromise<void> {
-    const nPrecond = this.startupPreconditions.length;
+    const preconditions = this.getStartupPreconditions();
+    const nPrecond = preconditions.length;
     let pPrecond: MaybePromise<void>;
     if (nPrecond !== 0) {
       this.debugLog.log(
           `awaiting ${nPrecond} precondition${ nPrecond > 1 ? "s" : "" }...`,
       );
-      const preconditionsMapped = this.startupPreconditions.map((p, index) => {
+      const preconditionsMapped = preconditions.map((p, index) => {
         this.preconditionStates[index] = "awaiting";
         return p.then(() => {
           this.preconditionStates[index] = "done";
@@ -295,5 +300,10 @@ export abstract class Module implements IModule {
     p.catch(this.log.onError(`self-${fnName}`));
     this.dSelfBootstrap[fnName].resolve(p.toPromise());
     return p;
+  }
+
+  private getStartupPreconditions() {
+    return this.dependencies.map((m) => m.whenReady).
+        concat(this.startupPreconditions);
   }
 }

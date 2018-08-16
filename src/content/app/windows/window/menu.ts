@@ -120,14 +120,14 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.privateBrowsingService.whenReady,
-      this.uriService.whenReady,
-      this.windowService.whenReady,
-      this.policy.whenReady,
-      this.cachedSettings.whenReady,
-      this.requestMemory.whenReady,
+      this.privateBrowsingService,
+      this.uriService,
+      this.windowService,
+      this.policy,
+      this.cachedSettings,
+      this.requestMemory,
     ];
   }
 

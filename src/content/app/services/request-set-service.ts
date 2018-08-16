@@ -29,9 +29,9 @@ import { RequestSet } from "lib/classes/request-set";
 
 export class RequestSetService extends Module
     implements App.services.IRequestSetService {
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.uriService.whenReady,
+      this.uriService,
     ];
   }
 

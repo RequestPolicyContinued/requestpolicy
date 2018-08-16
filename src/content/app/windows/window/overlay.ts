@@ -69,21 +69,21 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.storageApi.whenReady,
+      this.storageApi,
 
-      this.msgListener.whenReady,
-      this.redirectionNotifications.whenReady,
+      this.msgListener,
+      this.redirectionNotifications,
 
-      this.eventListener.whenReady,
-      this.uriService.whenReady,
-      this.windowService.whenReady,
-      this.policy.whenReady,
-      this.runtime.whenReady,
-      this.cachedSettings.whenReady,
-      this.requestMemory.whenReady,
-      this.requestProcessor.whenReady,
+      this.eventListener,
+      this.uriService,
+      this.windowService,
+      this.policy,
+      this.runtime,
+      this.cachedSettings,
+      this.requestMemory,
+      this.requestProcessor,
     ];
   }
 

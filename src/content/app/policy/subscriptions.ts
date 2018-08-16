@@ -71,10 +71,10 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
 
   private get storageArea() { return this.storageApi.local; }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.rulesetStorage.whenReady,
-      this.storageApi.whenReady,
+      this.rulesetStorage,
+      this.storageApi,
     ];
   }
 

@@ -113,16 +113,16 @@ export class RequestProcessor extends Module {
     };
   }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.rpPolicy.whenReady,
-      this.httpChannelService.whenReady,
-      this.requestService.whenReady,
-      this.uriService.whenReady,
-      this.cachedSettings.whenReady,
-      this.requestMemory.whenReady,
-      this.mm.whenReady,
-      this.windowModuleMap.whenReady,
+      this.rpPolicy,
+      this.httpChannelService,
+      this.requestService,
+      this.uriService,
+      this.cachedSettings,
+      this.requestMemory,
+      this.mm,
+      this.windowModuleMap,
     ];
   }
 

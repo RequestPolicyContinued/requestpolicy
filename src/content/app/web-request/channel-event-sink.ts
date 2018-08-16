@@ -28,6 +28,7 @@ import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
+import { Module } from "lib/classes/module";
 import { defer } from "lib/utils/js-utils";
 import { NonDI } from "non-di-interfaces";
 
@@ -50,9 +51,9 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
 
   private dCapturing = defer();
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.requestProcessor.whenReady,
+      this.requestProcessor,
     ];
   }
 

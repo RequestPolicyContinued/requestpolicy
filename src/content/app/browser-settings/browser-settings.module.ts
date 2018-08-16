@@ -26,9 +26,9 @@ import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class BrowserSettings extends Module implements App.IBrowserSettings {
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.cachedSettings.whenReady,
+      this.cachedSettings,
     ];
   }
 

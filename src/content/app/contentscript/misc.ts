@@ -48,10 +48,10 @@ export class ContentscriptMisc extends Module {
     };
   }
 
-  protected get startupPreconditions() {
+  protected get dependencies(): Module[] {
     return [
-      this.bgCommunication.whenReady,
-      this.msgListener.whenReady,
+      this.bgCommunication,
+      this.msgListener,
     ];
   }
 

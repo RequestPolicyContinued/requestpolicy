@@ -49,7 +49,7 @@ const legacyConnection = new Connection(
 const storageMigrationFromXpcom = new StorageMigrationFromXpcom(
     rootLog,
     legacyConnection.whenReady.then(() => legacyConnection),
-    browser.storage,
+    browser.storage,  // badword-linter:allow:browser.storage:
 );
 const ewe = new EweModule(
     rootLog,

@@ -22,7 +22,7 @@
  */
 
 import { App } from "app/interfaces";
-import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
+import { API, JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import { BoundMethods } from "lib/classes/bound-methods";
@@ -69,8 +69,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
+  // tslint:disable-next-line:max-line-length
+  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
+  private pStorageApiReady: Promise<void>;
+
   protected get startupPreconditions() {
     return [
+      this.pStorageApiReady,
+
       this.msgListener.whenReady,
       this.redirectionNotifications.whenReady,
 
@@ -94,7 +100,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,
       private readonly cr: XPCOM.nsXPCComponents_Results,
 
-      private readonly storageApi: typeof browser.storage,
+      pStorageApi: API.storage.StorageApiPromise,
 
       private readonly menu: App.windows.window.IMenu,
       private readonly msgListener: App.windows.window.IMessageListenerModule,
@@ -111,6 +117,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       private readonly requestProcessor: App.webRequest.IRequestProcessor,
   ) {
     super(`app.windows[${windowID}].overlay`, parentLog);
+
+    this.pStorageApiReady = pStorageApi.then((api) => {
+      this.storageApi = api;
+    });
   }
 
   /**
@@ -557,7 +567,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     }
   }
 
-  private onStorageChanged(changes: browser.storage.StorageChange) {
+  private onStorageChanged(changes: API.storage.api.ChangeDict) {
     if ("startWithAllowAllEnabled" in changes) {
       this.updatePermissiveStatus().
           catch(this.log.onError("onStorageChanged:startWithAllowAllEnabled"));

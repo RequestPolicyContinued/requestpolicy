@@ -34,13 +34,18 @@ export class CachedSettings extends Module {
 
   protected get startupPreconditions() {
     return [
-      this.storageReadyPromise,
+      this.pStorageApiReady,
     ];
   }
 
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;
   private defaultValues: IDefaultValues;
+
+  // tslint:disable-next-line:max-line-length
+  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
+  private pStorageApiReady: Promise<void>;
+  private get storageArea() { return this.storageApi.local; }
 
   constructor(
       log: Common.ILog,
@@ -53,8 +58,7 @@ export class CachedSettings extends Module {
           boolAliases: Array<[string, string]>,
           defaultValues: IDefaultValues,
       },
-      private storageReadyPromise: Promise<void>,
-      private storage: browser.storage.StorageArea,
+      pStorageApi: API.storage.StorageApiPromise,
       private rpPrefBranch: API.storage.IPrefBranch,
   ) {
     super("app.storage.cachedSettings", log);
@@ -66,6 +70,10 @@ export class CachedSettings extends Module {
     boolAliases.forEach(([storageKey, alias]) => {
       this.alias[`is${alias}`] = () => this.get(storageKey);
       this.alias[`set${alias}`] = (value) => this.set({[storageKey]: value});
+    });
+
+    this.pStorageApiReady = pStorageApi.then((api) => {
+      this.storageApi = api;
     });
   }
 
@@ -109,7 +117,7 @@ export class CachedSettings extends Module {
   public set_(aKeys: {[key: string]: any}): Promise<void> {
     this.assertReady();
     aKeys.lastStorageChange = new Date().toISOString();
-    return this.storage.set(aKeys);
+    return this.storageArea.set(aKeys);
   }
 
   private getRaw(aKey: string): any {

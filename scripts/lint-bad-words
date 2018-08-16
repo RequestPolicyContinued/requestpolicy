@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+DIR="$1"
+
+exitcode=0
+
+function lint() {
+  local _bad_word="$1"
+  local _file="$2"
+
+  cat "$_file" | {
+    grep -vE \
+      -e ' badword:' \
+      -e ' badword-linter:allow:(.+:)?'"$_bad_word"':' \
+      || test $? = 1
+  } | {
+    grep -F "$_bad_word" > /dev/null
+  } && rc=$? || rc=$?
+  if [ $rc = 0 ]; then
+    echo "bad word '$_bad_word' in file '$_file'!"
+    exitcode=1
+  fi
+}
+
+function lint_comment_defined_badwords() {
+  local FILES="$(grep -rlF ' badword:' $DIR || test $? = 1)"
+  local BAD_WORDS
+
+  for file in $FILES; do
+    BAD_WORDS="$(grep -F ' badword:' $file | sed -E 's#.* badword:##')"
+    for bad_word in $BAD_WORDS; do
+      lint "$bad_word" "$file"
+    done
+  done
+}
+
+function lint_bwfile_defined_badwords() {
+  local BW_FILES="$(find $DIR -type f -name '.badwords')"
+  local BWFILE_DIR
+  local BAD_WORDS
+  local FILES
+
+  for bwfile in $BW_FILES; do
+    BWFILE_DIR="$(dirname $bwfile)"
+    BAD_WORDS="$(cat $bwfile | grep -vE -e '^#' -e '^$')"
+    FILES="$(find $BWFILE_DIR -type f -not -name '.badwords')"
+
+    for file in $FILES; do
+      for bad_word in $BAD_WORDS; do
+        lint "$bad_word" "$file"
+      done
+    done
+  done
+}
+
+lint_comment_defined_badwords
+lint_bwfile_defined_badwords
+
+exit $exitcode

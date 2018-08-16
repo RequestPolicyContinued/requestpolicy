@@ -21,6 +21,7 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -36,7 +37,7 @@ export class AsyncSettings extends Module
     implements App.storage.IAsyncSettings {
   protected get startupPreconditions() {
     return [
-      this.storageReadyPromise,
+      this.pStorageApiReady,
     ];
   }
 
@@ -46,18 +47,25 @@ export class AsyncSettings extends Module
   // tslint:disable-next-line:member-ordering
   public onChanged = this.events.interfaces.onChanged;
 
+  // tslint:disable-next-line:max-line-length
+  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
+  private pStorageApiReady: Promise<void>;
+  private get storageArea() { return this.storageApi.local; }
+
   constructor(
       log: Common.ILog,
       protected readonly outerWindowID: number | null,
-      private storageApi: typeof browser.storage,
-      private storageArea: browser.storage.StorageArea,
+      pStorageApi: API.storage.StorageApiPromise,
       private defaultSettings: IDefaultSettings,
-      private storageReadyPromise: Promise<void>,
   ) {
     super(
-        `${
-            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
-        }.storage.asyncSettings`, log);
+        outerWindowID === null ? "app" : `AppContent[${outerWindowID}]` +
+        `.storage.asyncSettings`,
+        log,
+    );
+    this.pStorageApiReady = pStorageApi.then((api) => {
+      this.storageApi = api;
+    });
   }
 
   public get(aKeys: "" | string | string[]): Promise<any> {
@@ -89,10 +97,10 @@ export class AsyncSettings extends Module
   }
 
   private onChangedEvent(
-      changes: browser.storage.ChangeDict,
+      changes: API.storage.api.ChangeDict,
       areaName: string,
   ) {
-    const changes2: browser.storage.ChangeDict = {};
+    const changes2: API.storage.api.ChangeDict = {};
     Object.keys(changes).forEach((key) => {
       if (!this.defaultSettings.hasOwnProperty(key)) return;
       const change = changes[key];

@@ -46,7 +46,9 @@ declare const cfmm: XPCOM.ContentFrameMessageManager;
 const domWindowUtils = getDOMWindowUtils(cfmm.content);
 const {outerWindowID} = domWindowUtils;
 
-const storageReadyPromise = Promise.resolve();
+// FIXME: ask the background if the storage is indeed ready
+// tslint:disable-next-line:max-line-length
+const pStorageApi = Promise.resolve(browser.storage);  // badword-linter:allow:browser.storage:
 
 const msgListener = new MessageListenerModule(
     `AppContent[${outerWindowID}].contentSide`,
@@ -98,10 +100,8 @@ const rpServices = new RPContentServices(log, outerWindowID, uriService);
 const asyncSettings = new AsyncSettings(
     log,
     outerWindowID,
-    browser.storage,
-    browser.storage.local,
+    pStorageApi,
     SETTING_SPECS.defaultValues,
-    storageReadyPromise,
 );
 dAsyncSettings.resolve(asyncSettings);
 const storage = new Storage(
@@ -109,7 +109,6 @@ const storage = new Storage(
     outerWindowID,
     asyncSettings,
     null,
-    storageReadyPromise,
 );
 export const rp = new AppContent(
     log,

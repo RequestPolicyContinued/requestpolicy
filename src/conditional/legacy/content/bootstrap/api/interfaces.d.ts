@@ -1435,6 +1435,13 @@ export namespace API {
         namesToTypesMap: {[key: string]: PrefType},
     ) => IPrefBranch;
     export type PrefObserverFactory = () => PrefObserver;
+
+    export type StorageApiPromise = Promise<typeof browser.storage>;  // badword-linter:allow:browser.storage:
+    export namespace api {
+      export type ChangeDict = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
+      export type StorageName = browser.storage.StorageName;  // badword-linter:allow:browser.storage:
+      export type StorageObject = browser.storage.StorageObject;  // badword-linter:allow:browser.storage:
+    }
   }
 
   export namespace windows {

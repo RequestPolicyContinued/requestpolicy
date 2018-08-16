@@ -37,10 +37,8 @@ describe("AsyncSettings", function() {
     return new AsyncSettings(
         log,
         null,
-        stubbedStorage,
-        stubbedStorageArea,
+        storageReadyPromise.then(() => stubbedStorage),
         defaultSettings,
-        storageReadyPromise,
     );
   }
 

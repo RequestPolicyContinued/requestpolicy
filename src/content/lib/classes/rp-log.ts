@@ -21,6 +21,7 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Log, LogLevel } from "lib/classes/log";
 
 export class RPLog extends Log {
@@ -60,8 +61,8 @@ export class RPLog extends Log {
   }
 
   private onStorageChanged(
-      aChanges: browser.storage.ChangeDict,
-      aAreaName: browser.storage.StorageName,
+      aChanges: API.storage.api.ChangeDict,
+      aAreaName: API.storage.api.StorageName,
   ) {
     if (aChanges.hasOwnProperty("log")) {
       this.setEnabled(aChanges.log.newValue);

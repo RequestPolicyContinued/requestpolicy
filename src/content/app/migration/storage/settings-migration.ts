@@ -35,7 +35,8 @@ export class SettingsMigration extends Module
 
   constructor(
       log: Common.ILog,
-      private storage: browser.storage.StorageArea,
+      // tslint:disable-next-line:max-line-length
+      private storageArea: browser.storage.StorageArea,  // badword-linter:allow:browser.storage:
       private pStorageMigrationToWE:
           Promise<StorageMigrationToWebExtension | null>,
   ) {
@@ -59,14 +60,14 @@ export class SettingsMigration extends Module
 
   private async performMergeActions(): Promise<void> {
     const pMerges = Promise.all([
-      new PrefetchSettingsMerger(this.log, this.storage).performAction(),
+      new PrefetchSettingsMerger(this.log, this.storageArea).performAction(),
     ]);
     pMerges.catch(this.log.onError("merge settings"));
     return pMerges as Promise<any>;
   }
 
   private performRemoveActions(): Promise<void> {
-    const pRemove = this.storage.remove([
+    const pRemove = this.storageArea.remove([
       // removed in 0.2.0:
       "temporarilyAllowedOrigins",
       "temporarilyAllowedDestinations",

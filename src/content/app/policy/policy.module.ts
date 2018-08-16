@@ -41,7 +41,9 @@ function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
-export class Policy extends Module {
+export class Policy extends Module implements App.IPolicy {
+  // protected get debugEnabled() { return true; }
+
   public userRulesetExistedOnStartup: boolean;
   private userRulesets: any = {};
 

@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { IConnection } from "lib/classes/connection";
 import { MaybePromise } from "lib/classes/maybe-promise";
@@ -49,10 +51,13 @@ export class StorageMigrationToWebExtension extends Module
   // FIXME: this is only necessary for testing -- bad style!
   private dWaitingForEWE = defer<void>();
 
+  private get storageArea() { return this.storageApi.local; }
+  private get onStorageChanged() { return this.storageApi.onChanged; }
+
   constructor(
       log: Common.ILog,
-      private storageArea: browser.storage.StorageArea,
-      private onStorageChanged: typeof browser.storage.onChanged,
+      // tslint:disable-next-line:max-line-length
+      private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
       private pConnectionToEWE: Promise<IConnection>,
   ) {
     super("app.migration.storage.xpcomToWE", log);
@@ -130,11 +135,11 @@ export class StorageMigrationToWebExtension extends Module
     }
   }
 
-  private getFullWebextStorage(): Promise<browser.storage.StorageObject> {
+  private getFullWebextStorage(): Promise<API.storage.api.StorageObject> {
     return this.connectionToEWE.sendMessage(
         this.createMessage("request", "full-storage")).then((response: any) => {
       this.assertSuccessful(response, "request:full-storage");
-      return response.value as browser.storage.StorageObject;
+      return response.value as API.storage.api.StorageObject;
     });
   }
 
@@ -164,13 +169,13 @@ export class StorageMigrationToWebExtension extends Module
       this.shouldSendFullStorage = false;
     });
     p.catch(this.log.onError(
-          "Error on sending the full storage to the embedded WebExtension:",
+        "Error on sending the full storage to the embedded WebExtension:",
     ));
     return p;
   }
 
   private storageChanged(
-      aStorageChanges: browser.storage.ChangeDict,
+      aStorageChanges: API.storage.api.ChangeDict,
   ): Promise<void> {
     this.debugLog.log("obtained storage change.");
     if (!this.isStorageReadyForAccess) {

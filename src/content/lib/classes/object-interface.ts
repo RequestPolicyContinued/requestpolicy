@@ -20,6 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { API } from "bootstrap/api/interfaces";
 import {createListenersMap} from "lib/utils/listener-factories";
 
 export interface IKeysObject {
@@ -76,7 +77,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
     if (typeof aKeys !== "object") {
       throw new Error("aKeys must be an object!");
     }
-    const storageChanges: browser.storage.ChangeDict = {};
+    const storageChanges: API.storage.api.ChangeDict = {};
     Object.keys(aKeys).forEach((key) => {
       const newValue = aKeys[key];
       this.setByKey(key, newValue);
@@ -90,7 +91,7 @@ export abstract class AbstractObjectInterface<TKeys extends IKeysObject> {
       aKeys = [aKeys];
     }
     const rv = this.removeByKeys(aKeys);
-    const changes: browser.storage.ChangeDict = {};
+    const changes: API.storage.api.ChangeDict = {};
     aKeys.forEach((key) => changes[key] = {});
     this.eventListenersMap.onChanged.emit(changes);
     if (rv && Object.keys(rv.errors).length === 0) return;

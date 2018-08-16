@@ -120,14 +120,14 @@ export class Storage extends Module {
     if (this.ignorePrefObserverChangesTemporarily) return;
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
-    const changes: browser.storage.ChangeDict = {
+    const changes: API.storage.api.ChangeDict = {
       [prefName]: newValue === undefined ? {} : {newValue},
     };
     this.debugLog.log(`emitting pref changes:`, changes);
     this.events.listenersMap.onChanged.emit(changes);
   }
 
-  private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
+  private onSlsaChanged(aChanges: API.storage.api.ChangeDict) {
     this.debugLog.log(`emitting pref changes:`, aChanges);
     this.events.listenersMap.onChanged.emit(aChanges);
   }

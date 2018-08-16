@@ -22,17 +22,36 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
 import {RawRuleset} from "./ruleset";
 
-export class RulesetStorage extends Module {
+export class RulesetStorage extends Module
+    implements App.policy.IRulesetStorage {
+  // protected get debugEnabled() { return true; }
+
+  // tslint:disable-next-line:max-line-length
+  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
+  private pStorageApiReady: Promise<void>;
+  private get storageArea() { return this.storageApi.local; }
+
+  protected get startupPreconditions() {
+    return [
+      this.pStorageApiReady,
+    ];
+  }
+
   constructor(
       log: Common.ILog,
-      private storageArea: browser.storage.StorageArea,
+      pStorageApi: API.storage.StorageApiPromise,
       private uriService: App.services.IUriService,
   ) {
-    super("RulesetStorage", log);
+    super("app.policy.rulesetStorage", log);
+
+    this.pStorageApiReady = pStorageApi.then((api) => {
+      this.storageApi = api;
+    });
   }
 
   public loadRawRulesetFromFile(

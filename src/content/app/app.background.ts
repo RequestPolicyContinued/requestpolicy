@@ -73,6 +73,7 @@ import { MessageListenerModule } from "lib/classes/message-listener-module";
 import { NormalRequest, RedirectRequest } from "lib/classes/request";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
+import { defer } from "lib/utils/js-utils";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { getDOMWindowUtils } from "lib/utils/window-utils";
 import { AppBackground } from "./app.background.module";
@@ -125,7 +126,10 @@ const outerWindowID: number | null = null; // contentscripts only
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
 
-const localStorageArea = browser.storage.local;
+const dStorageReadyForAccess = defer<void>();
+const pStorageApi = dStorageReadyForAccess.promise.then(
+    () => browser.storage,  // badword-linter:allow:browser.storage:
+);
 
 const {pEWEConnection, pWebextStorageMigration}: {
   pWebextStorageMigration:
@@ -151,8 +155,7 @@ const {pEWEConnection, pWebextStorageMigration}: {
     );
     const rvWebextStorageMigration = new StorageMigrationToWebExtension(
         log,
-        browser.storage.local,
-        browser.storage.onChanged,
+        browser.storage,  // badword-linter:allow:browser.storage:
         rvEWEConnection.whenReady.then(() => rvEWEConnection),
     );
     return {
@@ -181,10 +184,10 @@ const {pEWEConnection, pWebextStorageMigration}: {
 
 const settingsMigration = new SettingsMigration(
     log,
-    browser.storage.local,
+    browser.storage.local,  // badword-linter:allow:browser.storage:
     pWebextStorageMigration,
 );
-const storageReadyPromise = settingsMigration.whenReady;
+dStorageReadyForAccess.resolve(settingsMigration.whenReady);
 
 // helper fn
 function whenLegacy<T>(gen: () => T): T | null {
@@ -229,10 +232,10 @@ const uriService = new UriService(
     mozIDNService!,  // fixme
     mozIOService!,  // fixme
 );
-const rulesetStorage = new RulesetStorage(log, localStorageArea, uriService);
+const rulesetStorage = new RulesetStorage(log, pStorageApi, uriService);
 const subscriptions = new Subscriptions(
     log,
-    localStorageArea,
+    pStorageApi,
     rulesetStorage,
     uriService,
 );
@@ -253,17 +256,14 @@ const runtime = new Runtime(log, pEWEConnection, aboutUri, browser.runtime);
 const asyncSettings = new AsyncSettings(
     log,
     outerWindowID,
-    browser.storage,
-    browser.storage.local,
+    pStorageApi,
     SETTING_SPECS.defaultValues,
-    storageReadyPromise,
 );
 dAsyncSettings.resolve(asyncSettings);
 const cachedSettings = new CachedSettings(
     log,
     SETTING_SPECS,
-    storageReadyPromise,
-    browser.storage.local,
+    pStorageApi,
     LegacyApi.rpPrefBranch, /* FIXME */
 );
 const storage = new Storage(
@@ -271,7 +271,6 @@ const storage = new Storage(
     outerWindowID,
     asyncSettings,
     cachedSettings,
-    storageReadyPromise,
 );
 
 const browserSettings = new BrowserSettings(
@@ -504,7 +503,7 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       Cc,
       Ci,
       Cr,
-      browser.storage,
+      pStorageApi,
       menu,
       msgListener,
       redirectionNotifications,

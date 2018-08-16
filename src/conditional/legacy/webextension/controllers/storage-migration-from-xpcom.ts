@@ -32,7 +32,8 @@ const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
 
 type StorageMessageType = "full-storage" | "storage-changes" |
     "request:full-storage";
-type IStorageChanges = browser.storage.ChangeDict;
+// tslint:disable-next-line:max-line-length
+type IStorageChanges = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
 
 // =============================================================================
 
@@ -42,10 +43,13 @@ export class StorageMigrationFromXpcom extends Module {
   private lastStorageChange: string | null = null;
   private connectionToLegacy: IConnection;
 
+  private get storageArea() { return this.storageApi.local; }
+
   constructor(
       log: Common.ILog,
       private pConnectionToLegacy: Promise<IConnection>,
-      private storage: typeof browser.storage,
+      // tslint:disable-next-line:max-line-length
+      private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
   ) {
     super("ewe.storageMigrationFromXpcom", log);
 
@@ -60,7 +64,7 @@ export class StorageMigrationFromXpcom extends Module {
   }
 
   private startupSelfAsync() {
-    return this.storage.local.get(
+    return this.storageArea.get(
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange =
@@ -86,11 +90,11 @@ export class StorageMigrationFromXpcom extends Module {
   }
 
   private getFullStorage() {
-    return this.storage.local.get(null);
+    return this.storageArea.get(null);
   }
 
   private setFullStorage(aFullStorage: {[key: string]: any}) {
-    return this.storage.local.set(aFullStorage);
+    return this.storageArea.set(aFullStorage);
   }
 
   private applyStorageChanges(aStorageChanges: IStorageChanges) {
@@ -110,8 +114,8 @@ export class StorageMigrationFromXpcom extends Module {
     }
     const hasKeysToRemove = keysToRemove.length !== 0;
     const promises: Array<Promise<void>> = [];
-    if (hasKeysToRemove) promises.push(this.storage.local.remove(keysToRemove));
-    if (hasKeysToSet) promises.push(this.storage.local.set(keysToSet));
+    if (hasKeysToRemove) promises.push(this.storageArea.remove(keysToRemove));
+    if (hasKeysToSet) promises.push(this.storageArea.set(keysToSet));
     return Promise.all(promises).then(() => {
       this.debugLog.log("done applying storage changes.");
     });

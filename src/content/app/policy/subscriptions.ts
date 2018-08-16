@@ -22,7 +22,7 @@
  */
 
 import { App } from "app/interfaces";
-import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
 import { MaybePromise } from "lib/classes/maybe-promise";
@@ -69,15 +69,21 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
   private subscriptionRulesets: SubscriptionRulesets = {};
   private events = createListenersMap(["onRulesChanged"]);
 
+  // tslint:disable-next-line:max-line-length
+  private storageApi: typeof browser.storage;  // badword-linter:allow:browser.storage:
+  private pStorageApiReady: Promise<void>;
+  private get storageArea() { return this.storageApi.local; }
+
   protected get startupPreconditions() {
     return [
       this.rulesetStorage.whenReady,
+      this.pStorageApiReady,
     ];
   }
 
   constructor(
       log: Common.ILog,
-      private storageArea: browser.storage.StorageArea,
+      pStorageApi: API.storage.StorageApiPromise,
 
       private readonly rulesetStorage: App.policy.IRulesetStorage,
       private readonly uriService: App.services.IUriService,
@@ -85,6 +91,10 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
     super("rules", log);
 
     this.onRulesChanged = this.events.interfaces.onRulesChanged;
+
+    this.pStorageApiReady = pStorageApi.then((api) => {
+      this.storageApi = api;
+    });
   }
 
   public getRulesets() {
@@ -309,7 +319,7 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
   }
 
   public save() {
-    browser.storage.local.set({
+    this.storageArea.set({
       subscriptions: this.subscriptions.data as any, // FIXME (as any)
     }).catch((e) => {
       this.log.error("UserSubscriptions.save():", e);

@@ -229,11 +229,11 @@ export abstract class Module implements IModule {
       pPrecond = MaybePromise.resolve(undefined);
     }
     return pPrecond.then(() => {
-      this.debugLog.log(`starting up self and submodules...`);
-      return MaybePromise.all([
-        this.runSubmoduleFns("startup"),
-        this.runSelfFn("startup"),
-      ]);
+      this.debugLog.log(`starting up submodules...`);
+      return this.runSubmoduleFns("startup");
+    }).then(() => {
+      this.debugLog.log(`starting up self...`);
+      return this.runSelfFn("startup");
     }).then(() => {
       this.debugLog.log("done starting up self and submodules");
     });

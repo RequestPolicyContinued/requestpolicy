@@ -136,7 +136,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
         this.requestLog!.addAllowedRequest(originUri, destUri);
       }
     } else {
-      this.updateNotificationDueToBlockedContent();
+      this.updateBlockedContentStateAfterTimeout();
       if (this.requestLog) {
         this.requestLog!.addBlockedRequest(originUri, destUri);
       }
@@ -278,13 +278,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       // this slow down the loading of the page, which is noticable
       // especially with CSS loading delays (it's not unlikely that slow
       // webservers have a hand in this, too).
-      // Note that the change to updateBlockedContentStateAfterTimeout seems to
-      // have added a bug where opening a blank tab and then quickly switching
-      // back to the original tab can cause the original tab's blocked content
-      // notification to be cleared. A simple compensation was to decrease
-      // the timeout from 1000ms to 250ms, making it much less likely the tab
-      // switch can be done in time for a blank opened tab. This isn't a real
-      // solution, though.
       this.updateBlockedContentStateAfterTimeout();
     });
 
@@ -294,9 +287,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       // content notification if there no longer blocked content. Another way
       // to solve this would be to observe allowed requests as well as blocked
       // requests.
-      // blockedContentCheckLastTime = (new Date()).getTime();
-      this.stopBlockedContentCheckTimeout();
-      this.updateBlockedContentState(message.target);
+      const browser = message.target as XUL.browser;
+      if (browser === this.gBrowser.selectedBrowser) {
+        this.updateBlockedContentState();
+      }
     });
 
     this.msgListener.addListener("handleMetaRefreshes", (message) => {
@@ -504,8 +498,10 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
    * Checks if the document has blocked content and shows appropriate
    * notifications.
    */
-  private updateBlockedContentState(browser: XUL.browser) {
+  private updateBlockedContentState() {
+    this.stopBlockedContentCheckTimeout();
     try {
+      const browser = this.gBrowser.selectedBrowser;
       if (!browser.currentURI) {
         this.setContentBlockedState(false);
         return;
@@ -583,25 +579,16 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   // TODO: observeBlockedFormSubmissionRedirect
 
-  private updateNotificationDueToBlockedContent() {
-    if (!this.blockedContentCheckTimeoutId) {
-      this.updateBlockedContentStateAfterTimeout();
-    }
-  }
-
   private updateBlockedContentStateAfterTimeout() {
-    const browser = this.gBrowser.selectedBrowser;
+    if (this.blockedContentCheckTimeoutId) return;
+
     this.blockedContentCheckTimeoutId = this.setTimeout(() => {
-      try {
-        this.updateBlockedContentState(browser);
-      } catch (e) {
-        // It's possible that the add-on has been disabled
-        // in the meantime.
-      }
+      this.updateBlockedContentState();
     }, this.blockedContentStateUpdateDelay);
   }
 
   private stopBlockedContentCheckTimeout() {
+    // FIXME: there might be multiple (overlapping) timeouts
     if (this.blockedContentCheckTimeoutId) {
       this.window.clearTimeout(this.blockedContentCheckTimeoutId);
       this.blockedContentCheckTimeoutId = null;
@@ -723,10 +710,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     this.locationListener = {
       onLocationChange: (aProgress, aRequest, aURI) => {
         // This gets called both for tab changes and for history navigation.
-        // The timer is running on the main window, not the document's window,
-        // so we want to stop the timer when the tab is changed.
-        this.stopBlockedContentCheckTimeout();
-        this.updateBlockedContentState(this.gBrowser.selectedBrowser);
+        this.updateBlockedContentState();
       },
 
       // tslint:disable-next-line:object-literal-sort-keys

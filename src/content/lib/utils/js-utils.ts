@@ -20,6 +20,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+interface IObject<T> { [key: string]: T; }
+
 export function arrayIncludes<T = any>(array: T[], searchElement: T) {
   // tslint:disable-next-line prefer-const
   for (let element of array) {
@@ -120,8 +122,8 @@ export function leftRotateArray<T = any>(array: T[], n: number): T[] {
 }
 
 // Object.values() polyfill
-export function objectEntries<T = any>(
-    obj: {[k: string]: T},
+export function objectEntries<T>(
+    obj: IObject<T>,
 ): Array<[string, T]> {
   const keys = Object.keys(obj);
   let i = keys.length;
@@ -131,11 +133,11 @@ export function objectEntries<T = any>(
 }
 
 // Object.values() polyfill
-export function objectValues(obj: any): any[] {
+export function objectValues<T>(obj: IObject<T>): T[] {
   const keys = Object.keys(obj);
   let i = keys.length;
-  const resArray = new Array(i);
-  while (i--) resArray[i] = keys[i];
+  const resArray: T[] = new Array(i);
+  while (i--) resArray[i] = obj[keys[i]];
   return resArray;
 }
 

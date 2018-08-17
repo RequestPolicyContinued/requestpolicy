@@ -31,6 +31,6 @@ export class ServicesApi extends Module {
       public fileService: API.services.IFileService,
       public xulService: API.services.IXulService,
   ) {
-    super("browser.services", log);
+    super("API.services", log);
   }
 }

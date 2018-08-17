@@ -25,7 +25,7 @@ import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-export class Manifest extends Module {
+export class Manifest extends Module implements API.IManifest {
   public data: any;
 
   constructor(

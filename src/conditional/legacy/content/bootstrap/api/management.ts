@@ -52,7 +52,7 @@ export class Management extends Module implements API.management.IManagement {
       log: Common.ILog,
       private addonManager: JSMs.AddonManager,
   ) {
-    super("browser.management", log);
+    super("API.management", log);
   }
 
   public get backgroundApi() {
@@ -78,8 +78,7 @@ export class Management extends Module implements API.management.IManagement {
             reject();
           }
         } catch (e) {
-          console.error("browser.management.get()");
-          console.dir(e);
+          this.log.error("get() failed:", e);
           reject(e);
         }
       });

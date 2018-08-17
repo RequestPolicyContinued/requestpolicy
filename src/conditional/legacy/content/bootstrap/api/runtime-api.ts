@@ -36,7 +36,7 @@ export class RuntimeApi extends Module {
       log: Common.ILog,
       private mozAppinfo: JSMs.Services["appinfo"],
   ) {
-    super("browser.runtime", log);
+    super("API.runtime", log);
   }
 
   get backgroundApi() {

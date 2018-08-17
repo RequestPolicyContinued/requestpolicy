@@ -34,7 +34,7 @@ export class I18n extends Module implements API.i18n.II18n {
       log: Common.ILog,
       protected localeData: API.i18n.IAsyncLocaleData,
   ) {
-    super("browser.i18n", log);
+    super("API.i18n", log);
   }
 
   protected get subModules() {

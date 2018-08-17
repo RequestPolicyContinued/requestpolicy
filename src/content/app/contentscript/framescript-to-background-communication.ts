@@ -50,6 +50,8 @@ type Runnable = () => void;
 // =============================================================================
 
 export class FramescriptToBackgroundCommunication extends Module {
+  protected get debugEnabled() { return C.LOG_BG_CONTENT_BOUNDARIES; }
+
   /**
    * A queue of runnables that wait for the overlay to be ready.
    * As it's a queue, the functions `pop` and `shift` have to be
@@ -139,12 +141,12 @@ export class FramescriptToBackgroundCommunication extends Module {
    */
   private startCommunication() {
     if (this.state === States.WAITING) {
-      // this.log.log("The Background is ready!");
+      this.debugLog.log("The Background is ready!");
       this.state = States.RUNNING;
 
       while (this.waitingRunnables.length > 0) {
         const runnable = this.waitingRunnables.shift()!;
-        // this.log.log("Lazily running function.");
+        this.debugLog.log("Lazily running function.");
         runnable.call(null);
       }
 

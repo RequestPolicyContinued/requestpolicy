@@ -43,7 +43,7 @@ const {LOG_FLAG_STATE} = C;
 declare const XPCOMUtils: JSMs.XPCOMUtils;
 
 export class Overlay extends Module implements App.windows.window.IOverlay {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_BG_CONTENT_BOUNDARIES; }
 
   // This is set by the request log when it is initialized.
   // We don't need to worry about setting it here.
@@ -345,11 +345,16 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     // listener must be added immediately.
     this.msgListener.addListener(
         "isOverlayReady",
-        () => true,
+        () => {
+          this.debugLog.log("confirming: the overlay is ready.");
+          return true;
+        },
         () => false,
     );
+    this.debugLog.log("sending 'overlay is ready' message.");
     this.window.messageManager.broadcastAsyncMessage(
-        `${C.MM_PREFIX}overlayIsReady`, true,
+        `${C.MM_PREFIX}overlayIsReady`,
+        true,
     );
 
     return MaybePromise.all(promises) as MaybePromise<any>;

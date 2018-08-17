@@ -129,3 +129,9 @@ export function getElementsByIdOnLoad(
   aWindow.addEventListener("load", callback);
   return scope;
 }
+
+export function getWindowtype(
+    aChromeWindow: XPCOM.nsIDOMWindow,
+): string | null {
+  return aChromeWindow.document.documentElement.getAttribute("windowtype");
+}

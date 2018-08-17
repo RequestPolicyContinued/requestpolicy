@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { promiseObserverTopic } from "legacy/lib/utils/xpcom-utils";
 import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
@@ -37,12 +38,13 @@ import { createListenersMap } from "lib/utils/listener-factories";
 import {
   getDOMWindowFromXULWindow,
   getTabBrowser,
+  getWindowtype,
 } from "lib/utils/window-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
 
 export class WindowService extends Module
     implements App.services.IWindowService {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_BG_CONTENT_BOUNDARIES; }
 
   public readonly pWindowsAvailable = this.areWindowsAvailable() ?
       Promise.resolve() : this.promiseSessionstoreWindowsRestored();
@@ -234,17 +236,29 @@ export class WindowService extends Module
   }
 
   private onProgressEvent(event: ProgressEvent) {
-    const window = event.target as XUL.chromeWindow;
+    this.debugLog.log(`obtaining progress event...`);
+
+    const document = event.target as XUL.chromeDocument;
+
+    // `document.defaultView` is the exact same object as returned by
+    // `getDOMWindowFromXULWindow(xulWindow: XPCOM.nsIXULWindow)`
+    // in `XPCOM.nsIWindowMediatorListener.onOpenWindow()`.
+    const domWindow = document.defaultView as XPCOM.nsIDOMWindow /* !! */;
 
     if (event.type in ["load", "unload"]) {
-      window.removeEventListener(
+      domWindow.removeEventListener(
           event.type,
           this.boundMethods.get(this.onProgressEvent),
           false,
       );
     }
 
-    if (window.windowtype !== "navigator:browser") return;
+    const windowtype = getWindowtype(domWindow);
+
+    if (windowtype !== "navigator:browser") {
+      this.debugLog.log(`ignoring window with type "${windowtype}"`);
+      return;
+    }
 
     switch (event.type) {
       case "load":
@@ -261,7 +275,7 @@ export class WindowService extends Module
             `#listeners=${ this.events.listenersMap.onWindowUnloaded.size }`,
         );
         this.events.listenersMap.onWindowUnloaded.emit(event);
-        this.windows.delete(window);
+        this.windows.delete(domWindow);
         break;
 
       default:

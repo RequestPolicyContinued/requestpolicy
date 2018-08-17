@@ -23,12 +23,13 @@
 import { App } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class Windows extends Module implements App.IWindows {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_BG_CONTENT_BOUNDARIES; }
 
   private boundMethods = new BoundMethods(this);
 

@@ -160,6 +160,7 @@ export class WindowService extends Module
       if (tabBrowser === null) {
         if (n-- === 0) {
           this.log.error(`window has no tabBrowser`);
+          d.reject(undefined);
           return;
         }
         this.setTimeout(step, 10);

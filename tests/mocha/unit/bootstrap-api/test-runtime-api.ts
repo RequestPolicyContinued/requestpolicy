@@ -19,7 +19,7 @@ import {Services as MockServices} from "./lib/mock-services";
 import {Components as MockComponents} from "./lib/mock-components";
 import { RuntimeApi } from "bootstrap/api/runtime-api";
 
-describe("browser.runtime", function() {
+describe("API.runtime", function() {
   let backgroundRuntime: RuntimeApi["backgroundApi"];
 
   before(function() {

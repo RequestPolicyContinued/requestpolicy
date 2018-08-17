@@ -55,12 +55,12 @@ export class ManagerForDOMContentLoaded extends Module {
 
   private documents: Map<Document, IDocumentInfo> = new Map();
 
-  protected get dependencies(): Module[] {
-    return [
-      this.bgCommunication,
-      this.blockedContent,
-      this.uriServices,
-    ];
+  protected get dependencies() {
+    return {
+      bgCommunication: this.bgCommunication,
+      blockedContent: this.blockedContent,
+      uriServices: this.uriServices,
+    };
   }
 
   constructor(

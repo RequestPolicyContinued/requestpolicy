@@ -37,10 +37,10 @@ export interface IClassicmenuRuleSpec {
 // tslint:disable:member-ordering
 
 export class ClassicMenu extends Module {
-  protected get dependencies(): Module[] {
-    return [
-      this.policy,
-    ];
+  protected get dependencies() {
+    return {
+      policy: this.policy,
+    };
   }
 
   constructor(

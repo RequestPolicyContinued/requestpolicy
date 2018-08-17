@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { App, IObject } from "app/interfaces";
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { IListenInterface } from "lib/classes/listeners";
@@ -32,7 +32,6 @@ import {createListenersMap} from "lib/utils/listener-factories";
 import { RawRuleset } from "./ruleset";
 import {
   DEFAULT_SUBSCRIPTION_LIST_URL_BASE,
-  IObject,
   ISubsObject,
   Serial,
   Subscription,
@@ -71,11 +70,11 @@ export class Subscriptions extends Module implements App.policy.ISubscriptions {
 
   private get storageArea() { return this.storageApi.local; }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.rulesetStorage,
-      this.storageApi,
-    ];
+  protected get dependencies() {
+    return {
+      rulesetStorage: this.rulesetStorage,
+      storageApi: this.storageApi,
+    };
   }
 
   constructor(

@@ -113,17 +113,18 @@ export class RequestProcessor extends Module {
     };
   }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.rpPolicy,
-      this.httpChannelService,
-      this.requestService,
-      this.uriService,
-      this.cachedSettings,
-      this.requestMemory,
-      this.mm,
-      this.windowModuleMap,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      httpChannelService: this.httpChannelService,
+      mm: this.mm,
+      redirectionService: this.redirectionService,
+      requestMemory: this.requestMemory,
+      requestService: this.requestService,
+      rpPolicy: this.rpPolicy,
+      uriService: this.uriService,
+      windowModuleMap: this.windowModuleMap,
+    };
   }
 
   constructor(
@@ -131,14 +132,15 @@ export class RequestProcessor extends Module {
       private readonly ci: XPCOM.nsXPCComponents_Interfaces,
       private readonly cr: XPCOM.nsXPCComponents_Results,
       private readonly observerService: XPCOM.nsIObserverService | null,
-      private readonly rpPolicy: App.IPolicy,
-      private readonly httpChannelService: App.services.IHttpChannelService,
-      private readonly redirectionService: App.services.IRedirectionService,
-      private readonly requestService: App.services.IRequestService,
-      private readonly uriService: App.services.IUriService,
+
       private readonly cachedSettings: App.storage.ICachedSettings,
-      private readonly requestMemory: App.webRequest.IRequestMemory,
+      private readonly httpChannelService: App.services.IHttpChannelService,
       private readonly mm: App.webRequest.IMetadataMemory,
+      private readonly redirectionService: App.services.IRedirectionService,
+      private readonly requestMemory: App.webRequest.IRequestMemory,
+      private readonly requestService: App.services.IRequestService,
+      private readonly rpPolicy: App.IPolicy,
+      private readonly uriService: App.services.IUriService,
       private readonly windowModuleMap: App.windows.IWindowModuleMap,
   ) {
     super("webRequest.requestProcessor", parentLog);

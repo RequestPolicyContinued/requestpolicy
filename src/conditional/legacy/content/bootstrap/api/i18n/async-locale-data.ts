@@ -21,31 +21,36 @@
  */
 
 import { API, JSMs } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
 import {
   getBestAvailableLocale,
   normalizeToBCP47,
 } from "legacy/lib/utils/i18n-utils";
 import { MaybePromise } from "lib/classes/maybe-promise";
-import { IModule } from "lib/classes/module";
-import {defer} from "lib/utils/js-utils";
+import { Module } from "lib/classes/module";
 import {LocaleData} from "./locale-data";
 
 /**
  * This object manages loading locales for i18n support.
  */
-export class AsyncLocaleData extends LocaleData implements IModule {
-  private dReady = defer();
+export class AsyncLocaleData extends Module
+    implements API.i18n.IAsyncLocaleData {
+  // tslint:disable-next-line:variable-name
+  public _data = new LocaleData();
+
+  public readonly serialize = this._data.serialize.bind(this._data);
+  public readonly has = this._data.has.bind(this._data);
+  public readonly localizeMessage = this._data.localizeMessage.bind(this._data);
+  public readonly localize = this._data.localize.bind(this._data);
+  public readonly addLocale = this._data.addLocale.bind(this._data);
 
   constructor(
+      parentLog: Common.ILog,
       private tryCatchUtils: API.ITryCatchUtils,
       private chromeFileService: API.services.IChromeFileService,
       private mozServices: JSMs.Services,
   ) {
-    super();
-  }
-
-  public get whenReady() {
-    return this.dReady.promise;
+    super(`API.i18n.asyncLocaleData`, parentLog);
   }
 
   /**
@@ -167,8 +172,8 @@ export class AsyncLocaleData extends LocaleData implements IModule {
     const normDefault = normalizeToBCP47(defaultLocale);
     const normUi = normalizeToBCP47(uiLocale);
 
-    const loadedTags = Array.from(this.messages.keys()).
-        filter((tag) => tag.toLowerCase() !== this.BUILTIN.toLowerCase()).
+    const loadedTags = Array.from(this._data.messages.keys()).
+        filter((tag) => tag.toLowerCase() !== this._data.BUILTIN.toLowerCase()).
         map((tag) => normalizeToBCP47(tag));
 
     const bestDefault =
@@ -184,8 +189,8 @@ export class AsyncLocaleData extends LocaleData implements IModule {
       // doesn't matter which value we set because defaultLocale will be used
       bestUi = normUi;
     }
-    this.defaultLocale = bestDefault;
-    this.selectedLocale = bestUi;
+    this._data.defaultLocale = bestDefault;
+    this._data.selectedLocale = bestUi;
 
     return {
       default: bestDefault,
@@ -193,7 +198,7 @@ export class AsyncLocaleData extends LocaleData implements IModule {
     };
   }
 
-  public startup() {
+  protected startupSelf() {
     let defaultLocale: string;
     let uiLocale: string;
 
@@ -208,18 +213,13 @@ export class AsyncLocaleData extends LocaleData implements IModule {
         then((bestMatches) => this.loadLocalesMessages(bestMatches)).
         then((localesMessages) => Promise.all(
             localesMessages.map(
-                (obj) => this.addLocale(obj.locale, obj.messages),
+                (obj) => this._data.addLocale(obj.locale, obj.messages),
             ),
         )).then(() => this.updateLocalesPrefs(defaultLocale, uiLocale)).
         then(() => {
-          this.dReady.resolve(undefined);
           return;
         });
-    p.catch((e) => {
-      console.error("LazyLocaleData.startup()");
-      console.dir(e);
-      this.dReady.reject(e);
-    });
+    p.catch(this.log.onError("LazyLocaleData.startup()"));
     return MaybePromise.resolve(p);
   }
 }

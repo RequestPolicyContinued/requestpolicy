@@ -48,11 +48,11 @@ export class ContentscriptMisc extends Module {
     };
   }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.bgCommunication,
-      this.msgListener,
-    ];
+  protected get dependencies() {
+    return {
+      bgCommunication: this.bgCommunication,
+      msgListener: this.msgListener,
+    };
   }
 
   constructor(

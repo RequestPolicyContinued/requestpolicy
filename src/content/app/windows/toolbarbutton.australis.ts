@@ -34,10 +34,10 @@ import { TOOLBARBUTTON_ATTRIBUTES } from "ui/xul-trees";
 export class AustralisToolbarButton extends Module {
   private isAustralis = this.miscInfos.isAustralis;
 
-  protected get dependencies(): Module[] {
-    return [
-      this.windowModuleMap,
-    ];
+  protected get dependencies() {
+    return {
+      windowModuleMap: this.windowModuleMap,
+    };
   }
 
   constructor(

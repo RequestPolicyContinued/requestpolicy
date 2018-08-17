@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { Module } from "lib/classes/module";
 
 // tslint:disable-next-line:max-line-length
@@ -30,17 +31,17 @@ type StorageArea = browser.storage.StorageArea;  // badword-linter:allow:browser
 
 export class StorageApiWrapper extends Module
     implements App.storage.IStorageApiWrapper {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
 
   public readonly local: StorageArea = Object.assign(
       Object.create(this.api.local),
       { set: this._set.bind(this) },
   );
 
-  protected get startupPreconditions() {
-    return [
-      this.pStorageReadyForAccess,
-    ];
+  protected get dependencies() {
+    return {
+      storageAvailabilityController: this.storageAvailabilityController,
+    };
   }
 
   constructor(
@@ -48,7 +49,8 @@ export class StorageApiWrapper extends Module
       log: Common.ILog,
       // tslint:disable-next-line:max-line-length
       private readonly api: typeof browser.storage,  // badword-linter:allow:browser.storage:
-      private readonly pStorageReadyForAccess: Promise<void>,
+      private readonly storageAvailabilityController:
+          App.storage.IStorageAvailabilityController,
   ) {
     super(
         outerWindowID === null ? "app" : `AppContent[${outerWindowID}]` +
@@ -62,7 +64,10 @@ export class StorageApiWrapper extends Module
 
   private _set(keys: API.storage.api.StorageObject) {
     keys.lastStorageChange = new Date().toISOString();
-    if (this.debugEnabled) this.debugLog.dir(keys);
+    this.debugLog.dir(
+        "storageArea.set() has been called. StorageObject:",
+        keys,
+    );
     return this.api.local.set(keys);
   }
 }

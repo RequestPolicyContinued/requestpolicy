@@ -41,11 +41,11 @@ export class RequestMemory extends Module
   private readonly eventListenersMap: {[key: string]: Listeners};
   public get onRequest() { return this.eventTargets.onRequest; }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.requestSetService,
-      this.uriService,
-    ];
+  protected get dependencies() {
+    return {
+      requestSetService: this.requestSetService,
+      uriService: this.uriService,
+    };
   }
 
   constructor(

@@ -32,11 +32,11 @@ export class Windows extends Module implements App.IWindows {
 
   private boundMethods = new BoundMethods(this);
 
-  protected get dependencies(): Module[] {
-    return [
-      this.cachedSettings,
-      this.windowService,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      windowService: this.windowService,
+    };
   }
 
   protected get subModules() {
@@ -63,7 +63,7 @@ export class Windows extends Module implements App.IWindows {
 
   protected startupSelf() {
     const promises = this.windowService.
-        forEachOpenWindow<Windows, MaybePromise<void>>(
+        forEachOpenWindow<Windows, Promise<void>>(
             this.boundMethods.get(this.loadIntoWindow),
         );
     this.windowService.onWindowLoaded.addListener(
@@ -86,7 +86,7 @@ export class Windows extends Module implements App.IWindows {
   private onWindowLoaded(event: ProgressEvent): void {
     const doc = event.target as XUL.chromeDocument;
     const win = doc.defaultView as XUL.chromeWindow;
-    this.loadIntoWindow(win);
+    this.loadIntoWindow(win).catch(this.log.onError("loadIntoWindow()"));
   }
 
   private onWindowUnloaded(event: ProgressEvent): void {
@@ -95,7 +95,7 @@ export class Windows extends Module implements App.IWindows {
     this.unloadFromWindow(win);
   }
 
-  private loadIntoWindow(window: XUL.chromeWindow): MaybePromise<void> {
+  private loadIntoWindow(window: XUL.chromeWindow): Promise<void> {
     const windowID = this.windowModules.getWindowId(window);
     this.debugLog.log(`loadIntoWindow(), windowID=${windowID}`);
     if (this.windowModules._map.has(windowID)) {

@@ -21,6 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IObject } from "app/interfaces";
 import { IRuleSpecs } from "./ruleset";
 
 // declare const Cc: any;
@@ -57,10 +58,6 @@ export const {
 // =============================================================================
 // types
 // =============================================================================
-
-export interface IObject<T> {
-  [k: string]: T;
-}
 
 // see also RawRuleset's IMetadata
 interface ISubscriptionMetadata {

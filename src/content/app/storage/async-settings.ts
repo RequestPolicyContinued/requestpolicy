@@ -35,10 +35,10 @@ type IDefaultSettings = IObject<tSettingValue>;
 
 export class AsyncSettings extends Module
     implements App.storage.IAsyncSettings {
-  protected get dependencies(): Module[] {
-    return [
-      this.storageApi,
-    ];
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
   }
 
   private changeEventListener = this.onChangedEvent.bind(this);

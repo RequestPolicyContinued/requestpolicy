@@ -20,13 +20,18 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { App, IObject } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { Module } from "lib/classes/module";
+import { C } from "data/constants";
+import { IModule, Module } from "lib/classes/module";
 
-export class StorageMigration extends Module
-    implements App.migration.IStorageMigration {
-  // protected get debugEnabled() { return true; }
+export class StorageAvailabilityController extends Module
+    implements App.storage.IStorageAvailabilityController {
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
+
+  private gotStorageMigrationToWE: Promise<void>;
+  private storageMigrationToWE:
+      App.migration.storage.IStorageMigrationToWebExtension | null;
 
   protected get startupPreconditions() {
     return {
@@ -34,40 +39,34 @@ export class StorageMigration extends Module
     };
   }
 
-  private gotStorageMigrationToWE: Promise<void>;
-  private storageMigrationToWE:
-      App.migration.storage.IStorageMigrationToWebExtension | null;
-
   constructor(
       log: Common.ILog,
-      public readonly settingsMigration:
-          App.migration.storage.ISettingsMigration,
-      public readonly v0Rules: App.migration.storage.IV0RulesMigration | null,
+      protected readonly outerWindowID: number | null,
+      private readonly settingsMigration:
+          App.migration.storage.ISettingsMigration | null,
       pStorageMigrationToWE:
           Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,
   ) {
-    super("app.migration.storage", log);
+    super(
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
+        `.storage`,
+        log,
+    );
 
     this.gotStorageMigrationToWE = pStorageMigrationToWE.then((m) => {
-      if (this.debugEnabled) {
-        if (m === null) {
-          this.debugLog.log(`"IStorageMigrationToWebExtension" n/a`);
-        } else {
-          this.debugLog.log(`got "IStorageMigrationToWebExtension"`);
-        }
-      }
       this.storageMigrationToWE = m;
     });
   }
 
-  protected get subModules() {
-    const rv: {[k: string]: IModule} = {
-      settingsMigration: this.settingsMigration,
-    };
-    if (this.storageMigrationToWE) {
-      rv.storageMigrationToWE = this.storageMigrationToWE;
-    }
-    if (this.v0Rules) { rv.v0Rules = this.v0Rules; }
-    return rv;
+  protected get dependencies() {
+    return Object.assign(
+        {} as IObject<IModule>,
+        this.storageMigrationToWE ? {
+          storageMigrationToWE: this.storageMigrationToWE,
+        } : {},
+        this.settingsMigration ? {
+          settingsMigration: this.settingsMigration,
+        } : {},
+    );
   }
 }

@@ -28,7 +28,6 @@ import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
 import { HttpChannelWrapper } from "lib/classes/http-channel-wrapper";
-import { Module } from "lib/classes/module";
 import { NonDI } from "non-di-interfaces";
 
 export class RPChannelEventSink extends XpcomClassFactoryModule {
@@ -48,10 +47,10 @@ export class RPChannelEventSink extends XpcomClassFactoryModule {
   // FIXME: suspend all redirects before this module is ready
   private forcedReturnValue: number | null = this.CES_ACCEPT;
 
-  protected get dependencies(): Module[] {
-    return [
-      this.requestProcessor,
-    ];
+  protected get dependencies() {
+    return {
+      requestProcessor: this.requestProcessor,
+    };
   }
 
   constructor(

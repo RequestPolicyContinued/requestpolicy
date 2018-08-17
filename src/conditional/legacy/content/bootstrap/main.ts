@@ -63,7 +63,10 @@ const xpconnectService = new XPConnectService();
 const fileService = new FileService(xpconnectService, mozFileUtils);
 const chromeFileService = new ChromeFileService(mozNetUtil, mozHttp);
 const localeData = new AsyncLocaleData(
-    tryCatchUtils, chromeFileService, mozServices,
+    log,
+    tryCatchUtils,
+    chromeFileService,
+    mozServices,
 );
 const i18n = new I18n(log, localeData);
 const xulService = new XulService(i18n);

@@ -21,6 +21,7 @@
  */
 
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { IConnection } from "lib/classes/connection";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -38,7 +39,7 @@ type IStorageChanges = browser.storage.ChangeDict;  // badword-linter:allow:brow
 // =============================================================================
 
 export class StorageMigrationFromXpcom extends Module {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
 
   private lastStorageChange: string | null = null;
   private connectionToLegacy: IConnection;

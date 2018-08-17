@@ -84,19 +84,19 @@ const WHITELISTED_DESTINATION_JAR_PATH_STARTS = [
 ];
 
 export class RequestService extends Module {
-  protected get dependencies(): Module[] {
-    return [
-      this.httpChannelService,
-      this.uriService,
-      this.cachedSettings,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      httpChannelService: this.httpChannelService,
+      uriService: this.uriService,
+    };
   }
 
   constructor(
       log: Common.ILog,
+      private cachedSettings: App.storage.ICachedSettings,
       private httpChannelService: App.services.IHttpChannelService,
       private uriService: App.services.IUriService,
-      private cachedSettings: App.storage.ICachedSettings,
   ) {
     super("app.services.request", log);
   }

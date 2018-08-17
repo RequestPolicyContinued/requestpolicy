@@ -29,11 +29,11 @@ import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 export class InitialSetup extends Module implements App.ui.IInitialSetup {
-  protected get dependencies(): Module[] {
-    return [
-      this.cachedSettings,
-      this.versionInfo,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      versionInfo: this.versionInfo,
+    };
   }
 
   private onNotificationsTabOpenedListener =

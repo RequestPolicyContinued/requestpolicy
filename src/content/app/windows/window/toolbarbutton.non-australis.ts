@@ -39,10 +39,10 @@ export class NonAustralisToolbarButton extends Module {
 
   private isAustralis = this.miscInfos.isAustralis;
 
-  protected get dependencies(): Module[] {
-    return [
-      this.xulTrees,
-    ];
+  protected get dependencies() {
+    return {
+      xulTrees: this.xulTrees,
+    };
   }
 
   constructor(

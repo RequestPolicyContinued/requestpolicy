@@ -27,7 +27,6 @@ import { Common } from "common/interfaces";
 import {
   XpcomClassFactoryModule,
 } from "legacy/lib/classes/xpcom-class-factory-module";
-import { Module } from "lib/classes/module";
 import { NonDI } from "non-di-interfaces";
 
 export class RPContentPolicy extends XpcomClassFactoryModule {
@@ -43,10 +42,10 @@ export class RPContentPolicy extends XpcomClassFactoryModule {
   // FIXME: suspend all requests before this module is ready
   private forcedReturnValue: number | null = this.CP_OK;
 
-  protected get dependencies(): Module[] {
-    return [
-      this.requestProcessor,
-    ];
+  protected get dependencies() {
+    return {
+      requestProcessor: this.requestProcessor,
+    };
   }
 
   constructor(

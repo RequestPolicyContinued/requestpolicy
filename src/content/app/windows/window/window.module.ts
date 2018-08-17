@@ -43,9 +43,11 @@ export class WindowModule extends Module implements App.windows.IWindowModule {
   }
 
   protected get startupPreconditions() {
-    return [
-      this.windowService.promiseTabBrowser(this.window), // FIXME !!
-    ] as Array<Promise<any>>;
+    return {
+      // FIXME
+      pTabBrowser: this.windowService.
+          promiseTabBrowser(this.window) as Promise<any>,
+    };
   }
 
   constructor(

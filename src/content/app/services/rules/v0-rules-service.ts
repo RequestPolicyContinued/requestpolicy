@@ -55,10 +55,10 @@ function splitString(aRulesString: string = ""): Set<string> {
 export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
 
-  protected get dependencies(): Module[] {
-    return [
-      this.uriService,
-    ];
+  protected get dependencies() {
+    return {
+      uriService: this.uriService,
+    };
   }
 
   constructor(

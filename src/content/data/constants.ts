@@ -31,6 +31,7 @@ export const C = {
   LOG_GETTING_SAVED_REQUESTS: env`/* @echo LOG_GETTING_SAVED_REQUESTS */`,
   LOG_MESSAGE_LISTENERS: env`/* @echo LOG_MESSAGE_LISTENERS */`,
   LOG_REQUESTS: env`/* @echo LOG_REQUESTS */`,
+  LOG_STORAGE_MIGRATION: env`/* @echo LOG_STORAGE_MIGRATION */`,
 
   // tslint:disable-next-line:object-literal-sort-keys
   AMO: env`/* @echo AMO */`,

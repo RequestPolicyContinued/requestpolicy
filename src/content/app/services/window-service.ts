@@ -78,16 +78,16 @@ export class WindowService extends Module
     ) => undefined,
   };
 
-  protected get dependencies(): Module[] {
-    return [
-      this.uriService,
-    ];
+  protected get dependencies() {
+    return {
+      uriService: this.uriService,
+    };
   }
 
   protected get startupPreconditions() {
-    return [
-      this.pWindowsAvailable,
-    ];
+    return {
+      pWindowsAvailable: this.pWindowsAvailable,
+    };
   }
 
   constructor(

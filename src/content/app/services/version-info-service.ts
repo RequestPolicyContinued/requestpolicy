@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App, IVersionComparator } from "app/interfaces";
+import { App, IObject, IVersionComparator } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -72,10 +72,10 @@ export class VersionInfoService extends Module {
     super("app.services.versionInfo", log);
   }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.cachedSettings,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+    };
   }
 
   protected startupSelf() {
@@ -138,7 +138,9 @@ export class VersionInfoService extends Module {
     // store last*Version
     // -------------------------------------------------------------------------
 
-    const p = Promise.all(objectValues(promises)).then(() => {
+    const p = Promise.all(
+        objectValues(promises as IObject<Promise<any>>),
+    ).then(() => {
       this.infos = infos as IInfos;
       const {curAppVersion, curRPVersion} = infos;
       return this.cachedSettings.set({

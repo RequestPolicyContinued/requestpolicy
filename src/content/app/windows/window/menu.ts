@@ -120,33 +120,31 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.privateBrowsingService,
-      this.uriService,
-      this.windowService,
-      this.policy,
-      this.cachedSettings,
-      this.requestMemory,
-    ];
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      policy: this.policy,
+      privateBrowsingService: this.privateBrowsingService,
+      requestMemory: this.requestMemory,
+      uriService: this.uriService,
+      windowService: this.windowService,
+    };
   }
 
   constructor(
       parentLog: Common.ILog,
       windowID: number,
       private window: XUL.chromeWindow,
-
       private readonly mozPromptService: XPCOM.nsIPromptService,
-
       private i18n: typeof browser.i18n,
 
+      private readonly cachedSettings: App.storage.ICachedSettings,
+      private readonly policy: App.IPolicy,
       private readonly privateBrowsingService:
           App.services.IPrivateBrowsingService,
+      private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly uriService: App.services.IUriService,
       private readonly windowService: App.services.IWindowService,
-      private readonly policy: App.IPolicy,
-      private readonly cachedSettings: App.storage.ICachedSettings,
-      private readonly requestMemory: App.webRequest.IRequestMemory,
   ) {
     super(`app.windows[${windowID}].menu`, parentLog);
   }

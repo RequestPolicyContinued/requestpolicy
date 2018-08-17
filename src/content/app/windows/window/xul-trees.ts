@@ -30,9 +30,9 @@ export class XulTrees extends Module {
   private get overlay() { return this.overlayWrapper.module!; }
 
   protected get startupPreconditions() {
-    return [
-      Promise.resolve(),
-    ];
+    return {
+      async: Promise.resolve(),
+    };
   }
 
   // tslint:disable-next-line:variable-name

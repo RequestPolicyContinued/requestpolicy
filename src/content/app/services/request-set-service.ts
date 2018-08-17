@@ -29,10 +29,10 @@ import { RequestSet } from "lib/classes/request-set";
 
 export class RequestSetService extends Module
     implements App.services.IRequestSetService {
-  protected get dependencies(): Module[] {
-    return [
-      this.uriService,
-    ];
+  protected get dependencies() {
+    return {
+      uriService: this.uriService,
+    };
   }
 
   constructor(

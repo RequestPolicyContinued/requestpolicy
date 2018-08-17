@@ -38,6 +38,9 @@ import { RPContentServices } from "./services/services.module.content";
 import { UriService } from "./services/uri-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
+import {
+  StorageAvailabilityController,
+} from "./storage/storage-availability-controller";
 import { Storage } from "./storage/storage.module";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
@@ -47,13 +50,20 @@ declare const cfmm: XPCOM.ContentFrameMessageManager;
 const domWindowUtils = getDOMWindowUtils(cfmm.content);
 const {outerWindowID} = domWindowUtils;
 
-// FIXME: ask the background if the storage is indeed ready
+// FIXME: ask the background if the storage migration is done yet
 // tslint:disable-next-line:max-line-length
+const storageAvailabilityController = new StorageAvailabilityController(
+    log,
+    outerWindowID,
+    null,
+    Promise.resolve(null),
+);
+
 const storageApiWrapper = new StorageApiWrapper(
     outerWindowID,
     log,
     browser.storage,  // badword-linter:allow:browser.storage:
-    Promise.resolve(), // <-- FIXME
+    storageAvailabilityController,
 );
 
 const msgListener = new MessageListenerModule(
@@ -116,6 +126,7 @@ const storage = new Storage(
     storageApiWrapper,
     asyncSettings,
     null,
+    storageAvailabilityController,
 );
 export const rp = new AppContent(
     log,

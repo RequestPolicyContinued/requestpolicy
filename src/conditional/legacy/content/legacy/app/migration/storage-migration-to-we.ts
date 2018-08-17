@@ -23,6 +23,7 @@
 import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { IConnection } from "lib/classes/connection";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -38,7 +39,7 @@ interface IResponse {
 
 export class StorageMigrationToWebExtension extends Module
     implements App.migration.storage.IStorageMigrationToWebExtension {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
 
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
@@ -180,7 +181,7 @@ export class StorageMigrationToWebExtension extends Module
   private storageChanged(
       aStorageChanges: API.storage.api.ChangeDict,
   ): Promise<void> {
-    this.debugLog.log("obtained storage change.");
+    this.debugLog.log("obtaining storage change:", aStorageChanges);
     if (!this.isStorageReadyForAccess) {
       this.log.error("Not ready for storage changes yet!");
     }

@@ -73,7 +73,6 @@ import { MessageListenerModule } from "lib/classes/message-listener-module";
 import { NormalRequest, RedirectRequest } from "lib/classes/request";
 import * as compareVersions from "lib/third-party/mozilla-version-comparator";
 import { getPortFromSlaveConnectable } from "lib/utils/connection-utils";
-import { defer } from "lib/utils/js-utils";
 import * as tryCatchUtils from "lib/utils/try-catch-utils";
 import { getDOMWindowUtils } from "lib/utils/window-utils";
 import { AppBackground } from "./app.background.module";
@@ -99,6 +98,9 @@ import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
 import { StorageApiWrapper } from "./storage/storage-api-wrapper";
+import {
+  StorageAvailabilityController,
+} from "./storage/storage-availability-controller";
 import { Storage } from "./storage/storage.module";
 import { InitialSetup } from "./ui/initial-setup";
 import { Notifications } from "./ui/notifications/notifications.module";
@@ -126,14 +128,6 @@ const outerWindowID: number | null = null; // contentscripts only
 // module to the constructor of another module. (Optional constructor
 // parameters are `undefined` and can be forgotten, `null` cannot.)
 //
-
-const dStorageReadyForAccess = defer<void>();
-const storageApiWrapper = new StorageApiWrapper(
-    outerWindowID,
-    log,
-    browser.storage,  // badword-linter:allow:browser.storage:
-    dStorageReadyForAccess.promise,
-);
 
 const {pEWEConnection, pWebextStorageMigration}: {
   pWebextStorageMigration:
@@ -191,7 +185,6 @@ const settingsMigration = new SettingsMigration(
     browser.storage.local,  // badword-linter:allow:browser.storage:
     pWebextStorageMigration,
 );
-dStorageReadyForAccess.resolve(settingsMigration.whenReady);
 
 // helper fn
 function whenLegacy<T>(gen: () => T): T | null {
@@ -229,6 +222,18 @@ const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   tryCatchUtils: LegacyApi.tryCatchUtils,
 } : null;
 
+const storageAvailabilityController = new StorageAvailabilityController(
+    log,
+    outerWindowID,
+    settingsMigration,
+    pWebextStorageMigration,
+);
+const storageApiWrapper = new StorageApiWrapper(
+    outerWindowID,
+    log,
+    browser.storage,  // badword-linter:allow:browser.storage:
+    storageAvailabilityController,
+);
 const uriService = new UriService(
     log,
     outerWindowID,
@@ -276,6 +281,7 @@ const storage = new Storage(
     storageApiWrapper,
     asyncSettings,
     cachedSettings,
+    storageAvailabilityController,
 );
 
 const browserSettings = new BrowserSettings(
@@ -311,7 +317,10 @@ const privateBrowsingService = new PrivateBrowsingService(
     cachedSettings,
 );
 const requestService = new RequestService(
-    log, httpChannelService, uriService, cachedSettings,
+    log,
+    cachedSettings,
+    httpChannelService,
+    uriService,
 );
 const redirectionService = new RedirectionService(
     log,
@@ -383,14 +392,14 @@ const requestProcessor = new RequestProcessor(
     Ci,
     Cr,
     mozObserverService,
-    policy,
-    httpChannelService,
-    redirectionService,
-    requestService,
-    uriService,
     cachedSettings,
-    requestMemory,
+    httpChannelService,
     metadataMemory,
+    redirectionService,
+    requestMemory,
+    requestService,
+    policy,
+    uriService,
     windowModuleMap,
 );
 const redirectRequestFactory = (
@@ -463,12 +472,12 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       window,
       mozPromptService!,  // fixme
       browser.i18n,
+      cachedSettings,
+      policy,
       privateBrowsingService,
+      requestMemory,
       uriService,
       windowService,
-      policy,
-      cachedSettings,
-      requestMemory,
   );
   const xulTrees = new XulTrees(
       log,
@@ -494,12 +503,12 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       browser.i18n,
       classicMenu,
       menu,
-      runtime,
+      cachedSettings,
       privateBrowsingService,
+      requestProcessor,
+      runtime,
       uriService,
       windowService,
-      cachedSettings,
-      requestProcessor,
   );
   const overlay = new Overlay(
       log,
@@ -512,14 +521,14 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       menu,
       msgListener,
       redirectionNotifications,
-      eventListener,
-      uriService,
-      windowService,
-      policy,
-      runtime,
       cachedSettings,
+      eventListener,
+      policy,
       requestMemory,
       requestProcessor,
+      runtime,
+      uriService,
+      windowService,
   );
   overlayWrapper.module = overlay;
   const keyboardShortcutFactory: API.windows.window.KeyboardShortcutFactory = (

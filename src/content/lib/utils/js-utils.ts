@@ -121,6 +121,28 @@ export function leftRotateArray<T = any>(array: T[], n: number): T[] {
   return secondPart.concat(firstPart);
 }
 
+export function mapObjectKeys<T>(
+    obj: {[key: string]: T},
+    map: (key: string) => string,
+): {[key: string]: T} {
+  return objectEntries(obj).map(
+      ([key, value]) => [map(key), value],
+  ).reduce(objectify, {});
+}
+
+export function mapObjectValues<T, U>(
+    obj: {[key: string]: T},
+    map: (value: T) => U,
+): {[key: string]: U} {
+  return objectEntries(obj).map(
+      ([key, value]: [string, T]) => [key, map(value)],
+  ).reduce(objectify, {});
+}
+
+export function objectify<T>(obj: IObject<T>, [k, v]: [string, T]) {
+  return { ...obj, [k]: v };
+}
+
 // Object.values() polyfill
 export function objectEntries<T>(
     obj: IObject<T>,

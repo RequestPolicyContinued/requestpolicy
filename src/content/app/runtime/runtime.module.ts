@@ -30,9 +30,9 @@ export class Runtime extends Module {
   // protected get debugEnabled() { return true; }
 
   protected get startupPreconditions() {
-    return [
-      this.pGotEWEConnection,
-    ] as Array<Promise<any>>;
+    return {
+      pGotEWEConnection: this.pGotEWEConnection,
+    };
   }
 
   private eweConnection: Connection<any, any> | null;

@@ -59,6 +59,7 @@ import { WindowService } from "./services/window-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
 import { StorageApiWrapper } from "./storage/storage-api-wrapper";
+import { StorageAvailabilityController } from "./storage/storage-availability-controller";
 import { Storage } from "./storage/storage.module";
 import { InitialSetup } from "./ui/initial-setup";
 import { Notifications } from "./ui/notifications/notifications.module";
@@ -81,6 +82,8 @@ import { XulTrees } from "./windows/window/xul-trees";
 import { WindowModuleMap } from "./windows/window-module-map";
 import { Windows } from "./windows/windows.module";
 import { EventListenerModule } from "lib/classes/event-listener-module";
+
+export interface IObject<T> { [k: string]: T; }
 
 export interface IVersionComparator {
   compare: typeof compareVersions;
@@ -134,6 +137,7 @@ export namespace App {
     export type IAsyncSettings = AsyncSettings;
     export type ICachedSettings = CachedSettings;
     export type IStorageApiWrapper = StorageApiWrapper;
+    export type IStorageAvailabilityController = StorageAvailabilityController;
   }
 
   export namespace ui {

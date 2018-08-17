@@ -34,10 +34,10 @@ export class CachedSettings extends Module
 implements App.storage.ICachedSettings {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
-  protected get dependencies(): Module[] {
-    return [
-      this.storageApi,
-    ];
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
   }
 
   private cachedKeys: string[];

@@ -22,18 +22,32 @@
 
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
-import { defer } from "lib/utils/js-utils";
+import {
+  defer,
+  mapObjectValues,
+  objectEntries,
+  objectValues,
+} from "lib/utils/js-utils";
 
 const MAX_WAIT_FOR_STARTUP_SECONDS = 15;
 const MAX_STARTUP_SECONDS = 15;
 
+const TERMS = {
+  dependencies: {singular: "dependency", plural: "dependencies"},
+  preconditions: {singular: "precondition", plural: "preconditions"},
+  submodules: {singular: "submodule", plural: "submodules"},
+};
+
+interface IObject<T> { [name: string]: T; }
 export interface IModule {
-  startup?: () => MaybePromise<void>;
-  shutdown?: () => MaybePromise<void>;
   whenReady: Promise<void>;
+  registerDependent(dependent: IModule): void;
+  shutdown(): MaybePromise<void>;
+  startup(): Promise<void>;
 }
 
 export type StartupState =
+    "not yet initialized" |
     "not yet started" |
     "starting up" |
     "startup done";
@@ -41,21 +55,41 @@ export type ShutdownState =
     "not yet shut down" |
     "shutting down" |
     "shutdown done";
+type PromiseState = "not awaiting" | "awaiting" | "done" | "failed";
 
-export abstract class Module implements IModule {
+abstract class AbstractModule implements IModule {
+  public abstract whenReady: Promise<void>;
+  private dependents: IModule[] = [];
+
+  public registerDependent(dependent: IModule) {
+    this.dependents.push(dependent);
+  }
+  public startup(): Promise<void> {
+    return Promise.resolve();
+  }
+  public shutdown(): MaybePromise<void> {
+    return MaybePromise.resolve(undefined);
+  }
+  protected ensureDependentsAreShutDown(): MaybePromise<void> {
+    return MaybePromise.all(
+        this.dependents.
+        filter((m) => "shutdown" in m).
+        map((m) => m.shutdown!()),
+    ) as MaybePromise<any>;
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class Module extends AbstractModule {
   protected log: Common.ILog;
   protected get debugEnabled() { return false; }
   protected debugLog: Common.ILog;
-
-  protected get subModules(): {[key: string]: IModule} | undefined {
-    return undefined;
-  }
 
   // tslint:disable-next-line:variable-name
   private _startupState: StartupState = "not yet started";
   protected get startupState() { return this._startupState; }
   private get startupCalled() {
-    return this.startupState !== "not yet started";
+    return !(this.startupState in ["not yet initialized", "not yet started"]);
   }
   private get ready() { return this.startupState === "startup done"; }
 
@@ -71,88 +105,57 @@ export abstract class Module implements IModule {
 
   private mpShutdownDone: MaybePromise<void>;
 
-  private preconditionStates: Array<
-      "not awaiting" | "awaiting" | "done" | "failed"
-  > = [];
+  private startupPromiseStates = {
+    dependencies: {} as IObject<PromiseState>,
+    preconditions: {} as IObject<PromiseState>,
+    submodules: {} as IObject<PromiseState>,
+  };
 
-  protected get dependencies(): Module[] {
-    return [];
+  protected get subModules(): {[key: string]: IModule} {
+    return {};
   }
 
-  private dependents: Module[] = [];
-
-  protected get startupPreconditions(): Array<Promise<void>> {
-    return [];
+  protected get dependencies(): {[name: string]: IModule} {
+    return {};
   }
 
-  protected get shutdownPreconditions(): Array<Promise<void>> {
-    return [];
+  protected get startupPreconditions(): IObject<Promise<void>> {
+    return {};
   }
 
   private timedOutWaitingForStartup = false;
+  private timedOutStartingUp = false;
   private creationTime: number;
+  private startupStartTime: number;
+  private startupEndTime: number;
 
   constructor(
       public readonly moduleName: string,
       protected parentLog: Common.ILog,
   ) {
+    super();
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: this.debugEnabled, level: "all"});
 
-    this.creationTime = new Date().getTime();
-    this.setTimeout(() => {
-      if (this.startupCalled) return;
-      this.log.error(`[severe] startup() hasn't been invoked ` +
-          `even after ${MAX_WAIT_FOR_STARTUP_SECONDS} seconds!`);
-    }, 1000 * MAX_WAIT_FOR_STARTUP_SECONDS);
   }
 
-  public startup(): MaybePromise<void> {
+  public startup(): Promise<void> {
     if (this.startupState !== "not yet started") {
       this.log.error("startup() has already been called!");
-      return MaybePromise.resolve(undefined);
-    }
-    this._startupState = "starting up";
-    this.getStartupPreconditions().forEach((_, index) => {
-      this.preconditionStates[index] = "not awaiting";
-    });
-
-    let timedOutStartingUp = false;
-    this.setTimeout(() => {
-      if (this.ready) return;
-      timedOutStartingUp = true;
-      this.log.error(
-          `startup didn't finish ` +
-          `even after ${MAX_STARTUP_SECONDS} seconds!`,
-          {
-            preconditionStates: this.preconditionStates,
-          },
-      );
-    }, 1000 * MAX_STARTUP_SECONDS);
-    const startupStartTime = new Date().getTime();
-    if (this.timedOutWaitingForStartup) {
-      this.log.error(
-          `starting up... / needed to wait ` +
-          `${(startupStartTime - this.creationTime) / 1000} seconds!`);
     } else {
-      this.debugLog.log("starting up...");
+      this.setStartupState("starting up");
+
+      this.initPromiseStates("dependencies");
+      this.initPromiseStates("preconditions");
+      this.initPromiseStates("submodules");
+
+      const p = this.startup_().then(() => {
+        this.setStartupState("startup done");
+      });
+      p.catch(this.log.onError("error on startup"));
+      this.dReady.resolve(p);
     }
-
-    const p = this.startup_();
-    p.catch(this.log.onError("error on startup"));
-    return MaybePromise.resolve(p.then(() => {
-      this._startupState = "startup done";
-      this.dReady.resolve(undefined);
-
-      if (timedOutStartingUp) {
-        const startupEndTime = new Date().getTime();
-        this.log.error(
-            `startup done / startup took ` +
-            `${(startupEndTime - startupStartTime) / 1000} seconds!`);
-      } else {
-        this.debugLog.log("startup done");
-      }
-    }));
+    return this.whenReady;
   }
 
   public shutdown(): MaybePromise<void> {
@@ -203,67 +206,34 @@ export abstract class Module implements IModule {
     }, aDelay);
   }
 
-  private startup_(): MaybePromise<void> {
-    const preconditions = this.getStartupPreconditions();
-    const nPrecond = preconditions.length;
-    let pPrecond: MaybePromise<void>;
-    if (nPrecond !== 0) {
-      this.debugLog.log(
-          `awaiting ${nPrecond} precondition${ nPrecond > 1 ? "s" : "" }...`,
-      );
-      const preconditionsMapped = preconditions.map((p, index) => {
-        this.preconditionStates[index] = "awaiting";
-        return p.then(() => {
-          this.preconditionStates[index] = "done";
-        }).catch((e) => {
-          this.preconditionStates[index] = "failed";
-          return Promise.reject(e);
-        });
-      });
-      pPrecond = MaybePromise.all(preconditionsMapped).then(() => {
-        this.debugLog.log("done awaiting preconditions");
-      });
-    } else {
-      pPrecond = MaybePromise.resolve(undefined);
-    }
-    return pPrecond.then(() => {
-      this.debugLog.log(`starting up submodules...`);
-      return this.runSubmoduleFns("startup");
+  private startup_(): Promise<void> {
+    return this.awaitPreconditions().then(() => {
+      this.debugLog.log("starting up submodules");
+      this.runSubmoduleFns("startup");
+      return Promise.all([
+        this.awaitSubmodules(),
+        this.awaitDependencies(),
+      ]);
     }).then(() => {
       this.debugLog.log(`starting up self...`);
-      for (const m of this.dependencies) {
+      for (const m of objectValues(this.getDependenciesAndSubmodules())) {
         m.registerDependent(this);
       }
       return this.runSelfFn("startup");
     }).then(() => {
-      this.debugLog.log("done starting up self and submodules");
+      this.debugLog.log("done starting up self");
     });
   }
 
   private shutdown_(): MaybePromise<void> {
     return this.ensureDependentsAreShutDown().
-        then(() => this.runSelfFn("shutdown")).
-        then(() => this.runSubmoduleFns("shutdown"));
-  }
-
-  private getSubmodules(): IModule[] {
-    if (!this.subModules) return [];
-    return Object.keys(this.subModules).
-        map((key) => this.subModules![key]).
-        filter((m, index) => {
-          if (!m) {
-            this.log.error(`submodule #${index + 1} is ${JSON.stringify(m)}`);
-            console.trace();
-          }
-          return !!m;
-        });
+        then(() => this.runSelfFn("shutdown"));
   }
 
   private runSubmoduleFns(fnName: "startup" | "shutdown"): MaybePromise<void> {
     const p = MaybePromise.all(
-        this.getSubmodules().
-        filter((m) => fnName in m).
-        map((m) => m[fnName]!()),
+        objectValues(this.subModules).
+        map((m) => m[fnName]()),
     ) as MaybePromise<any>;
     p.catch(this.log.onError(`submodule ${fnName}`));
     return p;
@@ -272,25 +242,174 @@ export abstract class Module implements IModule {
   private runSelfFn(fnName: "startup" | "shutdown"): MaybePromise<void> {
     const selfFnName =
         `${fnName}Self` as "startupSelf" | "shutdownSelf";
-    const p = this[selfFnName] ?
-        this[selfFnName]() :
-        MaybePromise.resolve(undefined);
+    const p = this[selfFnName]();
     p.catch(this.log.onError(`self-${fnName}`));
     return p;
   }
 
-  private getStartupPreconditions() {
-    return this.dependencies.map((m) => m.whenReady).
-        concat(this.startupPreconditions);
+  private initPromiseStates(
+      term: "dependencies" | "preconditions" | "submodules",
+  ) {
+    const states = this.startupPromiseStates[term];
+    Object.keys(states).forEach((key) => {
+      states[key] = "not awaiting";
+    });
   }
 
-  private registerDependent(dependent: Module) {
-    this.dependents.push(dependent);
+  private assertStartupState(state: StartupState): void | never {
+    if (this._startupState === state) return;
+    const msg = `Module "${this.moduleName}" should be in state "${state}", ` +
+        `but it's in state "${this._startupState}"!`;
+    this.log.error(msg);
+    console.trace();
+    throw new Error(msg);
   }
 
-  private ensureDependentsAreShutDown(): MaybePromise<void> {
-    return MaybePromise.all(this.dependents.map(
-        (m) => m.shutdown(),
-    )) as MaybePromise<any>;
+  private setStartupState(newState: StartupState) {
+    const now = new Date().getTime();
+    switch (newState) {
+      case "not yet started":
+        this.assertStartupState("not yet initialized");
+        this.creationTime = now;
+        this.startStartupInvocationWatchdog();
+        break;
+
+      case "starting up":
+        this.assertStartupState("not yet started");
+        this.startupStartTime = now;
+        this.startStartupDoneWatchdog();
+
+        if (this.timedOutWaitingForStartup) {
+          const duration = (this.startupStartTime - this.creationTime) / 1000;
+          this.log.error(
+              `starting up... / needed to wait ${duration} seconds!`,
+          );
+        } else {
+          this.debugLog.log("starting up...");
+        }
+        break;
+
+      case "startup done":
+        this.assertStartupState("starting up");
+        this.startupEndTime = now;
+
+        if (this.timedOutStartingUp) {
+          const duration = (this.startupEndTime - this.startupStartTime) / 1000;
+          // use log.error() because the earlier message ("startup
+          // didn't finish yet") is an error as well.
+          this.log.error(`startup done. startup took ${duration} seconds!`);
+        } else {
+          this.debugLog.log("startup done");
+        }
+        break;
+
+      default:
+        this.log.error(`invalid new state "${newState}"`);
+        return;
+    }
+    this._startupState = newState;
+  }
+
+  private startStartupInvocationWatchdog() {
+    this.setTimeout(() => {
+      if (this.startupCalled) return;
+      this.log.error(
+          `[severe] startup() hasn't been invoked ` +
+          `even after ${MAX_WAIT_FOR_STARTUP_SECONDS} seconds!`,
+      );
+    }, 1000 * MAX_WAIT_FOR_STARTUP_SECONDS);
+  }
+
+  private startStartupDoneWatchdog() {
+    this.setTimeout(() => {
+      if (this.ready) return;
+      this.timedOutStartingUp = true;
+      this.log.error(
+          `startup didn't finish ` +
+          `even after ${MAX_STARTUP_SECONDS} seconds!`,
+          {
+            startupPromiseStates: this.startupPromiseStates,
+          },
+      );
+    }, 1000 * MAX_STARTUP_SECONDS);
+  }
+
+  private getDependenciesAndSubmodules(): IObject<IModule> {
+    return Object.assign(
+        {} as IObject<IModule>,
+        this.dependencies,
+        this.subModules,
+    );
+  }
+
+  private awaitPreconditions() {
+    return this.awaitPromises(
+        TERMS.preconditions,
+        this.startupPreconditions,
+        this.startupPromiseStates.preconditions,
+    );
+  }
+
+  private awaitDependencies() {
+    return this.awaitPromises(
+        TERMS.dependencies,
+        mapObjectValues(this.dependencies, (m) => m.whenReady),
+        this.startupPromiseStates.dependencies,
+    );
+  }
+
+  private awaitSubmodules() {
+    return this.awaitPromises(
+        TERMS.submodules,
+        mapObjectValues(this.subModules, (m) => m.whenReady),
+        this.startupPromiseStates.submodules,
+    );
+  }
+
+  private awaitPromises(
+      aTerm: {singular: string, plural: string},
+      aPromises: IObject<Promise<void>>,
+      aPromiseStates: IObject<PromiseState>,
+  ): Promise<void> {
+    const nPromises = Object.keys(aPromises).length;
+    const termType = nPromises === 1 ? "singular" : "plural";
+    const promisesMapped = objectEntries(aPromises).map(([key, p]) => {
+      aPromiseStates[key] = "awaiting";
+      return p.then(() => {
+        aPromiseStates[key] = "done";
+      }).catch((e) => {
+        aPromiseStates[key] = "failed";
+        return Promise.reject(e);
+      });
+    });
+    this.debugLog.log(`awaiting ${nPromises} ${ aTerm[termType] }...`);
+    return Promise.all(promisesMapped).then(() => {
+      this.debugLog.log(`done awaiting ${aTerm.plural}.`);
+    });
+  }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+export class SimpleModule extends Module {
+  constructor(
+      moduleName: string,
+      parentLog: Common.ILog,
+      private readonly modulesAndDependencies: {
+        dependencies?: IObject<IModule>,
+        subModules?: IObject<IModule>,
+        startupPreconditions?: IObject<Promise<void>>,
+      },
+  ) {
+    super(moduleName, parentLog);
+  }
+
+  protected get subModules() {
+    return this.modulesAndDependencies.subModules || {};
+  }
+  protected get dependencies() {
+    return this.modulesAndDependencies.dependencies || {};
+  }
+  protected get startupPreconditions() {
+    return this.modulesAndDependencies.startupPreconditions || {};
   }
 }

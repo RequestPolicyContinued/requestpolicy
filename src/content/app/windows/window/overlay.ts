@@ -69,22 +69,24 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
 
   private get gBrowser() { return getTabBrowser(this.window)!; }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.storageApi,
+  protected get dependencies() {
+    // tslint:disable:object-literal-sort-keys
+    return {
+      storageApi: this.storageApi,
 
-      this.msgListener,
-      this.redirectionNotifications,
+      menu: this.menu,
+      msgListener: this.msgListener,
+      redirectionNotifications: this.redirectionNotifications,
 
-      this.eventListener,
-      this.uriService,
-      this.windowService,
-      this.policy,
-      this.runtime,
-      this.cachedSettings,
-      this.requestMemory,
-      this.requestProcessor,
-    ];
+      cachedSettings: this.cachedSettings,
+      eventListener: this.eventListener,
+      policy: this.policy,
+      requestMemory: this.requestMemory,
+      requestProcessor: this.requestProcessor,
+      runtime: this.runtime,
+      uriService: this.uriService,
+      windowService: this.windowService,
+    };
   }
 
   constructor(
@@ -103,14 +105,14 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
       public readonly redirectionNotifications:
           App.windows.window.IRedirectionNotifications,
 
-      private readonly eventListener: App.common.IEventListenerModule,
-      private readonly uriService: App.services.IUriService,
-      private readonly windowService: App.services.IWindowService,
-      private readonly policy: App.IPolicy,
-      private readonly runtime: App.IRuntime,
       private readonly cachedSettings: App.storage.ICachedSettings,
+      private readonly eventListener: App.common.IEventListenerModule,
+      private readonly policy: App.IPolicy,
       private readonly requestMemory: App.webRequest.IRequestMemory,
       private readonly requestProcessor: App.webRequest.IRequestProcessor,
+      private readonly runtime: App.IRuntime,
+      private readonly uriService: App.services.IUriService,
+      private readonly windowService: App.services.IWindowService,
   ) {
     super(`app.windows[${windowID}].overlay`, parentLog);
   }

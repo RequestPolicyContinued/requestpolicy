@@ -32,10 +32,10 @@ export class RulesetStorage extends Module
 
   private get storageArea() { return this.storageApi.local; }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.storageApi,
-    ];
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
   }
 
   constructor(

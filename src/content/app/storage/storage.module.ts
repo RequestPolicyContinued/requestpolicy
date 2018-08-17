@@ -31,11 +31,12 @@ export class Storage extends Module implements App.IStorage {
       public readonly apiWrapper: App.storage.IStorageApiWrapper,
       public readonly asyncSettings: App.storage.IAsyncSettings,
       public readonly cachedSettings: App.storage.ICachedSettings | null,
+      public readonly storageAvailabilityController:
+          App.storage.IStorageAvailabilityController,
   ) {
     super(
-        `${
-            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
-        }.storage`,
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
+        `.storage`,
         log,
     );
   }
@@ -44,6 +45,7 @@ export class Storage extends Module implements App.IStorage {
     const rv: {[k: string]: IModule} = {
       apiWrapper: this.apiWrapper,
       asyncSettings: this.asyncSettings,
+      storageAvailabilityController: this.storageAvailabilityController,
     };
     if (this.cachedSettings !== null) {
       rv.cachedSettings = this.cachedSettings;

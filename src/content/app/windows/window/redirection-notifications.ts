@@ -47,15 +47,19 @@ export class RedirectionNotifications extends Module
   private get gBrowser() { return getTabBrowser(this.window)!; }
   private get $str() { return this.i18n.getMessage.bind(browser.i18n); }
 
-  protected get dependencies(): Module[] {
-    return [
-      this.runtime,
-      this.privateBrowsingService,
-      this.uriService,
-      this.windowService,
-      this.cachedSettings,
-      this.requestProcessor,
-    ];
+  protected get dependencies() {
+    // tslint:disable:object-literal-sort-keys
+    return {
+      classicmenu: this.classicmenu,
+      menu: this.menu,
+
+      cachedSettings: this.cachedSettings,
+      privateBrowsingService: this.privateBrowsingService,
+      requestProcessor: this.requestProcessor,
+      runtime: this.runtime,
+      uriService: this.uriService,
+      windowService: this.windowService,
+    };
   }
 
   constructor(
@@ -68,13 +72,13 @@ export class RedirectionNotifications extends Module
       private readonly classicmenu: App.windows.window.IClassicMenu,
       private readonly menu: App.windows.window.IMenu,
 
-      private readonly runtime: App.IRuntime,
+      private readonly cachedSettings: App.storage.ICachedSettings,
       private readonly privateBrowsingService:
           App.services.IPrivateBrowsingService,
+      private readonly requestProcessor: App.webRequest.IRequestProcessor,
+      private readonly runtime: App.IRuntime,
       private readonly uriService: App.services.IUriService,
       private readonly windowService: App.services.IWindowService,
-      private readonly cachedSettings: App.storage.ICachedSettings,
-      private readonly requestProcessor: App.webRequest.IRequestProcessor,
   ) {
     super(`app.windows[${windowID}].r21n`, parentLog);
   }

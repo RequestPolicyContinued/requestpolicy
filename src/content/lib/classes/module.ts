@@ -107,7 +107,6 @@ export class Module {
   ) {
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: this.debugEnabled, level: "all"});
-
   }
 
   public startup(): Promise<void> {

@@ -53,7 +53,7 @@ export class StorageApiWrapper extends Module
           App.storage.IStorageAvailabilityController,
   ) {
     super(
-        outerWindowID === null ? "app" : `AppContent[${outerWindowID}]` +
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
         `.apiWrapper`,
         log,
     );

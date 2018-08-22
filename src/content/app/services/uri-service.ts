@@ -54,9 +54,8 @@ export class UriService extends Module implements App.services.IUriService {
       private mozIOService: JSMs.Services["io"],
   ) {
     super(
-        `${
-            outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`
-        }.services.uri`,
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
+        `.services.uri`,
         log,
     );
   }

@@ -56,7 +56,7 @@ export class AsyncSettings extends Module
       private defaultSettings: IDefaultSettings,
   ) {
     super(
-        outerWindowID === null ? "app" : `AppContent[${outerWindowID}]` +
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
         `.storage.asyncSettings`,
         log,
     );

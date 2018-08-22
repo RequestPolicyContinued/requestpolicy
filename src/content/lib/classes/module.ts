@@ -26,6 +26,7 @@ import {
   defer,
   mapObjectValues,
   objectEntries,
+  objectify,
   objectValues,
 } from "lib/utils/js-utils";
 
@@ -39,12 +40,6 @@ const TERMS = {
 };
 
 interface IObject<T> { [name: string]: T; }
-export interface IModule {
-  whenReady: Promise<void>;
-  registerDependent(dependent: IModule): void;
-  shutdown(): MaybePromise<void>;
-  startup(): Promise<void>;
-}
 
 export type StartupState =
     "not yet initialized" |
@@ -57,30 +52,7 @@ export type ShutdownState =
     "shutdown done";
 type PromiseState = "not awaiting" | "awaiting" | "done" | "failed";
 
-abstract class AbstractModule implements IModule {
-  public abstract whenReady: Promise<void>;
-  private dependents: IModule[] = [];
-
-  public registerDependent(dependent: IModule) {
-    this.dependents.push(dependent);
-  }
-  public startup(): Promise<void> {
-    return Promise.resolve();
-  }
-  public shutdown(): MaybePromise<void> {
-    return MaybePromise.resolve(undefined);
-  }
-  protected ensureDependentsAreShutDown(): MaybePromise<void> {
-    return MaybePromise.all(
-        this.dependents.
-        filter((m) => "shutdown" in m).
-        map((m) => m.shutdown!()),
-    ) as MaybePromise<any>;
-  }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-export class Module extends AbstractModule {
+export class Module {
   protected log: Common.ILog;
   protected get debugEnabled() { return false; }
   protected debugLog: Common.ILog;
@@ -103,7 +75,7 @@ export class Module extends AbstractModule {
     return this.shutdownState === "not yet shut down";
   }
 
-  private mpShutdownDone: MaybePromise<void>;
+  private dependents: Set<Module> = new Set();
 
   private startupPromiseStates = {
     dependencies: {} as IObject<PromiseState>,
@@ -111,11 +83,11 @@ export class Module extends AbstractModule {
     submodules: {} as IObject<PromiseState>,
   };
 
-  protected get subModules(): {[key: string]: IModule} {
+  protected get subModules(): {[key: string]: Module} {
     return {};
   }
 
-  protected get dependencies(): {[name: string]: IModule} {
+  protected get dependencies(): {[name: string]: Module} {
     return {};
   }
 
@@ -133,7 +105,6 @@ export class Module extends AbstractModule {
       public readonly moduleName: string,
       protected parentLog: Common.ILog,
   ) {
-    super();
     this.log = parentLog.extend({name: moduleName});
     this.debugLog = this.log.extend({enabled: this.debugEnabled, level: "all"});
 
@@ -158,27 +129,58 @@ export class Module extends AbstractModule {
     return this.whenReady;
   }
 
-  public shutdown(): MaybePromise<void> {
-    if (this.shutdownState === "not yet shut down") {
-      this._shutdownState = "shutting down";
-      this.debugLog.log("shutting down...");
-      this.mpShutdownDone = this.shutdown_().then(() => {
-        this._shutdownState = "shutdown done";
-        this.debugLog.log("done shutting down");
-      });
-      this.mpShutdownDone.catch(this.log.onError("error on shutdown"));
+  public shutdown() {
+    const allModules = new Set(this.recursivelyGetSubmodules());
+    for (let n = 1000; n > 0; --n) { // n is just an arbitrary number
+      if (allModules.size === 0) break;
+      const shutDownModules: Module[] = [];
+      for (const m of allModules.values()) {
+        if (m.dependents.size === 0) {
+          m.shutdown_();
+          shutDownModules.push(m);
+        }
+      }
+      if (shutDownModules.length === 0) {
+        const msg = "all remaining modules have dependents!";
+        const infos = Array.from(allModules.values()).map(
+            (m) => [
+              m.moduleName,
+              Array.from(m.dependents.values()).map((d) => d.moduleName),
+            ],
+        ).reduce(objectify, {});
+        this.log.error(msg, infos);
+        throw new Error(msg);
+      }
+      for (const m of shutDownModules) {
+        allModules.delete(m);
+      }
     }
-    return this.mpShutdownDone;
   }
 
   public isReady() { return this.ready; }
+
+  public registerDependent(dependent: Module) {
+    return this.dependents.add(dependent);
+  }
+
+  public unregisterDependent(dependent: Module) {
+    return this.dependents.delete(dependent);
+  }
 
   protected startupSelf(): MaybePromise<void> {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf(): MaybePromise<void> {
-    return MaybePromise.resolve(undefined);
+  protected shutdownSelf(): void {
+    return;
+  }
+
+  protected recursivelyGetSubmodules(): Module[] {
+    let modules = objectValues(this.subModules);
+    objectValues(this.subModules).forEach((submodule) => {
+      modules = modules.concat(submodule.recursivelyGetSubmodules());
+    });
+    return modules;
   }
 
   protected assertReady(): void | never {
@@ -209,41 +211,43 @@ export class Module extends AbstractModule {
   private startup_(): Promise<void> {
     return this.awaitPreconditions().then(() => {
       this.debugLog.log("starting up submodules");
-      this.runSubmoduleFns("startup");
+      this.startupSubmodules();
       return Promise.all([
         this.awaitSubmodules(),
         this.awaitDependencies(),
       ]);
     }).then(() => {
       this.debugLog.log(`starting up self...`);
-      for (const m of objectValues(this.getDependenciesAndSubmodules())) {
+      // NOTE: While on startup we await all submodules to finish,
+      //   on shutdown we won't.
+      for (const m of objectValues(this.dependencies)) {
         m.registerDependent(this);
       }
-      return this.runSelfFn("startup");
+      return this.startupSelf();
     }).then(() => {
       this.debugLog.log("done starting up self");
     });
   }
 
-  private shutdown_(): MaybePromise<void> {
-    return this.ensureDependentsAreShutDown().
-        then(() => this.runSelfFn("shutdown"));
+  private shutdown_() {
+    this.debugLog.log("shutting down self...");
+    try {
+      this.shutdownSelf();
+      this.debugLog.log("done shutting down self.");
+    } catch (e) {
+      this.log.error("failed to shut down self", e);
+    }
+    for (const m of objectValues(this.dependencies)) {
+      m.unregisterDependent(this);
+    }
   }
 
-  private runSubmoduleFns(fnName: "startup" | "shutdown"): MaybePromise<void> {
+  private startupSubmodules(): MaybePromise<void> {
     const p = MaybePromise.all(
         objectValues(this.subModules).
-        map((m) => m[fnName]()),
+        map((m) => m.startup()),
     ) as MaybePromise<any>;
-    p.catch(this.log.onError(`submodule ${fnName}`));
-    return p;
-  }
-
-  private runSelfFn(fnName: "startup" | "shutdown"): MaybePromise<void> {
-    const selfFnName =
-        `${fnName}Self` as "startupSelf" | "shutdownSelf";
-    const p = this[selfFnName]();
-    p.catch(this.log.onError(`self-${fnName}`));
+    p.catch(this.log.onError(`submodule startup`));
     return p;
   }
 
@@ -334,14 +338,6 @@ export class Module extends AbstractModule {
     }, 1000 * MAX_STARTUP_SECONDS);
   }
 
-  private getDependenciesAndSubmodules(): IObject<IModule> {
-    return Object.assign(
-        {} as IObject<IModule>,
-        this.dependencies,
-        this.subModules,
-    );
-  }
-
   private awaitPreconditions() {
     return this.awaitPromises(
         TERMS.preconditions,
@@ -395,8 +391,8 @@ export class SimpleModule extends Module {
       moduleName: string,
       parentLog: Common.ILog,
       private readonly modulesAndDependencies: {
-        dependencies?: IObject<IModule>,
-        subModules?: IObject<IModule>,
+        dependencies?: IObject<Module>,
+        subModules?: IObject<Module>,
         startupPreconditions?: IObject<Promise<void>>,
       },
   ) {

@@ -354,7 +354,7 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.requestMemory.onRequest.removeListener(
         this.boundMethods.get(this.observeRequest),
     );
@@ -370,8 +370,6 @@ export class Overlay extends Module implements App.windows.window.IOverlay {
     if (requestLog && requestLog.hidden === false) {
       this.toggleRequestLog();
     }
-
-    return MaybePromise.resolve(undefined);
   }
 
   private get popupElement(): XUL.menupopup {

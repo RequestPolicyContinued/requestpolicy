@@ -126,10 +126,9 @@ export class KeyboardShortcutModule extends Module
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.removeElement();
     this.prefObserver.removeAllListeners();
-    return MaybePromise.resolve(undefined);
   }
 
   private onPress(event: Event) {

@@ -22,7 +22,7 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class Storage extends Module implements App.IStorage {
   constructor(
@@ -42,7 +42,7 @@ export class Storage extends Module implements App.IStorage {
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    const rv: {[k: string]: Module} = {
       apiWrapper: this.apiWrapper,
       asyncSettings: this.asyncSettings,
       storageAvailabilityController: this.storageAvailabilityController,

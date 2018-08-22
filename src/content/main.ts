@@ -60,7 +60,7 @@ const shutdownMessage = `${C.MM_PREFIX}shutdown`;
 
 function shutdown(aShutdownArgs: any) {
   MainEnvironment.shutdown(aShutdownArgs);
-  rp.shutdown().catch(log.onError("main shutdown"));
+  rp.shutdown();
 }
 
 declare const Services: any;

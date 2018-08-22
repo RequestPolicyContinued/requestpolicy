@@ -63,7 +63,7 @@ Promise.resolve().then(() => {
     observe(subject: any, topic: any, reason: any) {
       if (subject.wrappedJSObject === COMMONJS_UNLOAD_SUBJECT) {
         try {
-          rp.shutdown().catch(log.onError("framescript shutdown"));
+          rp.shutdown();
         } catch (e) {
           logSevereError("framescript shutdown() failed!", e);
         }

@@ -24,7 +24,7 @@ import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Connection } from "lib/classes/connection";
 import { MaybePromise } from "lib/classes/maybe-promise";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class Runtime extends Module {
   // protected get debugEnabled() { return true; }
@@ -65,7 +65,7 @@ export class Runtime extends Module {
   public get isFennec() { return this.browserInfo.name === "Fennec"; }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    const rv: {[k: string]: Module} = {
       aboutUri: this.aboutUri,
     };
     if (!this.gotEWEConnection) {

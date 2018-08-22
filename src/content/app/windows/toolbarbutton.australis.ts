@@ -56,20 +56,22 @@ export class AustralisToolbarButton extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     if (this.isAustralis) {
       this.removeToolbarButtonFromAustralis();
     }
-    return MaybePromise.resolve(undefined);
   }
 
   private removeToolbarButtonFromAustralis() {
     const {id} = TOOLBARBUTTON_ATTRIBUTES;
+    this.debugLog.log("removing toolbar button");
     this.mozCustomizableUI!.destroyWidget(id);
   }
 
   private addToolbarButtonToAustralis() {
     const {id, label, tooltiptext} = TOOLBARBUTTON_ATTRIBUTES;
+
+    this.debugLog.log("adding toolbar button");
 
     this.mozCustomizableUI!.createWidget({
       defaultArea: this.mozCustomizableUI!.AREA_NAVBAR,

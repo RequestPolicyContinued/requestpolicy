@@ -49,9 +49,8 @@ export class ChromeStyleSheets extends Module
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.unloadStyleSheets();
-    return MaybePromise.resolve(undefined);
   }
 
   private loadStyleSheets() {

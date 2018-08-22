@@ -222,7 +222,7 @@ export class WindowService extends Module
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.windowMediator.removeListener(this.windowMediatorListener);
 
     const progressEventListener = this.boundMethods.get(this.onProgressEvent);
@@ -231,8 +231,6 @@ export class WindowService extends Module
       window.removeEventListener("unload", progressEventListener, false);
     }
     this.windows.clear();
-
-    return MaybePromise.resolve(undefined);
   }
 
   private onProgressEvent(event: ProgressEvent) {

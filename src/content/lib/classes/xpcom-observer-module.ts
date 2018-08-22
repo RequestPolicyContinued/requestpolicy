@@ -68,10 +68,9 @@ export class XPCOMObserverModule extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.topics.forEach((topic) => {
       this.observerService.removeObserver(this, topic);
     });
-    return MaybePromise.resolve(undefined);
   }
 }

@@ -30,7 +30,6 @@ import {C} from "data/constants";
 import {
   GUIDestination, GUILocation, GUILocationProperties, GUIOrigin,
 } from "lib/classes/gui-location";
-import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { RequestSet } from "lib/classes/request-set";
 import { removeChildren } from "lib/utils/dom-utils";
@@ -295,13 +294,12 @@ export class Menu extends Module implements App.windows.window.IMenu {
 
   // ---------------------------------------------------------------------------
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     // empty _all_ lists
     // tslint:disable-next-line:forin
     for (const listName in this.lists) {
       this.emptyList((this.lists as any)[listName]);
     }
-    return MaybePromise.resolve(undefined);
   }
 
   // ---------------------------------------------------------------------------

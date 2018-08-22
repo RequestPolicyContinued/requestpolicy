@@ -70,10 +70,9 @@ export class Storage extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.slsa.onChanged.removeListener(this.slsaChangedListener);
     this.rpPrefBranch.removeObserver("", this.prefObserver);
-    return MaybePromise.resolve(undefined);
   }
 
   private getLocal(

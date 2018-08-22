@@ -101,8 +101,11 @@ export abstract class XpcomClassFactoryModule extends Module {
     this.log.error(`Failed to register factory ${nTimes} times!`);
   }
 
-  protected shutdownSelf() {
-    return MaybePromise.resolve(this.unregister());
+  protected shutdownSelf(): void {
+    this.unregister().catch((e) => {
+      console.error(e);
+      console.trace();
+    });
   }
 
   // tslint:disable-next-line:no-empty

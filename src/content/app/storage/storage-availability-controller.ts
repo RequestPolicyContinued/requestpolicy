@@ -23,7 +23,7 @@
 import { App, IObject } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class StorageAvailabilityController extends Module
     implements App.storage.IStorageAvailabilityController {
@@ -60,7 +60,7 @@ export class StorageAvailabilityController extends Module
 
   protected get dependencies() {
     return Object.assign(
-        {} as IObject<IModule>,
+        {} as IObject<Module>,
         this.storageMigrationToWE ? {
           storageMigrationToWE: this.storageMigrationToWE,
         } : {},

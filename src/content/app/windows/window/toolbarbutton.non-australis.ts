@@ -70,14 +70,13 @@ export class NonAustralisToolbarButton extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     if (!this.isAustralis) {
       this.xulService.removeTreeElementsFromWindow(
           this.window,
           this.xulTrees.xulTreeLists.toolbarbutton,
       );
     }
-    return MaybePromise.resolve(undefined);
   }
 
   private addToolbarButtonToNavBar() {

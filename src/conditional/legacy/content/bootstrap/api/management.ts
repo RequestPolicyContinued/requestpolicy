@@ -112,9 +112,8 @@ export class Management extends Module implements API.management.IManagement {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.addonManager.removeAddonListener(this.addonListener);
-    return MaybePromise.resolve(undefined);
   }
 
   private mapAddonInfoToWebextExtensionInfo(aAddon: Addon): ExtensionInfo {

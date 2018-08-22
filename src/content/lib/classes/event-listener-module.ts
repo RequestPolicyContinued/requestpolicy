@@ -85,9 +85,8 @@ export class EventListenerModule extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.removeAllListeners();
-    return MaybePromise.resolve(undefined);
   }
 
   /**

@@ -77,7 +77,7 @@ export class XulTrees extends Module {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     // remove all XUL elements
     this.xulService.removeTreeElementsFromWindow(
         this.window,
@@ -89,7 +89,5 @@ export class XulTrees extends Module {
     // done when RP is being disabled.
     // eslint-disable-next-line no-param-reassign
     delete (this.window as any).rpcontinued;
-
-    return MaybePromise.resolve(undefined);
   }
 }

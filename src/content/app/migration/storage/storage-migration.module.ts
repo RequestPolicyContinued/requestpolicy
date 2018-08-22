@@ -61,7 +61,7 @@ export class StorageMigration extends Module
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    const rv: {[k: string]: Module} = {
       settingsMigration: this.settingsMigration,
     };
     if (this.storageMigrationToWE) {

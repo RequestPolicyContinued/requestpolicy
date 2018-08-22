@@ -109,8 +109,11 @@ export class FramescriptToBackgroundCommunication extends Module {
     return MaybePromise.resolve(this.startCommNowOrLater());
   }
 
-  protected shutdownSelf() {
-    return this.stopCommunication();
+  protected shutdownSelf(): void {
+    this.stopCommunication().catch((e) => {
+      console.error(e);
+      console.trace();
+    });
   }
 
   /**

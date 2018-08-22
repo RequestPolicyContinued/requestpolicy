@@ -326,8 +326,7 @@ export class ManagerForDOMContentLoaded extends Module {
   private unloadFromDocument(doc: Document) {
     const docInfo = this.documents.get(doc)!;
 
-    docInfo.eventListeners.shutdown().
-        catch(this.log.onError("eventListeners.shutdown()"));
+    docInfo.eventListeners.shutdown();
 
     this.documents.delete(doc);
 

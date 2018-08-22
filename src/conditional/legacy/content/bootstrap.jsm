@@ -237,20 +237,20 @@ var FakeWebExt = (function() {
     addon.commonjsEnv.unload(aReason);
     addon.commonjsEnv = null;
 
-    // shut down the fake environment
-    fakeEnv.exports.api.shutdown().then(() => {
+    try {
+      // shut down the fake environment
+      fakeEnv.exports.api.shutdown();
+
       fakeEnv.commonjsEnv.unload();
 
       // clean up
       fakeEnv.commonjsEnv = null;
       fakeEnv.exports = null;
       FakeWebExt.api = null;
-
-      return;
-    }).catch((e) => {
+    } catch (e) {
       console.error("Failed to shut down!");
       console.dir(e);
-    });
+    }
   };
 
   // ---------------------------------------------------------------------------

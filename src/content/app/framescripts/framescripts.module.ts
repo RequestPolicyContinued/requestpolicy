@@ -54,7 +54,7 @@ export class Framescripts extends Module implements App.IFramescripts {
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     // Stop loading framescripts into new tabs.
     // --------------------------
     // Note that it's not necessary to tell the framescripts'
@@ -66,7 +66,5 @@ export class Framescripts extends Module implements App.IFramescripts {
     //   children.
     this.globalFrameMessageManager.
         removeDelayedFrameScript(this.frameScriptURI);
-
-    return MaybePromise.resolve(undefined);
   }
 }

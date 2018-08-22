@@ -85,9 +85,8 @@ export class AsyncSettings extends Module
     return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.storageApi.onChanged.removeListener(this.changeEventListener);
-    return MaybePromise.resolve(undefined);
   }
 
   private onChangedEvent(

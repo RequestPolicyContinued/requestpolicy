@@ -76,12 +76,11 @@ export class Windows extends Module implements App.IWindows {
     return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
-  protected shutdownSelf() {
-    const rvs = this.windowService.
-        forEachOpenWindow<Windows, MaybePromise<void>>(
+  protected shutdownSelf(): void {
+    this.windowService.
+        forEachOpenWindow<Windows, void>(
             this.boundMethods.get(this.unloadFromWindow),
         );
-    return MaybePromise.all(rvs) as MaybePromise<any>;
   }
 
   private onWindowLoaded(event: ProgressEvent): void {
@@ -108,12 +107,12 @@ export class Windows extends Module implements App.IWindows {
     return windowModule.startup();
   }
 
-  private unloadFromWindow(window: XUL.chromeWindow): MaybePromise<void> {
+  private unloadFromWindow(window: XUL.chromeWindow): void {
     const windowID = this.windowModules.getWindowId(window);
     this.debugLog.log(`unloadFromWindow(), windowID=${windowID}`);
     if (!this.windowModules._map.has(windowID)) {
       this.log.warn(`Window #${windowID} not loaded.`);
-      return MaybePromise.resolve(undefined);
+      return;
     }
     const windowModule = this.windowModules._map.get(windowID)!;
     return windowModule.shutdown();

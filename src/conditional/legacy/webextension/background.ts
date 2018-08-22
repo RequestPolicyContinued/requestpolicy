@@ -35,9 +35,12 @@ const rootLog = new Log({
 });
 const log = rootLog.extend({name: "ewe"});
 const portGetterLog = rootLog.extend({name: "ewe.getPortFromConnectable"});
+const portGetterDebugLog = portGetterLog.extend({
+  enabled: C.LOG_STORAGE_MIGRATION,
+});
 const promiseLegacyPort = () => getPortFromMasterConnectable(
     portGetterLog,
-    portGetterLog,
+    portGetterDebugLog,
     browser.runtime,
 );
 const legacyConnection = new Connection(
@@ -61,5 +64,5 @@ ewe.startup().catch(log.onError("EWE startup failed"));
 
 window.addEventListener("unload", () => {
   // Only synchronous tasks can be done here.
-  ewe.shutdown().catch(log.onError("EWE shutdown failed"));
+  ewe.shutdown();
 });

@@ -79,7 +79,7 @@ const keys: {
     cached: true, defaultValue: "0.0",
   },
   "lastStorageChange": {
-    cached: true, defaultValue: "",
+    cached: false, defaultValue: "", // do not cache
   },
   "lastVersion": {
     cached: true, defaultValue: "0.0",

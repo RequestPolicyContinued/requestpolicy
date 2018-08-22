@@ -24,6 +24,7 @@ import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
 // tslint:disable-next-line:max-line-length
@@ -62,6 +63,11 @@ export class StorageApiWrapper extends Module
   public get onChanged() { return this.api.onChanged; }
   public get sync() { return this.api.sync; }
 
+  protected startupSelf() {
+    this.onChanged.addListener(this.observeStorageChange.bind(this));
+    return MaybePromise.resolve(undefined);
+  }
+
   private _set(keys: API.storage.api.StorageObject) {
     keys.lastStorageChange = new Date().toISOString();
     this.debugLog.dir(
@@ -69,5 +75,18 @@ export class StorageApiWrapper extends Module
         keys,
     );
     return this.api.local.set(keys);
+  }
+
+  private observeStorageChange(aChanges: API.storage.api.ChangeDict) {
+    if ("lastStorageChange" in aChanges) return;
+
+    const newDate = new Date().toISOString();
+    this.debugLog.log(
+        `updating "lastStorageChange": ${newDate}; storage change:`,
+        aChanges,
+    );
+    this.api.local.set({
+      lastStorageChange: newDate,
+    }).catch(this.log.onError(`error updating "lastStorageChange"`));
   }
 }

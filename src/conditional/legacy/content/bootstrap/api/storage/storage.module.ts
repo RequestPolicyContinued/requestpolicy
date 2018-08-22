@@ -22,6 +22,7 @@
 
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
@@ -31,7 +32,7 @@ type xpcomPrefBranch = XPCOM.nsIPrefBranch;
 type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
 
 export class Storage extends Module {
-  // protected get debugEnabled() { return true; }
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
 
   private events = createListenersMap(["onChanged"]);
 

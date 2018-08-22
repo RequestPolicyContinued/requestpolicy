@@ -18,6 +18,8 @@ import {createBrowserApi} from "../lib/sinon-chrome";
 import { AsyncSettings } from "app/storage/async-settings";
 import { Log } from "lib/classes/log";
 import { defer } from "lib/utils/js-utils";
+import { StorageApiWrapper } from "app/storage/storage-api-wrapper";
+import { Module } from "lib/classes/module";
 
 type IStorageChanges = browser.storage.ChangeDict;
 
@@ -34,10 +36,16 @@ describe("AsyncSettings", function() {
       defaultSettings = {},
       storageReadyPromise = Promise.resolve(),
   ) {
+    const storageAvailabilityController = new Module("", log);
+    storageReadyPromise.then(() => storageAvailabilityController.startup());
+    const storageApiWrapper = new StorageApiWrapper(
+        null, log, stubbedStorage, storageAvailabilityController as any,
+    );
+    storageApiWrapper.startup();
     return new AsyncSettings(
         log,
         null,
-        storageReadyPromise.then(() => stubbedStorage),
+        storageApiWrapper,
         defaultSettings,
     );
   }

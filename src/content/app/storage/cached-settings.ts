@@ -24,7 +24,10 @@
 import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { objectEntries } from "lib/utils/js-utils";
+import { getInfosOfStorageChange } from "lib/utils/storage-utils";
 
 interface IDefaultValues {
   [key: string]: string | number | boolean;
@@ -114,11 +117,30 @@ implements App.storage.ICachedSettings {
     return this.storageArea.set(aKeys);
   }
 
+  protected startupSelf() {
+    // observe storage changes and compare them w/ the cached ones
+    // (for legacy browsers with about:config)
+    this.storageApi.onChanged.addListener(
+        this.observeStorageChange.bind(this),
+    );
+    return MaybePromise.resolve(undefined);
+  }
+
   private getRaw(aKey: string): any {
     if (!this.isKeyCached(aKey)) {
       throw new Error(`Key "${aKey}" is not cached in Storage!`);
     }
     const result = this.rpPrefBranch.get(aKey);
     return result === undefined ? this.defaultValues[aKey] : result;
+  }
+
+  private observeStorageChange(aChanges: API.storage.api.ChangeDict) {
+    const {keysToRemove, keysToSet} = getInfosOfStorageChange(aChanges);
+    keysToRemove.forEach((key) => {
+      // reset to default
+    });
+    objectEntries(keysToSet).forEach(([key, value]) => {
+      // set value
+    });
   }
 }

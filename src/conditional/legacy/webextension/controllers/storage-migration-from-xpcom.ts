@@ -25,6 +25,7 @@ import { C } from "data/constants";
 import { IConnection } from "lib/classes/connection";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { getInfosOfStorageChange } from "lib/utils/storage-utils";
 
 const TARGET_NAME = "storage-migration-from-xpcom";
 const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
@@ -103,20 +104,12 @@ export class StorageMigrationFromXpcom extends Module {
 
   private applyStorageChanges(aStorageChanges: IStorageChanges) {
     this.debugLog.log("going to apply storage changes...");
-    const keysToRemove: string[] = [];
-    let hasKeysToSet = false;
-    const keysToSet: {[key: string]: any} = {};
-    // tslint:disable-next-line prefer-const
-    for (let key of Object.keys(aStorageChanges)) {
-      const change = aStorageChanges[key];
-      if ("newValue" in change) {
-        keysToSet[key] = change.newValue;
-        hasKeysToSet = true;
-      } else {
-        keysToRemove.push(key);
-      }
-    }
-    const hasKeysToRemove = keysToRemove.length !== 0;
+    const {
+      hasKeysToRemove,
+      hasKeysToSet,
+      keysToRemove,
+      keysToSet,
+    } = getInfosOfStorageChange(aStorageChanges);
     const promises: Array<Promise<void>> = [];
     if (hasKeysToRemove) promises.push(this.storageArea.remove(keysToRemove));
     if (hasKeysToSet) promises.push(this.storageArea.set(keysToSet));

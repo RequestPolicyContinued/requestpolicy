@@ -22,7 +22,10 @@
 
 declare const RUN_ID: number;  // see bootstrap.jsm
 
-const env = (str: TemplateStringsArray) => str[0] !== "undefined";
+const env = (str: TemplateStringsArray) => (
+    str[0] !== "undefined" &&
+    !str[0].startsWith("/* @echo ")
+);
 
 export const C = {
   LOG_BG_CONTENT_BOUNDARIES: env`/* @echo LOG_BG_CONTENT_BOUNDARIES */`,

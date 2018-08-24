@@ -130,6 +130,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {newValue: "bar"}});
@@ -150,6 +151,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves()
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {}});
@@ -171,6 +173,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {newValue: "myNewValue"}});
@@ -192,6 +195,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {oldValue: "oldValueAndDefault"}});
@@ -214,6 +218,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({

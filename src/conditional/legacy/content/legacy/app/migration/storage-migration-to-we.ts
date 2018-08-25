@@ -20,8 +20,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { IConnection } from "lib/classes/connection";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import {defer} from "lib/utils/js-utils";
 
@@ -33,53 +37,73 @@ interface IResponse {
   value: any;
 }
 
-export class StorageMigrationToWebExtension extends Module {
+export class StorageMigrationToWebExtension extends Module
+    implements App.migration.storage.IStorageMigrationToWebExtension {
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
+
   private shouldSendFullStorage: boolean = true;
   private lastStorageChange: string | null = null;
 
   private dStorageReadyForAccess = defer<void>();
   private dInitialSync = defer<void>();
+  private initialSyncState: "not started" | "started" | "done" = "not started";
 
   private connectionToEWE: IConnection;
 
   // FIXME: this is only necessary for testing -- bad style!
   private dWaitingForEWE = defer<void>();
 
+  private get storageArea() { return this.storageApi.local; }
+  private get onStorageChanged() { return this.storageApi.onChanged; }
+
   constructor(
       log: Common.ILog,
-      private storageArea: browser.storage.StorageArea,
-      private onStorageChanged: typeof browser.storage.onChanged,
+      // tslint:disable-next-line:max-line-length
+      private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
       private pConnectionToEWE: Promise<IConnection>,
   ) {
-    super("app.migration.xpcomToWE", log);
+    super("app.migration.storage.xpcomToWE", log);
 
     pConnectionToEWE.then((c) => this.connectionToEWE = c).
         catch(this.log.onError("connectionToEWE"));
   }
 
-  protected startupSelf(): Promise<void> {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected startupSelfAsync(): Promise<void> {
     const pGotLastStorageChange =
         this.storageArea.get("lastStorageChange").then((result) => {
           this.lastStorageChange =
               (result.lastStorageChange as string | undefined) || null;
+          this.debugLog.log(
+              `got "lastStorageChange": ${result.lastStorageChange}`,
+          );
         }).catch(this.log.onError("get lastStorageChange"));
+    const pGotConnectionToEWE = this.debugEnabled ?
+        this.pConnectionToEWE.then(() => {
+          this.debugLog.log(`got connection to EWE`);
+        }) : (this.pConnectionToEWE as Promise<any>);
     return Promise.all([
-      this.pConnectionToEWE,
+      pGotConnectionToEWE,
       pGotLastStorageChange,
     ]).then(() => {
-      this.debugLog.log("checkpoint");
       this.connectionToEWE.onMessage.
           addListener(this.receiveMessage.bind(this));
       const p = this.connectionToEWE.sendMessage(
           this.createMessage("startup", "ready"),
       );
-      this.debugLog.log("waiting for EWE to be ready");
+      this.debugLog.log("waiting for the EWE to be ready");
       this.dWaitingForEWE.resolve(undefined);
       return p;
     }).then(() => {
-      this.debugLog.log("waiting for synchronization to be done");
+      this.debugLog.log(
+          "the EWE is ready. waiting for synchronization to be done",
+      );
       return this.dInitialSync.promise;
     }).then(() => {
+      this.debugLog.log("synchronization done");
       this.onStorageChanged.addListener(this.storageChanged.bind(this));
     });
   }
@@ -115,52 +139,64 @@ export class StorageMigrationToWebExtension extends Module {
     }
   }
 
-  private getFullWebextStorage(): Promise<browser.storage.StorageObject> {
+  private getFullWebextStorage(): Promise<API.storage.api.StorageObject> {
     return this.connectionToEWE.sendMessage(
         this.createMessage("request", "full-storage")).then((response: any) => {
       this.assertSuccessful(response, "request:full-storage");
-      return response.value as browser.storage.StorageObject;
+      return response.value as API.storage.api.StorageObject;
     });
   }
 
   private pullFullStorage(): Promise<void> {
+    this.debugLog.log(`requesting full storage from the EWE`);
     return this.getFullWebextStorage().then((fullStorage) => {
+      this.debugLog.log(
+          `got full storage from the EWE. storing the full storage...`,
+      );
       return this.storageArea.set(fullStorage);
     }).then(() => {
+      this.debugLog.log(
+          `done storing the full storage, pull done.`,
+      );
       this.shouldSendFullStorage = false;
     });
   }
 
   private sendFullStorage(): Promise<void> {
     const p = this.storageArea.get(null).then((fullStorage) => {
+      this.debugLog.log(`sending full storage to the EWE`);
       return this.connectionToEWE.sendMessage(
           this.createMessage("full-storage", fullStorage));
     }).then((response: any) => {
       this.assertSuccessful(response, "full-storage");
+      this.debugLog.log(`successfully sent full storage to the EWE`);
       this.shouldSendFullStorage = false;
     });
-    p.catch((e: any) => {
-      this.log.error(
-          "Error on sending the full storage to the embedded WebExtension:",
-          e);
-
-    });
+    p.catch(this.log.onError(
+        "Error on sending the full storage to the embedded WebExtension:",
+    ));
     return p;
   }
 
   private storageChanged(
-      aStorageChanges: browser.storage.ChangeDict,
+      aStorageChanges: API.storage.api.ChangeDict,
   ): Promise<void> {
+    this.debugLog.log("obtaining storage change:", aStorageChanges);
     if (!this.isStorageReadyForAccess) {
       this.log.error("Not ready for storage changes yet!");
     }
     if (this.shouldSendFullStorage) {
       return this.sendFullStorage();
     }
+    this.debugLog.log(
+        "going to send storage change to the EWE:",
+        aStorageChanges,
+    );
     return this.connectionToEWE.sendMessage(
         this.createMessage("storage-changes", aStorageChanges),
     ).then((response: any) => {
       this.assertSuccessful(response, "storage-changes");
+      this.debugLog.log("successfully sent storage change to the EWE");
     }).catch((e: any) => {
       this.log.error(
           "Error on sending storage changes to the empedded WebExtension:",
@@ -176,6 +212,11 @@ export class StorageMigrationToWebExtension extends Module {
     if (aMessage.target !== "legacy-side-storage-migration-controller") return;
     if (aMessage.type !== "startup") return;
     if (!aMessage.value.ready) return;
+    if (this.initialSyncState !== "not started") return;
+    this.initialSyncState = "started";
+    this.debugLog.log(
+        `got EWE-side lastStorageChange: ${aMessage.value.lastStorageChange}`,
+    );
     const isPull =
         !aMessage.value.lastStorageChange ? false :
         !this.lastStorageChange ? true :
@@ -183,13 +224,19 @@ export class StorageMigrationToWebExtension extends Module {
           new Date(aMessage.value.lastStorageChange) >
           new Date(this.lastStorageChange)
         );
+    const pushOrPull = isPull ? "pull" : "push";
+    this.debugLog.log(
+        `going to perform storage synchronization (${pushOrPull})`,
+    );
     const pInitialSync = isPull ?
         this.pullFullStorage() :
         this.sendFullStorage();
     pInitialSync.catch((e: any) => {
-      this.log.error(`Error on initial sync (${isPull ? "pull" : "push"}):`, e);
+      this.log.error(`Error on initial sync (${pushOrPull}):`, e);
     });
-    this.dInitialSync.resolve(pInitialSync);
+    this.dInitialSync.resolve(pInitialSync.then(() => {
+      this.initialSyncState = "done";
+    }));
     if (isPull) {
       this.dStorageReadyForAccess.resolve(pInitialSync);
     } else {

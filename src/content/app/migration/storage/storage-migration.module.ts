@@ -22,16 +22,19 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class StorageMigration extends Module
     implements App.migration.IStorageMigration {
+  // protected get debugEnabled() { return true; }
+
   protected get startupPreconditions() {
-    return [
-      this.pStorageMigrationToWE.then(() => undefined),
-    ];
+    return {
+      gotStorageMigrationToWE: this.gotStorageMigrationToWE,
+    };
   }
 
+  private gotStorageMigrationToWE: Promise<void>;
   private storageMigrationToWE:
       App.migration.storage.IStorageMigrationToWebExtension | null;
 
@@ -40,16 +43,25 @@ export class StorageMigration extends Module
       public readonly settingsMigration:
           App.migration.storage.ISettingsMigration,
       public readonly v0Rules: App.migration.storage.IV0RulesMigration | null,
-      private pStorageMigrationToWE:
+      pStorageMigrationToWE:
           Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage", log);
-    pStorageMigrationToWE.then((m) => this.storageMigrationToWE = m).
-        catch(this.log.onError("pStorageMigrationToWE"));
+
+    this.gotStorageMigrationToWE = pStorageMigrationToWE.then((m) => {
+      if (this.debugEnabled) {
+        if (m === null) {
+          this.debugLog.log(`"IStorageMigrationToWebExtension" n/a`);
+        } else {
+          this.debugLog.log(`got "IStorageMigrationToWebExtension"`);
+        }
+      }
+      this.storageMigrationToWE = m;
+    });
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    const rv: {[k: string]: Module} = {
       settingsMigration: this.settingsMigration,
     };
     if (this.storageMigrationToWE) {

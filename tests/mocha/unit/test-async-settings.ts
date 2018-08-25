@@ -18,6 +18,8 @@ import {createBrowserApi} from "../lib/sinon-chrome";
 import { AsyncSettings } from "app/storage/async-settings";
 import { Log } from "lib/classes/log";
 import { defer } from "lib/utils/js-utils";
+import { StorageApiWrapper } from "app/storage/storage-api-wrapper";
+import { Module } from "lib/classes/module";
 
 type IStorageChanges = browser.storage.ChangeDict;
 
@@ -34,12 +36,17 @@ describe("AsyncSettings", function() {
       defaultSettings = {},
       storageReadyPromise = Promise.resolve(),
   ) {
+    const storageAvailabilityController = new Module("", log);
+    storageReadyPromise.then(() => storageAvailabilityController.startup());
+    const storageApiWrapper = new StorageApiWrapper(
+        null, log, stubbedStorage, storageAvailabilityController as any,
+    );
+    storageApiWrapper.startup();
     return new AsyncSettings(
         log,
-        stubbedStorage,
-        stubbedStorageArea,
+        null,
+        storageApiWrapper,
         defaultSettings,
-        storageReadyPromise,
     );
   }
 
@@ -123,6 +130,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {newValue: "bar"}});
@@ -143,6 +151,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves()
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {}});
@@ -164,6 +173,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {newValue: "myNewValue"}});
@@ -185,6 +195,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({foo: {oldValue: "oldValueAndDefault"}});
@@ -207,6 +218,7 @@ describe("AsyncSettings", function() {
       asyncSettings.onChanged.addListener(changeListener);
       asyncSettings.startup();
       await asyncSettings.whenReady;
+      stubbedStorage.local.set.resolves();
 
       // exercise
       stubbedStorage.onChanged.trigger({

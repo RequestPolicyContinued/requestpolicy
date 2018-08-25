@@ -29,25 +29,31 @@ export class AppBackground extends Module {
   constructor(
       log: Common.ILog,
       public readonly browserSettings: App.IBrowserSettings,
+      public readonly framescripts: App.IFramescripts,
       public readonly migration: App.IMigration,
       public readonly policy: App.IPolicy,
       public readonly runtime: Runtime,
       public readonly services: App.IRPServices,
       public readonly storage: App.IStorage,
       public readonly ui: App.IUi,
+      public readonly webRequest: App.IWebRequest,
+      public readonly windows: App.IWindows,
   ) {
-    super("App", log);
+    super("app", log);
   }
 
   protected get subModules() {
     return {
       browserSettings: this.browserSettings,
+      framescripts: this.framescripts,
       migration: this.migration,
       policy: this.policy,
       runtime: this.runtime,
       services: this.services,
       storage: this.storage,
       ui: this.ui,
+      webRequest: this.webRequest,
+      windows: this.windows,
     };
   }
 }

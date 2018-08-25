@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { UserSubscriptionsInfo } from "lib/subscription";
+import { UserSubscriptionsInfo } from "app/policy/subscription";
 import {BackgroundPage} from "main";
 import {elManager, WinEnv} from "./common";
 
@@ -74,21 +74,19 @@ declare const Services: any;
   }
 
   function handleSubscriptionCheckboxChange(event: any) {
-    const userSubs = rp.policy.subscriptions.getSubscriptions();
-
     const subName = event.target.name;
     const enabled = event.target.checked;
     const subInfo: UserSubscriptionsInfo = {};
     subInfo.official = {};
     subInfo.official[subName] = true;
     if (enabled) {
-      userSubs.addSubscription("official", subName);
+      rp.policy.subscriptions.addSubscription("official", subName);
       Services.obs.notifyObservers(
           null, SUBSCRIPTION_ADDED_TOPIC,
           JSON.stringify(subInfo),
       );
     } else {
-      userSubs.removeSubscription("official", subName);
+      rp.policy.subscriptions.removeSubscription("official", subName);
       Services.obs.notifyObservers(
           null, SUBSCRIPTION_REMOVED_TOPIC,
           JSON.stringify(subInfo),

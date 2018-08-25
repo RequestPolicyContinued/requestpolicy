@@ -24,6 +24,7 @@ import { XPCOM } from "bootstrap/api/interfaces";
 
 declare const Cc: XPCOM.nsXPCComponents_Classes;
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Cm: XPCOM.nsXPCComponents_Manager;
 
 export class XPConnectService {
   public createConverterInputStreamInstance(): XPCOM.nsIConverterInputStream {
@@ -49,5 +50,42 @@ export class XPConnectService {
   public createSupportsStringInstance(): XPCOM.nsISupportsString {
     return Cc["@mozilla.org/supports-string;1"].
         createInstance(Ci.nsISupportsString);
+  }
+
+  // services
+  public getCategoryManager(): XPCOM.nsICategoryManager {
+    return Cc["@mozilla.org/categorymanager;1"].
+        getService<XPCOM.nsICategoryManager>(Ci.nsICategoryManager);
+  }
+
+  public getGlobalFrameMessageManager(): XPCOM.GlobalFrameMessageManager {
+    return Cc["@mozilla.org/globalmessagemanager;1"].
+        getService(Ci.nsIMessageListenerManager);
+  }
+
+  public getIDNService(): XPCOM.nsIIDNService {
+    return Cc["@mozilla.org/network/idn-service;1"].
+          getService<XPCOM.nsIIDNService>(Ci.nsIIDNService);
+  }
+
+  public getPromptService(): XPCOM.nsIPromptService {
+    return Cc["@mozilla.org/embedcomp/prompt-service;1"].
+          getService<XPCOM.nsIPromptService>(Ci.nsIPromptService);
+  }
+
+  public getStyleSheetService(): XPCOM.nsIStyleSheetService {
+    return Cc["@mozilla.org/content/style-sheet-service;1"].
+        getService(Ci.nsIStyleSheetService);
+  }
+
+  public getXULAppInfo(): XPCOM.nsIXULAppInfo {
+    return Cc["@mozilla.org/xre/app-info;1"].
+        getService<XPCOM.nsIXULAppInfo>(Ci.nsIXULAppInfo);
+  }
+
+  // other
+
+  public getComponentRegistrar(): XPCOM.nsIComponentRegistrar {
+    return Cm.QueryInterface(Ci.nsIComponentRegistrar);
   }
 }

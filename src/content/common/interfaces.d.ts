@@ -21,8 +21,11 @@
  */
 
 import { Log } from "lib/classes/log";
+import * as TryCatchUtils from "lib/utils/try-catch-utils";
+
 export namespace Common {
   export type ILog = Log;
+  export type ITryCatchUtils = typeof TryCatchUtils;
 
   export interface IMasterConnectable {
     sendMessage: typeof browser.runtime.sendMessage;

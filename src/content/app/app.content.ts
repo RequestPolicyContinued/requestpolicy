@@ -20,30 +20,118 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { dAsyncSettings, log } from "app/log";
-import { RPContentServices } from "app/services/services.module.content";
-import { UriService } from "app/services/uri-service";
-import { Storage } from "app/storage/storage.module";
+import { StorageApiWrapper } from "app/storage/storage-api-wrapper";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
+import { MessageListenerModule } from "lib/classes/message-listener-module";
+import { getDOMWindowUtils } from "lib/utils/window-utils";
 import { AppContent } from "./app.content.module";
+import { ManagerForBlockedContent } from "./contentscript/blocked-content";
+import { ContentscriptModule } from "./contentscript/contentscript.module";
+import { ManagerForDOMContentLoaded } from "./contentscript/dom-content-loaded";
+import {
+  FramescriptToBackgroundCommunication,
+} from "./contentscript/framescript-to-background-communication";
+import { ContentscriptMisc } from "./contentscript/misc";
+import { dAsyncSettings, log } from "./log";
+import { RPContentServices } from "./services/services.module.content";
+import { UriService } from "./services/uri-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
+import {
+  StorageAvailabilityController,
+} from "./storage/storage-availability-controller";
+import { Storage } from "./storage/storage.module";
 
-const storageReadyPromise = Promise.resolve();
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Services: JSMs.Services;
+declare const cfmm: XPCOM.ContentFrameMessageManager;
 
-const uriService = new UriService(log, "AppContent");
-const rpServices = new RPContentServices(log, uriService);
+const domWindowUtils = getDOMWindowUtils(cfmm.content);
+const {outerWindowID} = domWindowUtils;
+
+// FIXME: ask the background if the storage migration is done yet
+// tslint:disable-next-line:max-line-length
+const storageAvailabilityController = new StorageAvailabilityController(
+    log,
+    outerWindowID,
+    null,
+    Promise.resolve(null),
+);
+
+const storageApiWrapper = new StorageApiWrapper(
+    outerWindowID,
+    log,
+    browser.storage,  // badword-linter:allow:browser.storage:
+    storageAvailabilityController,
+);
+
+const msgListener = new MessageListenerModule(
+    `AppContent[${outerWindowID}].contentSide`,
+    log,
+    cfmm,
+);
+const bgCommunication = new FramescriptToBackgroundCommunication(
+    log,
+    outerWindowID,
+    cfmm,
+    msgListener,
+);
+const blockedContent = new ManagerForBlockedContent(log, outerWindowID);
+const xpconnectService = new XPConnectService();
+const uriService = new UriService(
+    log,
+    outerWindowID,
+    Services.eTLD,
+    xpconnectService.getIDNService(),
+    Services.io,
+);
+const domContentLoaded = new ManagerForDOMContentLoaded(
+    log,
+    outerWindowID,
+    Ci,
+    cfmm,
+    bgCommunication,
+    blockedContent,
+    uriService,
+);
+const contentscriptMisc = new ContentscriptMisc(
+    log,
+    outerWindowID,
+    cfmm,
+    bgCommunication,
+    msgListener,
+);
+const contentSide = new ContentscriptModule(
+    log,
+    outerWindowID,
+    bgCommunication,
+    blockedContent,
+    domContentLoaded,
+    contentscriptMisc,
+);
+
+const rpServices = new RPContentServices(log, outerWindowID, uriService);
 
 const asyncSettings = new AsyncSettings(
     log,
-    browser.storage,
-    browser.storage.local,
+    outerWindowID,
+    storageApiWrapper,
     SETTING_SPECS.defaultValues,
-    storageReadyPromise,
 );
 dAsyncSettings.resolve(asyncSettings);
-const storage = new Storage(log, asyncSettings, null, storageReadyPromise);
+const storage = new Storage(
+    log,
+    outerWindowID,
+    storageApiWrapper,
+    asyncSettings,
+    null,
+    storageAvailabilityController,
+);
 export const rp = new AppContent(
     log,
+    outerWindowID,
+    contentSide,
     rpServices,
     storage,
 );

@@ -21,8 +21,11 @@
  */
 
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { IConnection } from "lib/classes/connection";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { getInfosOfStorageChange } from "lib/utils/storage-utils";
 
 const TARGET_NAME = "storage-migration-from-xpcom";
 const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
@@ -31,31 +34,46 @@ const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
 
 type StorageMessageType = "full-storage" | "storage-changes" |
     "request:full-storage";
-type IStorageChanges = browser.storage.ChangeDict;
+// tslint:disable-next-line:max-line-length
+type IStorageChanges = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
 
 // =============================================================================
 
 export class StorageMigrationFromXpcom extends Module {
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
+
   private lastStorageChange: string | null = null;
   private connectionToLegacy: IConnection;
+
+  private get storageArea() { return this.storageApi.local; }
 
   constructor(
       log: Common.ILog,
       private pConnectionToLegacy: Promise<IConnection>,
-      private storage: typeof browser.storage,
+      // tslint:disable-next-line:max-line-length
+      private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
   ) {
     super("ewe.storageMigrationFromXpcom", log);
 
-    pConnectionToLegacy.then((c) => this.connectionToLegacy = c).
-        catch(this.log.onError("connectionToLegacy"));
+    pConnectionToLegacy.then((c) => {
+      this.debugLog.log(`got "IConnection"`);
+      this.connectionToLegacy = c;
+    }).catch(this.log.onError("connectionToLegacy"));
   }
 
-  public startupSelf() {
-    return this.storage.local.get(
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  private startupSelfAsync() {
+    return this.storageArea.get(
         "lastStorageChange",
     ).then((result) => {
       this.lastStorageChange =
           (result.lastStorageChange as string | undefined) || null;
+      this.debugLog.log(
+          `got "lastStorageChange": ${result.lastStorageChange}`,
+      );
       return this.pConnectionToLegacy;
     }).then(() => {
       this.connectionToLegacy.onMessage.addListener(
@@ -70,40 +88,34 @@ export class StorageMigrationFromXpcom extends Module {
       ready: true,
     });
     p.catch((e) => {
-      console.error("Failed to send webex-side startup message");
-      console.dir(e);
+      this.log.error("Failed to send webex-side startup message", e);
       return Promise.reject(e);
     });
     return p;
   }
 
   private getFullStorage() {
-    return this.storage.local.get(null);
+    return this.storageArea.get(null);
   }
 
   private setFullStorage(aFullStorage: {[key: string]: any}) {
-    return this.storage.local.set(aFullStorage);
+    return this.storageArea.set(aFullStorage);
   }
 
   private applyStorageChanges(aStorageChanges: IStorageChanges) {
-    const keysToRemove: string[] = [];
-    let hasKeysToSet = false;
-    const keysToSet: {[key: string]: any} = {};
-    // tslint:disable-next-line prefer-const
-    for (let key of Object.keys(aStorageChanges)) {
-      const change = aStorageChanges[key];
-      if ("newValue" in change) {
-        keysToSet[key] = change.newValue;
-        hasKeysToSet = true;
-      } else {
-        keysToRemove.push(key);
-      }
-    }
-    const hasKeysToRemove = keysToRemove.length !== 0;
+    this.debugLog.log("going to apply storage changes...");
+    const {
+      hasKeysToRemove,
+      hasKeysToSet,
+      keysToRemove,
+      keysToSet,
+    } = getInfosOfStorageChange(aStorageChanges);
     const promises: Array<Promise<void>> = [];
-    if (hasKeysToRemove) promises.push(this.storage.local.remove(keysToRemove));
-    if (hasKeysToSet) promises.push(this.storage.local.set(keysToSet));
-    return Promise.all(promises);
+    if (hasKeysToRemove) promises.push(this.storageArea.remove(keysToRemove));
+    if (hasKeysToSet) promises.push(this.storageArea.set(keysToSet));
+    return Promise.all(promises).then(() => {
+      this.debugLog.log("done applying storage changes.");
+    });
   }
 
   private receiveMessage(
@@ -130,6 +142,7 @@ export class StorageMigrationFromXpcom extends Module {
             () => this.setFullStorage(aMessage.value),
         );
       case "storage-changes":
+        this.debugLog.log("obtained storage changes");
         return this.respond(
             "storage-changes",
             () => this.applyStorageChanges(aMessage.value as IStorageChanges));

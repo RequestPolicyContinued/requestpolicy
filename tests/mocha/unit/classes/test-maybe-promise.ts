@@ -1,17 +1,18 @@
 "use strict";
 
-const {assert} = require("chai");
+import {assert} from "chai";
 
-const {MaybePromise} = require("lib/classes/maybe-promise");
+import { MaybePromise } from "lib/classes/maybe-promise";
 
-function genPromise({isFulfilled, value = {}}) {
+function genPromise({isFulfilled, value = {}}): Promise<any> {
   return isFulfilled ? Promise.resolve(value) : Promise.reject(value);
 }
 
-function genMaybePromise({isFulfilled, isPromiseWrapper, value = {}}) {
-  const mpArg = isPromiseWrapper ? genPromise({isFulfilled, value}) : value;
-  const mpFnName = isPromiseWrapper || isFulfilled ? "resolve" : "reject";
-  return MaybePromise[mpFnName](mpArg);
+function genMaybePromise({isFulfilled, isPromiseWrapper, value = {}, usingAllFn = false}): MaybePromise<any> {
+  const mpArg = isPromiseWrapper ? genPromise({isFulfilled, value}) : (value as any);
+  const mp = isPromiseWrapper || isFulfilled ?
+      MaybePromise.resolve(mpArg) : MaybePromise.reject(mpArg);
+  return usingAllFn ? MaybePromise.all([mp]) : mp;
 }
 
 function callDescribeOrIt(aDescribeOrIt, aDescription, aFn, aArgs) {
@@ -49,6 +50,46 @@ function callFor_fulfilledAndRejected_fakeAndRealPromise(aDescribe, aFn, aDescri
 }
 
 describe("MaybePromise", () => {
+  describe("all()", function() {
+    it("it's synchronous when all() is called with empty list", function() {
+      // setup
+      let thenFnCalled = false;
+      let catchFnCalled = false;
+
+      // exercise
+      const mp = MaybePromise.all([]);
+      mp.then(() => {
+        thenFnCalled = true;
+        return;
+      }, () => {
+        catchFnCalled = true;
+      });
+
+      // verify
+      assert.strictEqual(thenFnCalled, true);
+      assert.strictEqual(catchFnCalled, false);
+    });
+
+    describe("isFulfilled(), isRejected(), isPromiseWrapper()", function() {
+      callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
+        isFulfilled, isPromiseWrapper,
+      }) {
+        it("test", function() {
+          const mp = genMaybePromise({isFulfilled, isPromiseWrapper, usingAllFn: true});
+          assert.strictEqual(mp.isPromiseWrapper(), isPromiseWrapper);
+          if (isPromiseWrapper) {
+            assert.throws(() => mp.isFulfilled());
+            assert.throws(() => mp.isRejected());
+          } else {
+            assert.strictEqual(mp.isFulfilled(), isFulfilled);
+            assert.strictEqual(mp.isRejected(), !isFulfilled);
+          }
+          return mp.catch(() => {}).toPromise();
+        });
+      });
+    });
+  });
+
   describe("isFulfilled(), isRejected(), isPromiseWrapper()", function() {
     callFor_fulfilledAndRejected_fakeAndRealPromise(describe, function({
       isFulfilled, isPromiseWrapper,

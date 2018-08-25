@@ -24,6 +24,7 @@ import {Services as MockServices} from "./lib/mock-services";
 import {AsyncLocaleData} from "bootstrap/api/i18n/async-locale-data";
 import {ChromeFileService} from "bootstrap/api/services/chrome-file-service";
 import { CIMap } from "lib/classes/case-insensitive-map";
+import { Log } from "lib/classes/log";
 
 let sandbox = sinon.createSandbox();
 
@@ -36,12 +37,14 @@ function createMockTryCatchUtils(appLocale: string) {
 describe("AsyncLocaleData", function() {
   let chromeFileService: stubbedCFS;
   let asyncLocaleData: AsyncLocaleData;
+  let log: Log;
 
   let mockNu: MockNetUtil;
   let mockServices: MockServices;
   let mockTryCatchUtils;
 
   before(function() {
+    log = new Log();
     mockNu = new MockNetUtil();
     mockServices = new MockServices();
     const mockHttp = {httpRequest: function(url, option) {}};
@@ -54,7 +57,7 @@ describe("AsyncLocaleData", function() {
 
   beforeEach(function() {
     asyncLocaleData = new AsyncLocaleData(
-        mockTryCatchUtils, chromeFileService, mockServices as any,
+        log, mockTryCatchUtils, chromeFileService, mockServices as any,
     );
   });
 
@@ -66,6 +69,7 @@ describe("AsyncLocaleData", function() {
   describe("getAppLocale()", function() {
     it("Should return normalized BCP 47 tag", function() {
       asyncLocaleData = new AsyncLocaleData(
+          log,
           createMockTryCatchUtils("fr-FR") as any,
           chromeFileService,
           mockServices as any,
@@ -77,6 +81,7 @@ describe("AsyncLocaleData", function() {
 
     it("Should throw RangeError if not a valid BCP 47 tag", function() {
       asyncLocaleData = new AsyncLocaleData(
+          log,
           createMockTryCatchUtils("-invalid tag") as any,
           chromeFileService,
           mockServices as any,
@@ -225,39 +230,39 @@ describe("AsyncLocaleData", function() {
 
   describe("updateLocalesPrefs(defaultLocale, uiLocale)", function() {
     it("Should find best match for default locale", function() {
-      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
+      asyncLocaleData._data.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en-US", "de");
       expect(result.default).to.equal("en");
-      expect(asyncLocaleData.defaultLocale).to.equal("en");
+      expect(asyncLocaleData._data.defaultLocale).to.equal("en");
     });
 
     it("Should find best match for ui locale", function() {
-      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
+      asyncLocaleData._data.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en", "fr-FR");
       expect(result.selected).to.equal("fr");
-      expect(asyncLocaleData.selectedLocale).to.equal("fr");
+      expect(asyncLocaleData._data.selectedLocale).to.equal("fr");
     });
 
     it("Should throw error if no match for default locale", function() {
-      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
+      asyncLocaleData._data.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let fn = () => asyncLocaleData.updateLocalesPrefs("de", "fr");
       expect(fn).to.throw(Error);
     });
 
     it("Should use fallback if no match for ui locale", function() {
-      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
+      asyncLocaleData._data.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("en", "de");
       expect(result.selected).to.equal("de");
-      expect(asyncLocaleData.selectedLocale).to.equal("de");
+      expect(asyncLocaleData._data.selectedLocale).to.equal("de");
     });
 
     it("Should normalized locales tag during search", function() {
-      asyncLocaleData.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
+      asyncLocaleData._data.messages = new Map([["en", new CIMap()], ["fr", new CIMap()]]);
       let result = asyncLocaleData.updateLocalesPrefs("En-uS", "fR-fR");
       expect(result.default).to.equal("en");
       expect(result.selected).to.equal("fr");
-      expect(asyncLocaleData.defaultLocale).to.equal("en");
-      expect(asyncLocaleData.selectedLocale).to.equal("fr");
+      expect(asyncLocaleData._data.defaultLocale).to.equal("en");
+      expect(asyncLocaleData._data.selectedLocale).to.equal("fr");
     });
   });
 });

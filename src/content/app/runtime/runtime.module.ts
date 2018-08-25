@@ -20,31 +20,66 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Connection } from "lib/classes/connection";
-import { IModule, Module } from "lib/classes/module";
+import { MaybePromise } from "lib/classes/maybe-promise";
+import { Module } from "lib/classes/module";
 
 export class Runtime extends Module {
+  // protected get debugEnabled() { return true; }
+
   protected get startupPreconditions() {
-    return [
-      this.pEWEConnection.then(() => undefined),
-    ];
+    return {
+      pGotEWEConnection: this.pGotEWEConnection,
+    };
   }
 
   private eweConnection: Connection<any, any> | null;
+  private pGotEWEConnection: Promise<void>;
+  private gotEWEConnection = false;
+
+  // tslint:disable-next-line:variable-name
+  private _browserInfo: {
+    name: string,
+    vendor: string,
+    version: string,
+    buildID: string,
+  };
+  public get browserInfo() { return this._browserInfo; }
 
   constructor(
       log: Common.ILog,
-      public readonly pEWEConnection: Promise<Connection<any, any> | null>,
+      pEWEConnection: Promise<Connection<any, any> | null>,
+      private readonly aboutUri: App.runtime.IAboutUri,
+      private readonly runtimeApi: typeof browser.runtime,
   ) {
     super("app.runtime", log);
-    pEWEConnection.then((m) => this.eweConnection = m).
-        catch(this.log.onError("pEWEConnection"));
+    this.pGotEWEConnection = pEWEConnection.then((m) => {
+      this.eweConnection = m;
+      this.gotEWEConnection = true;
+    });
+    this.pGotEWEConnection.catch(this.log.onError("pGotEWEConnection"));
   }
 
+  public get isFennec() { return this.browserInfo.name === "Fennec"; }
+
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {};
+    const rv: {[k: string]: Module} = {
+      aboutUri: this.aboutUri,
+    };
+    if (!this.gotEWEConnection) {
+      throw new Error(`startup preconditions not finished yet!`);
+    }
     if (this.eweConnection) { rv.eweConnection = this.eweConnection; }
     return rv;
+  }
+
+  protected startupSelf() {
+    const p = this.runtimeApi.getBrowserInfo().then((browserInfo) => {
+      this._browserInfo = browserInfo;
+      return;
+    });
+    return MaybePromise.resolve(p);
   }
 }

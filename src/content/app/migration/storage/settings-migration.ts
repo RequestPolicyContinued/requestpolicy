@@ -25,6 +25,7 @@ import { Common } from "common/interfaces";
 import {
   StorageMigrationToWebExtension,
 } from "legacy/app/migration/storage-migration-to-we";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { PrefetchSettingsMerger } from "./merge-prefetch-settings";
 
@@ -34,14 +35,19 @@ export class SettingsMigration extends Module
 
   constructor(
       log: Common.ILog,
-      private storage: browser.storage.StorageArea,
+      // tslint:disable-next-line:max-line-length
+      private storageArea: browser.storage.StorageArea,  // badword-linter:allow:browser.storage:
       private pStorageMigrationToWE:
           Promise<StorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage.settings", log);
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  protected async startupSelfAsync() {
     this.storageMigrationToWE = await this.pStorageMigrationToWE;
     if (this.storageMigrationToWE) {
       await this.storageMigrationToWE.pStorageReadyForAccess;
@@ -54,14 +60,14 @@ export class SettingsMigration extends Module
 
   private async performMergeActions(): Promise<void> {
     const pMerges = Promise.all([
-      new PrefetchSettingsMerger(this.log, this.storage).performAction(),
-    ]).then(() => undefined);
+      new PrefetchSettingsMerger(this.log, this.storageArea).performAction(),
+    ]);
     pMerges.catch(this.log.onError("merge settings"));
-    return pMerges;
+    return pMerges as Promise<any>;
   }
 
   private performRemoveActions(): Promise<void> {
-    const pRemove = this.storage.remove([
+    const pRemove = this.storageArea.remove([
       // removed in 0.2.0:
       "temporarilyAllowedOrigins",
       "temporarilyAllowedDestinations",

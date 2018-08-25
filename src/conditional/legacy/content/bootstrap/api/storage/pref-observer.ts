@@ -21,7 +21,7 @@
  */
 
 import { API } from "bootstrap/api/interfaces";
-import {MapOfSets} from "lib/classes/map-of-sets";
+import { MapOfSets } from "lib/classes/map-of-sets";
 
 type Listener = (prefName: string) => void;
 
@@ -55,7 +55,7 @@ export class PrefObserver {
     this.maps.domainsToListeners.addToSet(aDomain, aListener);
   }
 
-  public addListeners(aDomains: string, aListener: Listener) {
+  public addListeners(aDomains: string[], aListener: Listener) {
     for (const domain of aDomains) {
       this.addListener(domain, aListener);
     }
@@ -77,7 +77,7 @@ export class PrefObserver {
     }
   }
 
-  public removeListeners(aDomains: string, aListener: Listener) {
+  public removeListeners(aDomains: string[], aListener: Listener) {
     for (const domain of aDomains) {
       this.removeListener(domain, aListener);
     }

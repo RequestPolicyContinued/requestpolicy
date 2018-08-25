@@ -22,20 +22,17 @@
 
 import {rp} from "app/app.background";
 import {log} from "app/log";
+import {
+  SUBSCRIPTION_ADDED_TOPIC,
+  SUBSCRIPTION_REMOVED_TOPIC,
+} from "app/policy/subscription";
 import { API } from "bootstrap/api/interfaces";
 import {C} from "data/constants";
 import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import * as RequestProcessor from "lib/request-processor";
-import {
-  SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC,
-} from "lib/subscription";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import * as Metadata from "models/metadata";
-import {Requests} from "models/requests";
 
 declare const LegacyApi: API.ILegacyApi;
 
@@ -45,9 +42,6 @@ export const BackgroundPage = {
   LegacyApi,
   MainEnvironment,
   ManagerForPrefObservers,
-  Metadata,
-  RequestProcessor,
-  Requests,
   RuleUtils,
   SUBSCRIPTION_ADDED_TOPIC,
   SUBSCRIPTION_REMOVED_TOPIC,

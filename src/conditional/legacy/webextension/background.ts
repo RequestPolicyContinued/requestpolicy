@@ -29,30 +29,40 @@ import { Connection } from "lib/classes/connection";
 import { Log, LogLevel } from "lib/classes/log";
 import { getPortFromMasterConnectable } from "lib/utils/connection-utils";
 
-const log = new Log({
+const rootLog = new Log({
   enabled: true,
   level: LogLevel.ALL,
-  name: "ewe",
 });
-const promiseLegacyPort = () => getPortFromMasterConnectable(browser.runtime);
+const log = rootLog.extend({name: "ewe"});
+const portGetterLog = rootLog.extend({name: "ewe.getPortFromConnectable"});
+const portGetterDebugLog = portGetterLog.extend({
+  enabled: C.LOG_STORAGE_MIGRATION,
+});
+const promiseLegacyPort = () => getPortFromMasterConnectable(
+    portGetterLog,
+    portGetterDebugLog,
+    browser.runtime,
+);
 const legacyConnection = new Connection(
     C.EWE_CONNECTION_EWE_ID,
-    log,
+    rootLog,
     C.EWE_CONNECTION_LEGACY_ID,
     promiseLegacyPort,
 );
 const storageMigrationFromXpcom = new StorageMigrationFromXpcom(
-    log,
+    rootLog,
     legacyConnection.whenReady.then(() => legacyConnection),
-    browser.storage,
+    browser.storage,  // badword-linter:allow:browser.storage:
 );
-const ewe = new EweModule(log, legacyConnection, storageMigrationFromXpcom);
+const ewe = new EweModule(
+    rootLog,
+    legacyConnection,
+    storageMigrationFromXpcom,
+);
 
-log.log("Embedded WebExtension is being loaded.");
-ewe.startup().catch(log.onError("EWE startup"));
+ewe.startup().catch(log.onError("EWE startup failed"));
 
 window.addEventListener("unload", () => {
   // Only synchronous tasks can be done here.
-  log.log("Embedded WebExtension is being unloaded.");
-  ewe.shutdown().catch(log.onError("EWE shutdown"));
+  ewe.shutdown();
 });

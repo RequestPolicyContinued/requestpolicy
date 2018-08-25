@@ -472,9 +472,10 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-coffee lint-js lint-python lint-ts lint-xpi
+lint: lint-anytype lint-coffee lint-js lint-python lint-ts lint-xpi
 
 .PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
+lint-anytype: bad-words-linter
 lint-coffee: coffeelint
 lint-js: eslint
 lint-python: pycodestyle
@@ -503,7 +504,7 @@ ts: node-packages
 	@echo $@
 	@$(TSC) --noEmit
 	@$(TSC) --noEmit -p src/conditional/legacy/webextension/tsconfig.json
-	@#$(TSC) --noEmit -p tests/mocha     # failing
+	@#$(TSC) --noEmit -p tests/mocha
 	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
 	@echo $@
@@ -517,6 +518,10 @@ tslint: node-packages
 		--exclude '**/third-party/**/*' \
 		'src/conditional/legacy/webextension/**/*.ts' \
 		| $(_remove_leading_empty_lines)
+
+bad-words-linter:
+	@echo $@
+	@./scripts/lint-bad-words src/
 
 #-------------------------------------------------------------------------------
 # localization checks

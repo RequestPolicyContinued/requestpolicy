@@ -22,6 +22,8 @@
 
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
@@ -30,6 +32,8 @@ type xpcomPrefBranch = XPCOM.nsIPrefBranch;
 type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
 
 export class Storage extends Module {
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
+
   private events = createListenersMap(["onChanged"]);
 
   private ignorePrefObserverChangesTemporarily = false;
@@ -43,7 +47,7 @@ export class Storage extends Module {
       private slsa: API.storage.ISyncLocalStorageArea,
       private rpPrefBranch: API.storage.IPrefBranch,
   ) {
-    super("browser.storage", log);
+    super("API.storage", log);
   }
 
   public get backgroundApi() {
@@ -64,13 +68,12 @@ export class Storage extends Module {
   protected startupSelf() {
     this.rpPrefBranch.addObserver("", this.prefObserver);
     this.slsa.onChanged.addListener(this.slsaChangedListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.slsa.onChanged.removeListener(this.slsaChangedListener);
     this.rpPrefBranch.removeObserver("", this.prefObserver);
-    return Promise.resolve();
   }
 
   private getLocal(
@@ -117,15 +120,15 @@ export class Storage extends Module {
     if (this.ignorePrefObserverChangesTemporarily) return;
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
-    const changes: browser.storage.ChangeDict = {
+    const changes: API.storage.api.ChangeDict = {
       [prefName]: newValue === undefined ? {} : {newValue},
     };
-    this.debugLog.log(`pref changes:`, changes);
+    this.debugLog.log(`emitting pref changes:`, changes);
     this.events.listenersMap.onChanged.emit(changes);
   }
 
-  private onSlsaChanged(aChanges: browser.storage.ChangeDict) {
-    this.debugLog.log(`pref changes:`, aChanges);
+  private onSlsaChanged(aChanges: API.storage.api.ChangeDict) {
+    this.debugLog.log(`emitting pref changes:`, aChanges);
     this.events.listenersMap.onChanged.emit(aChanges);
   }
 }

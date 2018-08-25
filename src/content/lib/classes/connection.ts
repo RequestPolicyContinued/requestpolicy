@@ -21,6 +21,7 @@
  */
 
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { defer, IDeferred } from "lib/utils/js-utils";
 import { createListenersMap } from "lib/utils/listener-factories";
@@ -35,7 +36,7 @@ interface IMessage<T> {
 }
 
 export class Connection<TRx, TRxResp> extends Module {
-  private events = createListenersMap(["onMessage"]);
+  private events = createListenersMap<TRxResp>(["onMessage"]);
   public get onMessage() { return this.events.interfaces.onMessage; }
 
   private dConnectionReady = defer<void>();
@@ -52,7 +53,21 @@ export class Connection<TRx, TRxResp> extends Module {
     super(moduleName, log);
   }
 
-  public async startupSelf() {
+  public sendMessage<TTx, TTxResp>(value: TTx): Promise<TTxResp> {
+    const id = String(Math.random());
+    const dResponse = defer<TTxResp>();
+    this.expectedResponses.set(id, dResponse);
+
+    const message = this.buildMessage(id, value, false);
+    this.port.postMessage(message);
+    return dResponse.promise;
+  }
+
+  protected startupSelf() {
+    return MaybePromise.resolve(this.startupSelfAsync());
+  }
+
+  private async startupSelfAsync() {
     this.debugLog.log("await port");
     try {
       this.port = await this.promisePort();
@@ -65,18 +80,6 @@ export class Connection<TRx, TRxResp> extends Module {
     this.port.postMessage(this.buildMessage("startup", "ready", false));
     // NOTE: the startup is NOT done yet
     await this.dConnectionReady.promise;
-  }
-
-  // methods
-
-  public sendMessage<TTx, TTxResp>(value: TTx): Promise<TTxResp> {
-    const id = String(Math.random());
-    const dResponse = defer<TTxResp>();
-    this.expectedResponses.set(id, dResponse);
-
-    const message = this.buildMessage(id, value, false);
-    this.port.postMessage(message);
-    return dResponse.promise;
   }
 
   private receiveMessage(aMessage: IMessage<any>): void {

@@ -33,7 +33,7 @@
 
   // Listener for revoke temporary permission link
   $id("rpc-revoke-temporary-permissions").addEventListener("click",
-      overlay.revokeTemporaryPermissions, false);
+      overlay.revokeTemporaryPermissions.bind(overlay), false);
 
   // Listeners for the footer links
   let toggleLinkBlocking = function(event) {
@@ -49,16 +49,16 @@
       toggleLinkBlocking, false);
 
   $id("rpc-link-help").addEventListener("click",
-      overlay.openHelp, false);
+      overlay.openHelp.bind(overlay), false);
 
   $id("rpc-link-prefs").addEventListener("click",
-      overlay.openPrefs, false);
+      overlay.openPrefs.bind(overlay), false);
 
   $id("rpc-link-policies").addEventListener("click",
-      overlay.openPolicyManager, false);
+      overlay.openPolicyManager.bind(overlay), false);
 
   $id("rpc-link-request-log").addEventListener("click",
-      overlay.toggleRequestLog, false);
+      overlay.toggleRequestLog.bind(overlay), false);
 
   // If the popup is embedded in a frame, we add a mutation observer
   // to resize the frame on DOM changes

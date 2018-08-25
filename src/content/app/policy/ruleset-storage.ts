@@ -21,16 +21,29 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
-import {RawRuleset} from "lib/ruleset";
+import {RawRuleset} from "./ruleset";
 
-export class RulesetStorage extends Module {
+export class RulesetStorage extends Module
+    implements App.policy.IRulesetStorage {
+  // protected get debugEnabled() { return true; }
+
+  private get storageArea() { return this.storageApi.local; }
+
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
+  }
+
   constructor(
       log: Common.ILog,
-      private storageArea: browser.storage.StorageArea,
+      private storageApi: App.storage.IStorageApiWrapper,
+      private uriService: App.services.IUriService,
   ) {
-    super("RulesetStorage", log);
+    super("app.policy.rulesetStorage", log);
   }
 
   public loadRawRulesetFromFile(
@@ -41,7 +54,7 @@ export class RulesetStorage extends Module {
     const pResult = this.storageArea.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
-      return RawRuleset.create(aResult[key]);
+      return RawRuleset.create(this.log, this.uriService, aResult[key]);
     });
     pRawRuleset.catch((e) => {
       this.log.error("RulesetStorage.loadRawRulesetFromFile():", e);
@@ -56,7 +69,7 @@ export class RulesetStorage extends Module {
   ) {
     const key = this.getKey(policyName, subscriptionListName);
     const p = this.storageArea.set({
-      [key]: policy as any, // FIXME (as any)
+      [key]: policy.data as any, // FIXME (as any)
     });
     p.catch((e) => {
       this.log.error("RulesetStorage.saveRawRulesetToFile():", e);

@@ -25,6 +25,8 @@ import { Common } from "common/interfaces";
 type Port = browser.runtime.Port;
 
 export function getPortFromSlaveConnectable(
+    log: Common.ILog,
+    debugLog: Common.ILog,
     connectable: Common.ISlaveConnectable,
 ): Promise<Port> {
   return new Promise<Port>((resolve, reject) => {
@@ -49,6 +51,8 @@ export function getPortFromSlaveConnectable(
 }
 
 export function getPortFromMasterConnectable(
+    log: Common.ILog,
+    debugLog: Common.ILog,
     connectable: Common.IMasterConnectable,
     maxTries: number = 100,
 ): Promise<Port> {
@@ -57,7 +61,7 @@ export function getPortFromMasterConnectable(
     let i = -1;
     do {
       ++i;
-      console.log(`trying to connect to slave, try #${i}`);
+      debugLog.log(`trying to connect to slave, try #${i}`);
       if (i >= maxTries) {
         reject(`slave did not respond, even after ${maxTries} tries`);
         return;
@@ -65,10 +69,10 @@ export function getPortFromMasterConnectable(
       try {
         response = await connectable.sendMessage("isConnectionSlaveReady");
       } catch (e) {
-        // uncomment for inspection
-        console.dir(e);
+        debugLog.dir(e);
       }
     } while (response !== "connectionSlaveIsReady");
+    debugLog.log("the connection slave is ready");
     resolve();
   }).then(() => browser.runtime.connect());
 }

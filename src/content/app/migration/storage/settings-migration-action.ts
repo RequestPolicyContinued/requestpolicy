@@ -25,7 +25,8 @@ import { Common } from "common/interfaces";
 export abstract class SettingsMigrationAction {
   constructor(
       protected log: Common.ILog,
-      protected storage: browser.storage.StorageArea,
+      // tslint:disable-next-line:max-line-length
+      protected storageArea: browser.storage.StorageArea,  // badword-linter:allow:browser.storage:
   ) {}
 
   public abstract performAction(): Promise<void>;

@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IRuleSpec } from "app/policy/ruleset";
 import { UriService } from "app/services/uri-service";
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { IRuleSpec } from "lib/ruleset";
 
 declare const Cc: any;
 declare const Ci: any;
@@ -54,6 +54,12 @@ function splitString(aRulesString: string = ""): Set<string> {
 
 export class V0RulesService extends Module {
   private eTLDService = Services.eTLD;
+
+  protected get dependencies() {
+    return {
+      uriService: this.uriService,
+    };
+  }
 
   constructor(
       log: Common.ILog,

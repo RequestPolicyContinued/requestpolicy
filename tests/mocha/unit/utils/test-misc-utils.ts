@@ -70,7 +70,7 @@ describe("Utils", function() {
     });
 
     function errorCallback(aMessage, aError) {
-      assert.fail(0, 1, aMessage);
+      // assert.fail(0, 1, aMessage);
     }
 
     function uutWrap(f1, f2) {

@@ -22,15 +22,19 @@
 
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import {
+  matchKeyPattern,
+  updateDocument,
+  updateString,
+} from "legacy/lib/utils/l10n-utils";
 import {Module} from "lib/classes/module";
-import * as L10nUtils from "./l10n-utils";
 
-export class I18n extends Module {
+export class I18n extends Module implements API.i18n.II18n {
   constructor(
       log: Common.ILog,
       protected localeData: API.i18n.IAsyncLocaleData,
   ) {
-    super("browser.i18n", log);
+    super("API.i18n", log);
   }
 
   protected get subModules() {
@@ -56,9 +60,9 @@ export class I18n extends Module {
 
   get legacyApi() {
     return {
-      matchKeyPattern: L10nUtils.matchKeyPattern.bind(this),
-      updateDocument: L10nUtils.updateDocument.bind(null, this),
-      updateString: L10nUtils.updateString.bind(null, this),
+      matchKeyPattern: matchKeyPattern.bind(this),
+      updateDocument: updateDocument.bind(null, this),
+      updateString: updateString.bind(null, this),
     };
   }
 

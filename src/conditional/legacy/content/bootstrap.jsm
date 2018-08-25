@@ -71,7 +71,10 @@ var console = (function() {
   return Cu.import(uri, {}).console;
 })();
 
-var {clearTimeout, setTimeout} = Cu.import("resource://gre/modules/Timer.jsm");
+var {
+  clearTimeout,
+  setTimeout, // badword-linter:allow: setTimeout:
+} = Cu.import("resource://gre/modules/Timer.jsm");
 
 // =============================================================================
 // Globals
@@ -87,7 +90,7 @@ function getGlobals() {
 
     clearTimeout,
     console,
-    setTimeout,
+    setTimeout, // badword-linter:allow: setTimeout:
   };
 }
 
@@ -234,20 +237,20 @@ var FakeWebExt = (function() {
     addon.commonjsEnv.unload(aReason);
     addon.commonjsEnv = null;
 
-    // shut down the fake environment
-    fakeEnv.exports.api.shutdown().then(() => {
+    try {
+      // shut down the fake environment
+      fakeEnv.exports.api.shutdown();
+
       fakeEnv.commonjsEnv.unload();
 
       // clean up
       fakeEnv.commonjsEnv = null;
       fakeEnv.exports = null;
       FakeWebExt.api = null;
-
-      return;
-    }).catch((e) => {
+    } catch (e) {
       console.error("Failed to shut down!");
       console.dir(e);
-    });
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -261,7 +264,7 @@ var FakeWebExt = (function() {
 
     const commonjsEnv = createCommonjsEnv();
     commonjsEnv.load({
-      mainFile: "framescripts/main",
+      mainFile: "main.framescript",
       additionalGlobals: [
         ["cfmm", cfmm],
         ["browser", api.contentApi],

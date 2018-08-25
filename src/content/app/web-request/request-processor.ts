@@ -173,14 +173,22 @@ export class RequestProcessor extends Module {
       // a blocked attempt by javascript to set the document location.
 
       const browser = this.requestService.getBrowser(request);
-      const window = this.requestService.getChromeWindow(request);
+      const window: any = this.requestService.getChromeWindow(request);
 
-      if (!browser || !window || typeof window.rpcontinued === "undefined") {
+      if (
+          !browser ||
+          !window ||
+          typeof window.rpcontinued === "undefined"
+      ) {
         this.log.warn("The user could not be notified " +
             "about the blocked top-level document request!");
       } else {
-        window.rpcontinued.overlay.observeBlockedTopLevelDocRequest(
-            browser, request.originURI, request.destURIWithRef,
+        const overlay: App.windows.window.IOverlay =
+            window.rpcontinued.overlay;
+        overlay.observeBlockedTopLevelDocRequest(
+            browser,
+            request.originURI!,
+            request.destURIWithRef,
         );
       }
     }

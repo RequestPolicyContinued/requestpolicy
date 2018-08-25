@@ -36,6 +36,7 @@ describe("AsyncSettings", function() {
   ) {
     return new AsyncSettings(
         log,
+        null,
         stubbedStorage,
         stubbedStorageArea,
         defaultSettings,

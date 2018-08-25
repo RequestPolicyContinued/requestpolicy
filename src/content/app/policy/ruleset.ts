@@ -21,22 +21,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { rp } from "app/app.background";
-import { log } from "app/log";
+import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
-import {C} from "data/constants";
-
-// =============================================================================
-// utilities
-// =============================================================================
-
-function dprint(msg: string) {
-  log.info("[POLICY] " + msg);
-}
-
-function dwarn(msg: string) {
-  log.warn("[POLICY] " + msg);
-}
+import { Common } from "common/interfaces";
+import { C } from "data/constants";
 
 // =============================================================================
 // types
@@ -57,7 +45,7 @@ type Port = (
   -1 // default port (= default)
 );
 
-interface IEndpointSpec {
+export interface IEndpointSpec {
   s?: string; // scheme
   h?: string; // host
   port?: Port;
@@ -135,7 +123,11 @@ function dump(arr, level=0) {
 // =============================================================================
 
 export class RawRuleset implements IRawRuleset {
-  public static create(aData?: any) {
+  public static create(
+      log: Common.ILog,
+      uriService: App.services.IUriService,
+      aData?: any,
+  ) {
     let metadata: IMetadata = {version: 1};
     let entries: IMaybeRuleSpecs = {};
     if (aData) {
@@ -155,7 +147,7 @@ export class RawRuleset implements IRawRuleset {
     if (!entries.deny) {
       entries.deny = [];
     }
-    return new RawRuleset(metadata, entries as IRuleSpecs);
+    return new RawRuleset(log, uriService, metadata, entries as IRuleSpecs);
   }
 
   private static checkDataObj(
@@ -186,7 +178,12 @@ export class RawRuleset implements IRawRuleset {
   public readonly metadata: IMetadata;
   public readonly entries: IRuleSpecs;
 
-  constructor(aMetadata: IMetadata, aEntries: IRuleSpecs) {
+  constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
+      aMetadata: IMetadata,
+      aEntries: IRuleSpecs,
+  ) {
     this.metadata = aMetadata;
     this.entries = aEntries;
   }
@@ -233,7 +230,7 @@ export class RawRuleset implements IRawRuleset {
    */
   public addRule(ruleAction: RuleAction, ruleData: IRuleSpec, policy: Ruleset) {
     // XXX: remove loggings
-    // dprint("addRule: adding entry");
+    // this.log.info("addRule: adding entry");
     const actionStr = ruleAction === RuleAction.ALLOW ? "allow" :
         ruleAction === RuleAction.DENY ? "deny" : "";
     if (!actionStr) {
@@ -266,7 +263,7 @@ export class RawRuleset implements IRawRuleset {
       policy: Ruleset,
   ) {
     // XXX: remove loggings
-    // dprint("removeRule: removing entry");
+    // this.log.info("removeRule: removing entry");
     const actionStr = ruleAction === RuleAction.ALLOW ? "allow" :
         ruleAction === RuleAction.DENY ? "deny" : "";
     if (!actionStr) {
@@ -311,13 +308,13 @@ export class RawRuleset implements IRawRuleset {
    * @return {Ruleset}
    */
   public toRuleset(name: string) {
-    const policy = new Ruleset(name);
+    const policy = new Ruleset(this.log, this.uriService, name);
 
     // tslint:disable-next-line prefer-const forin
     for (let actionStr in this.entries) {
-      // dprint("actionStr: " + actionStr);
+      // this.log.info("actionStr: " + actionStr);
       if (actionStr !== "allow" && actionStr !== "deny") {
-        dwarn("Invalid entry type: " + actionStr);
+        this.log.warn("Invalid entry type: " + actionStr);
         continue;
       }
       const ruleAction = actionStr === "allow" ? RuleAction.ALLOW :
@@ -325,7 +322,7 @@ export class RawRuleset implements IRawRuleset {
       const entryArray = this.entries[actionStr];
       // tslint:disable-next-line prefer-const forin
       for (let i in entryArray) {
-        // dprint("toRuleset: adding entry");
+        // this.log.info("toRuleset: adding entry");
         this._addEntryToRuleset(entryArray[i], ruleAction, policy);
       }
     }
@@ -364,7 +361,7 @@ export class RawRuleset implements IRawRuleset {
     let rules: Rules;
     let r: Rule;
 
-    // dprint("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
+    // this.log.info("_addEntryToRuleset: " + o + " " + d + " " + ruleAction);
 
     if (o && d) {
       ({rules, r} = this._addEntryHelper(o, policy));
@@ -457,7 +454,8 @@ export class RawRuleset implements IRawRuleset {
       // if (r.destinationRuleAction === ruleAction) {
       //   r.destinationRuleAction = null;
       // }
-      // dprint("_removeEntryFromRuleset: got rule to alter: " + r.toString());
+      // this.log.info(
+      //     "_removeEntryFromRuleset: got rule to alter: " + r.toString());
       if (ruleAction === RuleAction.ALLOW) {
         r.allowDestination = null;
       } else if (ruleAction === RuleAction.DENY) {
@@ -543,6 +541,11 @@ export class RawRuleset implements IRawRuleset {
 class Rules {
   private rules: Rule[] = [];
 
+  constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
+  ) {}
+
   public print(depth = 0) {
     // tslint:disable-next-line prefer-const
     for (let rule of this.rules) {
@@ -563,7 +566,7 @@ class Rules {
   }
 
   public get(scheme?: string, port?: Port): Rule | null {
-    const rule = new Rule(scheme, port);
+    const rule = new Rule(this.log, this.uriService, scheme, port);
     // tslint:disable-next-line prefer-const
     for (let existingRule of this.rules) {
       if (existingRule.isEqual(rule)) {
@@ -574,7 +577,7 @@ class Rules {
   }
 
   public add(scheme?: string, port?: Port): Rule {
-    const newRule = new Rule(scheme, port);
+    const newRule = new Rule(this.log, this.uriService, scheme, port);
     // tslint:disable-next-line prefer-const
     for (let existingRule of this.rules) {
       if (existingRule.isEqual(newRule)) {
@@ -620,7 +623,12 @@ class Rule {
   // For origin-to-destination rules, these are the destinations.
   public destinations: Ruleset;
 
-  constructor(scheme?: string | null, port?: Port) {
+  constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
+      scheme?: string | null,
+      port?: Port,
+  ) {
     if (scheme) this.scheme = scheme;
     if (port) this.port = port;
   }
@@ -643,9 +651,9 @@ class Rule {
     for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
-    dprint(indent + this.toString());
+    this.log.info(indent + this.toString());
     if (this.destinations) {
-      dprint(indent + "  " + "destinations:");
+      this.log.info(indent + "  " + "destinations:");
       this.destinations.print(depth + 1);
     }
   }
@@ -660,7 +668,7 @@ class Rule {
     if (this.destinations) {
       return;
     }
-    this.destinations = new Ruleset();
+    this.destinations = new Ruleset(this.log, this.uriService);
   }
 
   public isMatch(
@@ -668,15 +676,14 @@ class Rule {
       endpointSpecHasHost: boolean,
   ): boolean {
     if (this.scheme && this.scheme !== "*" && this.scheme !== uriObj.scheme) {
-      // dprint("isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
-      //        this.scheme + "')");
+      // this.log.info(
+      //     "isMatch: wrong scheme (uri: '" + uriObj.scheme + "', rule: '" +
+      //     this.scheme + "')");
       return false;
     }
 
-    const uriService = rp.services.uri;
-
     // Check the port only in case the URI has a host at all.
-    if (uriService.uriObjHasPort(uriObj)) {
+    if (this.uriService.uriObjHasPort(uriObj)) {
       if (this.port) {
         // If the rule's port is "*" it means any port. We use this convention
         // because we assume an empty port in a rule means default ports rather
@@ -687,12 +694,12 @@ class Rule {
           if (
               rulePort === uriObj.port ||
               uriObj.port === -1 &&
-                  rulePort === uriService.
+                  rulePort === this.uriService.
                                getDefaultPortForScheme(uriObj.scheme)
           ) {
             // Port Match is OK, so continue
           } else {
-            // dprint(
+            // this.log.info(
             //     "isMatch: wrong port (not the port specified by the rule)");
             return false;
           }
@@ -701,8 +708,9 @@ class Rule {
         if (!endpointSpecHasHost) {
           // Both host and port are undefined, so skip the default-port-check.
         } else {
-          if (!uriService.hasStandardPort(uriObj)) {
-            // dprint("isMatch: wrong port (not the default port and the " +
+          if (!this.uriService.hasStandardPort(uriObj)) {
+            // this.log.info(
+            //     "isMatch: wrong port (not the default port and the " +
             //     "rule assumes default)");
             return false;
           }
@@ -716,16 +724,16 @@ class Rule {
     if (this.path) {
       if (typeof this.path === "string") {
         if (uriObj.path.indexOf(this.path) !== 0) {
-          // dprint("isMatch: wrong path (string): " +
+          // this.log.info("isMatch: wrong path (string): " +
           //     this.path + " vs " + uriObj.path);
           return false;
         }
       } else if (!this.path.test(uriObj.path)) {
-        // dprint("isMatch: wrong path (regex)");
+        // this.log.info("isMatch: wrong path (regex)");
         return false;
       }
     }
-    // dprint("isMatch: MATCH");
+    // this.log.info("isMatch: MATCH");
     return true;
   }
 }
@@ -737,7 +745,7 @@ class Rule {
 // tslint:disable-next-line max-classes-per-file
 class DomainEntry {
   public fullName: string | null = null;
-  public rules: Rules = new Rules();
+  public rules: Rules = new Rules(this.log, this.uriService);
 
   private name: string;
   /**
@@ -747,6 +755,8 @@ class DomainEntry {
   private lower: IObject<DomainEntry> = {};
 
   constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
       name: string | null,
       fullName?: string | null,
       higher?: DomainEntry | null,
@@ -770,7 +780,7 @@ class DomainEntry {
     for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
-    dprint(indent + this.toString());
+    this.log.info(indent + this.toString());
     if (this.rules) {
       this.rules.print(depth + 1);
     }
@@ -803,9 +813,13 @@ class DomainEntry {
 // tslint:disable-next-line max-classes-per-file
 class IPAddressEntry {
   public address: string;
-  public rules: Rules = new Rules();
+  public rules: Rules = new Rules(this.log, this.uriService);
 
-  constructor(address: string) {
+  constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
+      address: string,
+  ) {
     this.address = address;
   }
 
@@ -819,7 +833,7 @@ class IPAddressEntry {
     for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
-    dprint(indent + this.toString());
+    this.log.info(indent + this.toString());
     if (this.rules) {
       this.rules.print(depth + 1);
     }
@@ -971,13 +985,17 @@ export class Ruleset {
 
   private ipAddr: {[k: string]: IPAddressEntry};
 
-  constructor(name?: string) {
+  constructor(
+      private log: Common.ILog,
+      private uriService: App.services.IUriService,
+      name?: string,
+  ) {
     if (name) this.name = name;
     // Start off with an "empty" top-level domain entry. This will never have
     // its own rules. Non-host-specific rules go in |this.rules|.
-    this.domain = new DomainEntry(null, null, null);
+    this.domain = new DomainEntry(this.log, this.uriService, null, null, null);
     this.ipAddr = {};
-    this.rules = new Rules();
+    this.rules = new Rules(this.log, this.uriService);
   }
 
   public toString() {
@@ -989,7 +1007,7 @@ export class Ruleset {
     for (let i = 0; i < depth; i++) {
       indent += "  ";
     }
-    dprint(indent + this.toString());
+    this.log.info(indent + this.toString());
     this.domain.print(depth + 1);
     // this._ipAddr.print(depth + 1);
     this.rules.print(depth + 1);
@@ -1000,7 +1018,7 @@ export class Ruleset {
       // eslint-disable-next-line no-throw-literal
       throw new Error("INVALID_HOST");
     }
-    if (rp.services.uri.isIPAddress(host)) {
+    if (this.uriService.isIPAddress(host)) {
       return this._getIPAddress(host);
     } else {
       return this._getDomain(host);
@@ -1012,7 +1030,7 @@ export class Ruleset {
       // eslint-disable-next-line no-throw-literal
       throw new Error("INVALID_HOST");
     }
-    if (rp.services.uri.isIPAddress(host)) {
+    if (this.uriService.isIPAddress(host)) {
       return this._addIPAddress(host);
     } else {
       return this._addDomain(host);
@@ -1042,7 +1060,7 @@ export class Ruleset {
       return;
     }
 
-    if (rp.services.uri.isIPAddress(host)) {
+    if (this.uriService.isIPAddress(host)) {
       const addrEntry = this.ipAddr[host];
       if (addrEntry) {
         yield [addrEntry, true];
@@ -1075,45 +1093,45 @@ export class Ruleset {
   public check(origin: XPCOM.nsIURI, dest: XPCOM.nsIURI): [Match[], Match[]] {
     const matchedAllowRules: Match[] = [];
     const matchedDenyRules: Match[] = [];
-    const uriService = rp.services.uri;
+    const uriService = this.uriService;
     const originHost = uriService.getHostByUriObj(origin) || "";
     const destHost = uriService.getHostByUriObj(dest) || "";
 
-    // dprint("Checking origin rules and origin-to-destination rules.");
+    // this.log.info("Checking origin rules and origin-to-destination rules.");
     // First, check for rules for each part of the origin host.
     // tslint:disable-next-line prefer-const
     for (let [entry, originSpecHasHost] of this.getHostMatches(originHost)) {
-      // dprint(entry);
+      // this.log.info(entry);
       // tslint:disable-next-line prefer-const
       for (let rule of entry.rules) {
-        // dprint("Checking rule: " + rule);
+        // this.log.info("Checking rule: " + rule);
       // tslint:disable-next-line prefer-const
         let ruleMatchedOrigin = rule.isMatch(origin, originSpecHasHost);
 
         if (rule.allowOrigin && ruleMatchedOrigin) {
-          // dprint("ALLOW origin by rule " + entry + " " + rule);
+          // this.log.info("ALLOW origin by rule " + entry + " " + rule);
           matchedAllowRules.push(["origin", entry, rule]);
         }
         if (rule.denyOrigin && ruleMatchedOrigin) {
-          // dprint("DENY origin by rule " + entry + " " + rule);
+          // this.log.info("DENY origin by rule " + entry + " " + rule);
           matchedDenyRules.push(["origin", entry, rule]);
         }
 
         // Check if there are origin-to-destination rules from the origin host
         // entry we're currently looking at.
         if (ruleMatchedOrigin && rule.destinations) {
-          // dprint("There are origin-to-destination " +
+          // this.log.info("There are origin-to-destination " +
           //     "rules using this origin rule.");
           // tslint:disable-next-line prefer-const
           for (let [destEntry, destSpecHasHost]
                of rule.destinations.getHostMatches(destHost)) {
-            // dprint(destEntry);
+            // this.log.info(destEntry);
             // tslint:disable-next-line prefer-const
             for (let destRule of destEntry.rules) {
-              // dprint("Checking rule: " + rule);
+              // this.log.info("Checking rule: " + rule);
               if (destRule.allowDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                // dprint("ALLOW origin-to-dest by rule origin " +
+                // this.log.info("ALLOW origin-to-dest by rule origin " +
                 //     entry + " " + rule + " to dest " + destEntry +
                 //     " " + destRule);
                 matchedAllowRules.push([
@@ -1126,7 +1144,7 @@ export class Ruleset {
               }
               if (destRule.denyDestination &&
                   destRule.isMatch(dest, destSpecHasHost)) {
-                // dprint("DENY origin-to-dest by rule origin " +
+                // this.log.info("DENY origin-to-dest by rule origin " +
                 //     entry + " " + rule + " to dest " + destEntry +
                 //     " " + destRule);
                 matchedDenyRules.push([
@@ -1139,26 +1157,26 @@ export class Ruleset {
               }
             }
           }
-          // dprint("Done checking origin-to-destination " +
+          // this.log.info("Done checking origin-to-destination " +
           //     "rules using this origin rule.");
         } // end: if (rule.destinations)
       }
     }
 
-    // dprint("Checking dest rules.");
+    // this.log.info("Checking dest rules.");
     // Last, check for rules for each part of the destination host.
     // tslint:disable-next-line prefer-const
     for (let [entry, destSpecHasHost] of this.getHostMatches(destHost)) {
-      // dprint(entry);
+      // this.log.info(entry);
       // tslint:disable-next-line prefer-const
       for (let rule of entry.rules) {
-        // dprint("Checking rule: " + rule);
+        // this.log.info("Checking rule: " + rule);
         if (rule.allowDestination && rule.isMatch(dest, destSpecHasHost)) {
-          // dprint("ALLOW dest by rule " + entry + " " + rule);
+          // this.log.info("ALLOW dest by rule " + entry + " " + rule);
           matchedAllowRules.push(["dest", entry, rule]);
         }
         if (rule.denyDestination && rule.isMatch(dest, destSpecHasHost)) {
-          // dprint("DENY dest by rule " + entry + " " + rule);
+          // this.log.info("DENY dest by rule " + entry + " " + rule);
           matchedDenyRules.push(["dest", entry, rule]);
         }
       }
@@ -1175,7 +1193,9 @@ export class Ruleset {
   private _addIPAddress(address: string): IPAddressEntry {
     // TODO: Canonicalize IPv6 addresses.
     if (!this.ipAddr[address]) {
-      this.ipAddr[address] = new IPAddressEntry(address);
+      this.ipAddr[address] = new IPAddressEntry(
+          this.log, this.uriService, address,
+      );
     }
     return this.ipAddr[address];
   }
@@ -1186,7 +1206,7 @@ export class Ruleset {
     let nextLevel;
     let fullName = "";
     for (let i = parts.length - 1; i >= 0; i--) {
-      // dprint(parts[i]);
+      // this.log.info(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
@@ -1203,12 +1223,14 @@ export class Ruleset {
     let nextLevel;
     let fullName = "";
     for (let i = parts.length - 1; i >= 0; i--) {
-      // dprint(parts[i]);
+      // this.log.info(parts[i]);
       fullName = parts[i] + (fullName ? "." : "") + fullName;
       nextLevel = curLevel.getLowerLevel(parts[i]);
       if (!nextLevel) {
-        nextLevel = new DomainEntry(parts[i], fullName, curLevel);
-        // dprint(nextLevel);
+        nextLevel = new DomainEntry(
+            this.log, this.uriService, parts[i], fullName, curLevel,
+        );
+        // this.log.info(nextLevel);
         curLevel.addLowerLevel(parts[i], nextLevel);
       }
       curLevel = nextLevel;

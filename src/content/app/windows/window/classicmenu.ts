@@ -21,52 +21,77 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { XUL } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
 import * as DOMUtils from "lib/utils/dom-utils";
-import {rp} from "app/app.background";
 
-export function loadClassicmenuIntoWindow(window) {
-  let self = {};
+export interface IClassicmenuRuleSpec {
+  allow: boolean;
+  origin?: string | null;
+  dest?: string | null;
+  temp?: boolean;
+}
 
-  let {document} = window;
+// tslint:disable:member-ordering
 
-  // ===========================================================================
+export class ClassicMenu extends Module {
+  protected get startupPreconditions() {
+    return [
+      this.policy.whenReady,
+    ];
+  }
+
+  constructor(
+      parentLog: Common.ILog,
+      windowID: number,
+      private readonly policy: App.IPolicy,
+  ) {
+    super(
+        `app.windows[${windowID}].classicmenu`,
+        parentLog,
+    );
+  }
 
   /**
-   * Removes all menu items and removes all event listeners.
-   *
-   * @param {menupopup} menu
+   * Remove all menu items and all event listeners.
    */
-  self.emptyMenu = function(menu) {
+  public emptyMenu(menu: XUL.menupopup) {
     const menuitems = menu.getElementsByTagName("menuitem");
-    for (let item of menuitems) {
+    for (const item of Array.from(menuitems)) {
       if (!item.hasOwnProperty("rpListener")) {
         console.error("There's a menuitem without listener!");
         continue;
       }
 
-      item.removeEventListener("command", item.rpListener, false);
-      delete item.rpListener;
+      item.removeEventListener("command", (item as any).rpListener, false);
+      delete (item as any).rpListener;
     }
     DOMUtils.removeChildren(menu);
-  };
+  }
 
-  self.addMenuSeparator = function(menu) {
+  public addMenuSeparator(menu: XUL.menupopup) {
     const separator = document.createElement("menuseparator");
     menu.insertBefore(separator, menu.firstChild);
     return separator;
-  };
+  }
 
-  self.addCustomMenuItem = function(menu, label, aCallback) {
+  public addCustomMenuItem(
+      menu: XUL.menupopup,
+      label: string,
+      aCallback: () => void,
+  ) {
     const menuItem = document.createElement("menuitem");
     menuItem.setAttribute("label", label);
     menuItem.addEventListener("command", aCallback, false);
-    menuItem.rpListener = aCallback;
+    (menuItem as any).rpListener = aCallback;
     // menuItem.setAttribute("tooltiptext", node.getAttribute("tooltiptext"));
     menu.insertBefore(menuItem, menu.firstChild);
     return menuItem;
-  };
+  }
 
-  function getInfoFromRuleSpec(aRuleSpec) {
+  private getInfoFromRuleSpec(aRuleSpec: IClassicmenuRuleSpec) {
     const isTemp = "temp" in aRuleSpec && aRuleSpec.temp;
     const isAllow = "allow" in aRuleSpec && aRuleSpec.allow;
     const hasOrigin = "origin" in aRuleSpec && aRuleSpec.origin;
@@ -79,9 +104,13 @@ export function loadClassicmenuIntoWindow(window) {
     return Object.freeze({isTemp, isAllow, hasOrigin, hasDest, type});
   }
 
-  self.addMenuItem = function(aMenu, aRuleSpec, aAllowRedirectFn) {
+  public addMenuItem(
+      aMenu: XUL.menupopup,
+      aRuleSpec: IClassicmenuRuleSpec,
+      aOnRedirectAllowed: () => void,
+  ) {
     const {isTemp, isAllow, hasOrigin, hasDest, type} =
-        getInfoFromRuleSpec(aRuleSpec);
+        this.getInfoFromRuleSpec(aRuleSpec);
 
     if (!isAllow) {
       console.error("Invalid addMenuItem rule-spec:");
@@ -115,28 +144,25 @@ export function loadClassicmenuIntoWindow(window) {
         return;
     }
 
-    let originAndOrDestArray = []; // contains origin and/or dest
+    const originAndOrDestArray: string[] = []; // contains origin and/or dest
     if (hasOrigin) {
-      originAndOrDestArray.push(aRuleSpec.origin);
+      originAndOrDestArray.push(aRuleSpec.origin!);
     }
     if (hasDest) {
-      originAndOrDestArray.push(aRuleSpec.dest);
+      originAndOrDestArray.push(aRuleSpec.dest!);
     }
-    originAndOrDestArray = Object.freeze(originAndOrDestArray);
+    Object.freeze(originAndOrDestArray);
 
-    const callbackFn = function() {
-      rp.policy.addRuleBySpec(aRuleSpec);
-      aAllowRedirectFn();
+    const callbackFn = () => {
+      this.policy.addRuleBySpec(aRuleSpec);
+      aOnRedirectAllowed();
     };
     const label = browser.i18n.getMessage(labelName, originAndOrDestArray);
 
-    const item = self.addCustomMenuItem(aMenu, label, callbackFn);
+    const item = this.addCustomMenuItem(aMenu, label, callbackFn);
     if (isTemp) {
       item.setAttribute("class", "rpcontinuedTemporary");
     }
     return item;
-  };
-
-  // eslint-disable-next-line no-param-reassign
-  window.rpcontinued.classicmenu = self;
+  }
 }

@@ -35,7 +35,7 @@ interface IMessageListenerWrapper {
 }
 
 export class MessageListenerModule<
-    T extends XPCOM.nsIMessageManager
+    T extends XPCOM.nsIMessageListenerManager
 > extends Module {
   private listeners: IMessageListenerWrapper[] = [];
   private addNewListenersImmediately = false;

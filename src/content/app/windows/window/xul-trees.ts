@@ -20,46 +20,52 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { XUL } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
 import * as XULUtils from "lib/utils/xul-utils";
-import {loadOverlayIntoWindow} from "ui/overlay.js";
-import {loadMenuIntoWindow} from "ui/menu.js";
-import {loadClassicmenuIntoWindow} from "ui/classicmenu.js";
 
-// =============================================================================
-// OverlayController
-// =============================================================================
+export class XulTrees extends Module {
+  constructor(
+      parentLog: Common.ILog,
+      protected readonly windowID: number,
+      protected readonly window: XUL.chromeWindow,
 
-export const OverlayController = (function() {
-  let self = {};
+      private readonly classicmenu: App.windows.window.IClassicMenu,
+      private readonly menu: App.windows.window.IMenu,
+      private readonly overlay: App.windows.window.IOverlay,
+  ) {
+    super(
+        `app.windows[${windowID}].xulTrees`,
+        parentLog,
+    );
+  }
 
-  self.loadIntoWindow = function(window) {
+  protected startupSelf() {
     // create a scope variable
-    // eslint-disable-next-line no-param-reassign
-    window.rpcontinued = {};
-
-    loadOverlayIntoWindow(window);
-    loadMenuIntoWindow(window);
-    loadClassicmenuIntoWindow(window);
+    (this.window as any).rpcontinued = {
+      classicmenu: this.classicmenu,
+      menu: this.menu,
+      overlay: this.overlay,
+    };
 
     // add all XUL elements
-    XULUtils.addTreeElementsToWindow(window, "mainTree");
+    XULUtils.addTreeElementsToWindow(this.window, "mainTree");
 
-    // init() assumes that all XUL elements are ready
-    window.rpcontinued.overlay.init();
-  };
+    return Promise.resolve();
+  }
 
-  self.unloadFromWindow = function(window) {
-    // the overlay cares itself about shutdown.
-
+  protected shutdownSelf() {
     // remove all XUL elements
-    XULUtils.removeTreeElementsFromWindow(window, "mainTree");
+    XULUtils.removeTreeElementsFromWindow(this.window, "mainTree");
 
     // Remove the scope variable.
     // This wouldn't be needed when the window is closed, but this has to be
     // done when RP is being disabled.
     // eslint-disable-next-line no-param-reassign
-    delete window.rpcontinued;
-  };
+    delete (this.window as any).rpcontinued;
 
-  return self;
-})();
+    return Promise.resolve();
+  }
+}

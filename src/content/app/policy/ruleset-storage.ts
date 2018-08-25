@@ -21,14 +21,16 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import {Module} from "lib/classes/module";
-import {RawRuleset} from "lib/ruleset";
+import {RawRuleset} from "./ruleset";
 
 export class RulesetStorage extends Module {
   constructor(
       log: Common.ILog,
       private storageArea: browser.storage.StorageArea,
+      private uriService: App.services.IUriService,
   ) {
     super("RulesetStorage", log);
   }
@@ -41,7 +43,7 @@ export class RulesetStorage extends Module {
     const pResult = this.storageArea.get(key);
     const pRawRuleset = pResult.then((aResult) => {
       if (!aResult.hasOwnProperty(key)) return null;
-      return RawRuleset.create(aResult[key]);
+      return RawRuleset.create(this.log, this.uriService, aResult[key]);
     });
     pRawRuleset.catch((e) => {
       this.log.error("RulesetStorage.loadRawRulesetFromFile():", e);

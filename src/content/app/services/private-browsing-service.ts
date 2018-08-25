@@ -21,23 +21,29 @@
  */
 
 import { App } from "app/interfaces";
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
-import {Module} from "lib/classes/module";
-import { InitialSetup } from "./initial-setup";
+import { Module } from "lib/classes/module";
 
-export class Ui extends Module {
+export class PrivateBrowsingService extends Module
+    implements App.services.IPrivateBrowsingService {
   constructor(
-      log: Common.ILog,
-      private readonly initialSetup: InitialSetup,
-      private readonly notifications: App.ui.INotifications,
+      parentLog: Common.ILog,
+      private privateBrowsingUtils: JSMs.PrivateBrowsingUtils,
+      private cachedSettings: App.storage.ICachedSettings,
   ) {
-    super("app.ui", log);
+    super("app.services.privateBrowsing", parentLog);
   }
 
-  protected get subModules() {
-    return {
-      initialSetup: this.initialSetup,
-      notifications: this.notifications,
-    };
+  public isWindowPrivate(aWindow: XPCOM.nsIDOMWindow) {
+    return this.privateBrowsingUtils.isWindowPrivate(aWindow);
+  }
+
+  /**
+   * Should it be possible to add permanent rules in that window?
+   */
+  public mayPermanentRulesBeAdded(aWindow: XPCOM.nsIDOMWindow): boolean {
+    return this.isWindowPrivate(aWindow) === false ||
+        this.cachedSettings.get("privateBrowsingPermanentWhitelisting");
   }
 }

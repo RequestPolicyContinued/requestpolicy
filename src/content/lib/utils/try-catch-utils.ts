@@ -21,7 +21,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { XPCOM } from "bootstrap/api/interfaces";
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
 
 /**
  * Functions with expected exceptions.
@@ -144,7 +144,10 @@ export function addSessionHistoryListener(gBrowser: any, listener: any): RV {
   }
 }
 
-export function removeSessionHistoryListener(gBrowser: any, listener: any): RV {
+export function removeSessionHistoryListener(
+    gBrowser: XUL.tabBrowser,
+    listener: any,
+): RV {
   try {
     gBrowser.webNavigation.sessionHistory.removeSHistoryListener(listener);
     return value(null);

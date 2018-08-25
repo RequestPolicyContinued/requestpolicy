@@ -23,7 +23,7 @@
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
-type EventListenerCallback = () => void;
+type EventListenerCallback = (event: Event) => void;
 
 interface IEventListener {
   callback: EventListenerCallback;

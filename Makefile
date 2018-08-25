@@ -503,7 +503,7 @@ ts: node-packages
 	@echo $@
 	@$(TSC) --noEmit
 	@$(TSC) --noEmit -p src/conditional/legacy/webextension/tsconfig.json
-	@#$(TSC) --noEmit -p tests/mocha     # failing
+	@#$(TSC) --noEmit -p tests/mocha
 	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
 	@echo $@

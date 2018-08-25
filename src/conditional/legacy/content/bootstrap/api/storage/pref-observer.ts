@@ -55,7 +55,7 @@ export class PrefObserver {
     this.maps.domainsToListeners.addToSet(aDomain, aListener);
   }
 
-  public addListeners(aDomains: string, aListener: Listener) {
+  public addListeners(aDomains: string[], aListener: Listener) {
     for (const domain of aDomains) {
       this.addListener(domain, aListener);
     }
@@ -77,7 +77,7 @@ export class PrefObserver {
     }
   }
 
-  public removeListeners(aDomains: string, aListener: Listener) {
+  public removeListeners(aDomains: string[], aListener: Listener) {
     for (const domain of aDomains) {
       this.removeListener(domain, aListener);
     }

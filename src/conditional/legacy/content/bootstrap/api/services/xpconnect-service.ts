@@ -64,6 +64,11 @@ export class XPConnectService {
           getService<XPCOM.nsIIDNService>(Ci.nsIIDNService);
   }
 
+  public getStyleSheetService(): XPCOM.nsIStyleSheetService {
+    return Cc["@mozilla.org/content/style-sheet-service;1"].
+        getService(Ci.nsIStyleSheetService);
+  }
+
   // other
 
   public getComponentRegistrar(): XPCOM.nsIComponentRegistrar {

@@ -21,21 +21,22 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IEndpointSpec } from "app/policy/ruleset";
+
 /**
  * Get a string representation of an endpoint (origin or dest) specification.
  *
  * Example cases can be found in the unit test corresponding
  * to this function.
- *
- * @param {Object} aEndpointSpec
- * @return {string}
  */
-export function endpointSpecToDisplayString(aEndpointSpec) {
+export function endpointSpecToDisplayString(
+    aEndpointSpec: IEndpointSpec,
+): string {
   if (aEndpointSpec.port !== undefined &&
       (aEndpointSpec.h === null || aEndpointSpec.h === "")) {
     return "[invalid endpoint specification]";
   }
-  let scheme = aEndpointSpec.s ? String(aEndpointSpec.s) : "*";
+  const scheme = aEndpointSpec.s ? String(aEndpointSpec.s) : "*";
   if (aEndpointSpec.port === undefined) {
     // Special cases.
     switch (aEndpointSpec.h) {

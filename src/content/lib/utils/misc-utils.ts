@@ -21,17 +21,23 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { JSMs, XPCOM } from "bootstrap/api/interfaces";
+
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
+declare const Services: JSMs.Services;
+
 /**
  * Posts an action to the event queue of the current thread to run it
  * asynchronously. Any additional parameters to this function are passed
  * as parameters to the callback.
- *
- * @param {Function} callback
- * @param {Object} thisPtr
  */
-export function runAsync(callback, thisPtr, ...params) {
-  let runnable = {
-    run: function() {
+export function runAsync<T>(
+    this: T,
+    callback: () => void,
+    thisPtr: T | null = null,
+    ...params: any[]) {
+  const runnable = {
+    run() {
       try {
         callback.apply(thisPtr, params);
       } catch (e) {
@@ -41,8 +47,10 @@ export function runAsync(callback, thisPtr, ...params) {
       }
     },
   };
-  Services.tm.currentThread.dispatch(runnable,
-      Ci.nsIEventTarget.DISPATCH_NORMAL);
+  Services.tm.currentThread.dispatch(
+      runnable,
+      Ci.nsIEventTarget.DISPATCH_NORMAL,
+  );
 }
 
 /**
@@ -52,12 +60,15 @@ export function runAsync(callback, thisPtr, ...params) {
  * @param {function():boolean} aFunction
  * @param {number} aTries - The number of tries.
  */
-export function tryMultipleTimes(aFunction, aTries=10) {
+export function tryMultipleTimes(
+    aFunction: () => boolean,
+    aTries: number = 10,
+) {
   if (aTries <= 0) {
     return;
   }
-  let triesLeft = aTries - 1;
-  runAsync(function() {
+  const triesLeft = aTries - 1;
+  runAsync(() => {
     if (aFunction.call(null, triesLeft) !== true) {
       tryMultipleTimes(aFunction, triesLeft);
     }
@@ -68,23 +79,13 @@ export function tryMultipleTimes(aFunction, aTries=10) {
  * Return a nested property or `undefined` if it does not exist.
  * Any element in the object chain may be undefined.
  *
- * Other implementations at http://stackoverflow.com/questions/2631001/javascript-test-for-existence-of-nested-object-key
- *
- * @param {Object} object
- * @param {...string} properties
- * @return {any}
+ * Other implementations at https://stackoverflow.com/q/2631001/307637
  */
-export function getObjectPath(object, ...properties) {
+export function getObjectPath(object: any, ...properties: string[]) {
   return properties.reduce(getObjectProperty, object);
 }
 
-/**
- * @private
- * @param {Object} object
- * @param {string} property
- * @return {any}
- */
-export function getObjectProperty(object, property) {
+function getObjectProperty(object: any, property: string) {
   if (!!object && object.hasOwnProperty(property)) {
     return object[property];
   }
@@ -94,21 +95,18 @@ export function getObjectProperty(object, property) {
 /**
  * Return a module's `internal` object, which is a singleton.
  * The `internal` can be accessed from all submodules of that module.
- *
- * @param {Object} aModuleScope
- * @return {Object} the module's `internal`
  */
-export function createModuleInternal(aModuleScope) {
+export function createModuleInternal(aModuleScope: any): any {
   /* eslint-disable no-param-reassign */
-  let internal = {};
+  const internal = {};
   let sealed = false;
-  aModuleScope.getInternal = function() {
+  aModuleScope.getInternal = () => {
     if (sealed) {
       return undefined;
     }
     return internal;
   };
-  aModuleScope.sealInternal = function() {
+  aModuleScope.sealInternal = () => {
     sealed = true;
   };
   return internal;
@@ -118,19 +116,15 @@ export function createModuleInternal(aModuleScope) {
  * Wrap a function. Allow 'before' and 'after' functions.
  * If the function was wrapped already earlier in time, the old
  * wrapper function will be re-used.
- *
- * @param {Object} aOwnerObject The object which contains (a reference to)
- *     the function which should be wrapped.
- * @param {string} aFunctionName The function's name in the object.
- * @param {Function=} aErrorCallback
- * @param {Function=} aBeforeFunction The function to be called before the
- *     original function.
- * @param {Function=} aAfterFunction The function to be called after the
- *     original function.
  */
-export function wrapFunction(aOwnerObject, aFunctionName, aErrorCallback,
-    aBeforeFunction = null, aAfterFunction = null) {
-  initWrapperFunction(aOwnerObject, aFunctionName);
+export function wrapFunction(
+    aOwnerObject: any,
+    aFunctionName: string,
+    aErrorCallback: ((message: string, error: any) => void) | null,
+    aBeforeFunction: ((message: string, error: any) => void) | null = null,
+    aAfterFunction: ((message: string, error: any) => void) | null = null,
+) {
+  initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback);
 
   const fnMetadata = aOwnerObject.rpcontinuedWrappedFunctions[aFunctionName];
   fnMetadata.before = aBeforeFunction;
@@ -142,30 +136,25 @@ export function wrapFunction(aOwnerObject, aFunctionName, aErrorCallback,
  * be removed though, because another addon could have wrapped the same
  * function as well. Instead, the 'before' and 'after' functions are
  * set to `null`.
- *
- * @param {Object} aOwnerObject The object which contains (a reference to)
- *     the function which should be wrapped.
- * @param {string} aFunctionName The function's name in the object.
  */
-export function unwrapFunction(aOwnerObject, aFunctionName) {
+export function unwrapFunction(aOwnerObject: any, aFunctionName: string) {
   wrapFunction(aOwnerObject, aFunctionName, null, null, null);
 }
 
-/**
- * @param {Object} aOwnerObject The object which contains (a reference to)
- *     the function which should be wrapped.
- * @param {string} aFunctionName The function's name in the object.
- * @param {Function} aErrorCallback
- */
-function initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback) {
-  function onError(aError, aWhen) {
+function initWrapperFunction(
+    aOwnerObject: any,
+    aFunctionName: string,
+    aErrorCallback: ((message: string, error: any) => void) | null,
+) {
+  const onError = (aError: any, aWhen: any) => {
     if (typeof aErrorCallback === "function") {
       aErrorCallback(
           `The "${aWhen}" function of the \`${aFunctionName}()\` wrapper ` +
-          `has thrown an error.`, aError
+          `has thrown an error.`,
+          aError,
       );
     }
-  }
+  };
 
   // create metadata object
   if (!aOwnerObject.hasOwnProperty("rpcontinuedWrappedFunctions")) {
@@ -181,13 +170,13 @@ function initWrapperFunction(aOwnerObject, aFunctionName, aErrorCallback) {
 
   // create metadata
   metadata[aFunctionName] = {
-    main: aOwnerObject[aFunctionName], // the original function
-    before: null,
     after: null,
+    before: null,
+    main: aOwnerObject[aFunctionName], // the original function
   };
 
   // actually wrap the object
-  aOwnerObject[aFunctionName] = function(...args) {
+  aOwnerObject[aFunctionName] = (...args: any[]) => {
     const {main, before, after} = metadata[aFunctionName];
 
     // Execute some action before the original function call.

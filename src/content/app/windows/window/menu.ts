@@ -21,89 +21,154 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel} from "lib/environment";
-import {Ruleset} from "lib/ruleset";
+import { App } from "app/interfaces";
+import {log} from "app/log";
+import { IRuleSpec, Ruleset } from "app/policy/ruleset";  // fixme
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
+import { Common } from "common/interfaces";
+import {C} from "data/constants";
 import {
-  GUIOrigin, GUIDestination, GUILocation, GUILocationProperties,
+  GUIDestination, GUILocation, GUILocationProperties, GUIOrigin,
 } from "lib/classes/gui-location";
+import { Module } from "lib/classes/module";
+import { RequestSet } from "lib/classes/request-set";
 import * as DOMUtils from "lib/utils/dom-utils";
 import * as WindowUtils from "lib/utils/window-utils";
-import {C} from "data/constants";
-import {rp} from "app/app.background";
-import {log} from "app/log";
 
-const uriService = rp.services.uri;
-const {cachedSettings} = rp.storage;
-const {requestMemory} = rp.webRequest;
+type IList = HTMLDivElement;
+interface IListItem extends HTMLDivElement {
+  value: string;
+  requestpolicyRuleData: IRuleSpec;
+  requestpolicyRuleAction: RuleActionChange;
+}
 
-export function loadMenuIntoWindow(window) {
-  let {document, rpcontinued} = window;
+interface IRuleSpecObj {
+  [canonicalRuleString: string]: IRuleSpec;
+}
 
-  // ===========================================================================
+type RuleActionChange =
+    "allow" |
+    "allow-temp" |
+    "stop-allow" |
+    "deny" |
+    "deny-temp" |
+    "stop-deny";
 
-  let gBrowser = WindowUtils.getTabBrowser(window);
+const RULE_ACTION_CHANGES: RuleActionChange[] = [
+  "allow",
+  "allow-temp",
+  "stop-allow",
+  "deny",
+  "deny-temp",
+  "stop-deny",
+];
 
-  let initialized = false;
+// tslint:disable:member-ordering
 
+export class Menu extends Module implements App.windows.window.IMenu {
   // TODO: Create a "List" class which also contains functions like
   //       _populateList() and emptyList().
-  const lists = {
-    otherOrigins: null,
+  private lists: {
+    addRules: IList | null,
+    allowedDestinations: IList | null,
+    blockedDestinations: IList | null,
+    mixedDestinations: IList | null,
+    otherOrigins: IList | null,
+    removeRules: IList | null,
+  } = {
+    addRules: null,
+    allowedDestinations: null,
     blockedDestinations: null,
     mixedDestinations: null,
-    allowedDestinations: null,
+    otherOrigins: null,
     removeRules: null,
-    addRules: null,
   };
 
-  let self = {
-    addedMenuItems: [],
+  public addedMenuItems: any[] = [];
 
-    _originItem: null,
-    _originDomainnameItem: null,
-    _isUncontrollableOrigin: null,
-    _originNumRequestsItem: null,
+  private originItem: any = null;
+  private originDomainnameItem: any = null;
+  private isUncontrollableOrigin: any = null;
+  private originNumRequestsItem: any = null;
 
-    _isCurrentlySelectedDestBlocked: null,
-    _isCurrentlySelectedDestAllowed: null,
+  private isCurrentlySelectedDestBlocked: any = null;
+  private isCurrentlySelectedDestAllowed: any = null;
 
-    _ruleChangeQueues: {},
+  private ruleChangeQueues: {
+    "allow": IRuleSpecObj;
+    "allow-temp": IRuleSpecObj;
+    "stop-allow": IRuleSpecObj;
+    "deny": IRuleSpecObj;
+    "deny-temp": IRuleSpecObj;
+    "stop-deny": IRuleSpecObj;
+  } = {
+    "allow": {},
+    "allow-temp": {},
+    "deny": {},
+    "deny-temp": {},
+    "stop-allow": {},
+    "stop-deny": {},
   };
+
+  private currentBaseDomain: string | null;
+  private currentlySelectedDest: string | null;
+  private currentlySelectedOrigin: string;
+  private currentUri: string;
+  private currentUriObj: XPCOM.nsIURI;
+  private isChromeUri: boolean;
+
+  private allRequestsOnDocument: RequestSet;
+
+  protected readonly document = this.window.document;
+  protected readonly gBrowser = WindowUtils.getTabBrowser(this.window)!;
+  protected get $str() { return this.i18n.getMessage.bind(browser.i18n); }
+
+  constructor(
+      parentLog: Common.ILog,
+      windowID: number,
+      private window: XUL.chromeWindow,
+
+      private readonly mozPromptService: XPCOM.nsIPromptService,
+
+      private i18n: typeof browser.i18n,
+
+      private readonly overlay: App.windows.window.IOverlay,
+
+      private readonly privateBrowsingService:
+          App.services.IPrivateBrowsingService,
+      private readonly uriService: App.services.IUriService,
+      private readonly policy: App.IPolicy,
+      private readonly cachedSettings: App.storage.ICachedSettings,
+      private readonly requestMemory: App.webRequest.IRequestMemory,
+  ) {
+    super(`app.windows[${windowID}].menu`, parentLog);
+  }
+
+  protected shutdownSelf() {
+    // empty _all_ lists
+    // tslint:disable-next-line:forin
+    for (const listName in this.lists) {
+      this.emptyList((this.lists as any)[listName]);
+    }
+    return Promise.resolve();
+  }
 
   /**
    * Return a DOM element by its id. First search in the document included
    * in the frame, and if not found search in the main document.
-   *
-   * @param {string} id the DOM element's id
-   * @return {Element} the DOM element or null if not found
    */
-  let $id = function(id) {
+  private $id(id: string): HTMLElement | null {
     let element = null;
-    let popupframe = window.top.document.getElementById("rpc-popup-frame");
+    const popupframe = this.window.top.document.
+        getElementById("rpc-popup-frame") as HTMLFrameElement | null;
     if (popupframe && popupframe.contentDocument) {
       element = popupframe.contentDocument.getElementById(id);
     }
     if (!element) {
-      element = window.top.document.getElementById(id);
+      element = this.window.top.document.getElementById(id);
     }
     return element;
-  };
-
-  self.init = function() {
-    if (initialized === false) {
-      initialized = true;
-
-      rpcontinued.overlay.OverlayEnvironment.addShutdownFunction(
-          EnvLevel.INTERFACE,
-          function() {
-          // empty _all_ lists
-            for (let listName in lists) {
-              emptyList(lists[listName]);
-            }
-          }
-      );
-    }
-  };
+  }
 
   // ---------------------------------------------------------------------------
   // utilities
@@ -112,35 +177,39 @@ export function loadMenuIntoWindow(window) {
   /**
    * Show a dialog with "OK" and "Cancel" buttons, as well as with a
    * checkbox labeled "always ask?".
-   *
-   * @param {string} dialogMessage
-   * @param {string} alwaysAskPrefName
-   * @param {Object=} params
-   * @return {boolean} If the question has been confirmed or not.
    */
-  function confirm(dialogMessage, alwaysAskPrefName, params={}) {
-    let shouldAsk = cachedSettings.get(alwaysAskPrefName);
+  private confirm(
+      dialogMessage: string,
+      alwaysAskPrefName: string,
+      params: any = {},
+  ): boolean {
+    const shouldAsk = this.cachedSettings.get(alwaysAskPrefName);
     if (shouldAsk === false) {
       // never ask
       return true;
     }
 
-    let dialogTitle = params.dialogTitle || "RequestPolicy";
-    let checkboxObj = {value: shouldAsk};
-    let checkboxText = browser.i18n.getMessage("alwaysAsk");
+    const dialogTitle = params.dialogTitle || "RequestPolicy";
+    const checkboxObj = {value: shouldAsk};
+    const checkboxText = browser.i18n.getMessage("alwaysAsk");
 
     if (typeof params.onBeforeDialog === "function") {
       params.onBeforeDialog.call();
     }
 
-    let confirmed = Services.prompt.confirmCheck(
-        window, dialogTitle,
-        dialogMessage, checkboxText, checkboxObj
+    const confirmed = this.mozPromptService.confirmCheck(
+        this.window,
+        dialogTitle,
+        dialogMessage,
+        checkboxText,
+        checkboxObj,
     );
 
     if (confirmed) {
       // "OK" has been pressed
-      cachedSettings.set(alwaysAskPrefName, checkboxObj.value);
+      this.cachedSettings.set({
+        alwaysAskPrefName: checkboxObj.value,
+      }).catch(this.log.onError(`set 'alwaysAskPrefName'`));
       return true;
     }
     // "Cancel" has been pressed
@@ -149,19 +218,17 @@ export function loadMenuIntoWindow(window) {
 
   /**
    * Remove all children from a list, and remove all event listeners.
-   *
-   * @param {Element} aList The list that should be emptied.
    */
-  function emptyList(aList) {
+  private emptyList(aList: IList) {
     if (!aList) {
       return;
     }
 
     // remove all event listeners
     {
-      let elements = aList.getElementsByClassName("listen-click");
-      for (let el of elements) {
-        el.removeEventListener("click", self.itemSelected, false);
+      const elements = aList.getElementsByClassName("listen-click");
+      for (const el of Array.from(elements)) {
+        el.removeEventListener("click", this.itemSelected, false);
       }
     }
 
@@ -173,60 +240,62 @@ export function loadMenuIntoWindow(window) {
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  self.prepareMenu = function() {
+  public prepareMenu() {
     try {
-      self._originItem = $id("rpc-origin");
-      self._originDomainnameItem = $id("rpc-origin-domainname");
-      self._originNumRequestsItem = $id("rpc-origin-num-requests");
+      this.originItem = this.$id("rpc-origin");
+      this.originDomainnameItem = this.$id("rpc-origin-domainname");
+      this.originNumRequestsItem = this.$id("rpc-origin-num-requests");
 
-      lists.otherOrigins = $id("rpc-other-origins-list");
-      lists.blockedDestinations = $id("rpc-blocked-destinations-list");
-      lists.mixedDestinations = $id("rpc-mixed-destinations-list");
-      lists.allowedDestinations = $id("rpc-allowed-destinations-list");
-      lists.addRules = $id("rpc-rules-add");
-      lists.removeRules = $id("rpc-rules-remove");
+      this.lists.otherOrigins =
+          this.$id("rpc-other-origins-list") as HTMLDivElement;
+      this.lists.blockedDestinations =
+          this.$id("rpc-blocked-destinations-list") as HTMLDivElement;
+      this.lists.mixedDestinations =
+          this.$id("rpc-mixed-destinations-list") as HTMLDivElement;
+      this.lists.allowedDestinations =
+          this.$id("rpc-allowed-destinations-list") as HTMLDivElement;
+      this.lists.addRules = this.$id("rpc-rules-add") as HTMLDivElement;
+      this.lists.removeRules = this.$id("rpc-rules-remove") as HTMLDivElement;
 
-      const disabled = cachedSettings.alias.isBlockingDisabled();
-      $id("rpc-link-enable-blocking").hidden = !disabled;
-      $id("rpc-link-disable-blocking").hidden = disabled;
+      const disabled = this.cachedSettings.alias.isBlockingDisabled();
+      this.$id("rpc-link-enable-blocking")!.hidden = !disabled;
+      this.$id("rpc-link-disable-blocking")!.hidden = disabled;
 
-      let tempPermLink = $id("rpc-revoke-temporary-permissions");
-      if (rp.policy.temporaryRulesExist()) {
+      const tempPermLink = this.$id("rpc-revoke-temporary-permissions")!;
+      if (this.policy.temporaryRulesExist()) {
         tempPermLink.className = "rpc-revoke-temporary-permissions-enable";
       } else {
         tempPermLink.className = "rpc-revoke-temporary-permissions-disable";
       }
 
-      self._currentUri = rpcontinued.overlay.getTopLevelDocumentUri();
+      this.currentUri = this.overlay.getTopLevelDocumentUri();
 
       try {
-        self._currentBaseDomain = uriService.getBaseDomain(self._currentUri);
-        if (self._currentBaseDomain === null) {
+        this.currentBaseDomain =
+            this.uriService.getBaseDomain(this.currentUri);
+        if (this.currentBaseDomain === null) {
           log.info(`${"Unable to prepare menu because " +
-              "the current uri has no host: "}${self._currentUri}`);
-          self._populateMenuForUncontrollableOrigin();
+              "the current uri has no host: "}${this.currentUri}`);
+          this._populateMenuForUncontrollableOrigin();
           return;
         }
       } catch (e) {
         log.info(`${"Unable to prepare menu because " +
-            "base domain can't be determined: "}${self._currentUri}`);
-        self._populateMenuForUncontrollableOrigin();
+            "base domain can't be determined: "}${this.currentUri}`);
+        this._populateMenuForUncontrollableOrigin();
         return;
       }
 
-      self._currentIdentifier = rpcontinued.overlay.
-          getTopLevelDocumentUriIdentifier();
+      // log.info("this._currentUri: " + this._currentUri);
+      this.currentUriObj = this.uriService.getUriObject(this.currentUri);
 
-      // log.info("self._currentUri: " + self._currentUri);
-      self._currentUriObj = uriService.getUriObject(self._currentUri);
+      this.isChromeUri = this.currentUriObj.scheme === "chrome";
+      // this._currentUriIsHttps = this._currentUriObj.scheme === "https";
 
-      self._isChromeUri = self._currentUriObj.scheme === "chrome";
-      // self._currentUriIsHttps = self._currentUriObj.scheme === "https";
+      log.info(`this._currentUri: ${this.currentUri}`);
 
-      log.info(`self._currentUri: ${self._currentUri}`);
-
-      if (self._isChromeUri) {
-        self._populateMenuForUncontrollableOrigin();
+      if (this.isChromeUri) {
+        this._populateMenuForUncontrollableOrigin();
         return;
       }
 
@@ -236,64 +305,65 @@ export function loadMenuIntoWindow(window) {
       // top-level document translation rule (these are used sometimes
       // for extension compatibility). For example, this is essential to the
       // menu showing relevant info when using the Update Scanner extension.
-      self._allRequestsOnDocument = requestMemory.
-          getAllRequestsInBrowser(gBrowser.selectedBrowser);
-      self._allRequestsOnDocument.print(
+      this.allRequestsOnDocument = this.requestMemory.
+          getAllRequestsInBrowser(this.gBrowser.selectedBrowser);
+      this.allRequestsOnDocument.print(
           "_allRequestsOnDocument",
           log.log.bind(log),
       );
 
-      self._setPrivateBrowsingStyles();
+      this._setPrivateBrowsingStyles();
 
-      self._populateOrigin();
-      self._populateOtherOrigins();
-      self._activateOriginItem(self._originItem);
+      this._populateOrigin();
+      this._populateOtherOrigins();
+      this._activateOriginItem(this.originItem);
     } catch (e) {
       console.error("[Fatal] Unable to prepare menu! Details:");
       console.dir(e);
       // eslint-disable-next-line no-throw-literal
       throw e;
     }
-  };
+  }
 
-  self.close = function() {
-    $id("rpc-popup").hidePopup();
-  };
+  public close() {
+    ((this.$id("rpc-popup") as any) as XUL.menupopup).hidePopup();
+  }
 
-  self._populateMenuForUncontrollableOrigin = function() {
-    self._originDomainnameItem.textContent =
+  public _populateMenuForUncontrollableOrigin() {
+    this.originDomainnameItem.textContent =
         browser.i18n.getMessage("noOrigin");
-    self._isUncontrollableOrigin = true;
-    self._originNumRequestsItem.textContent = "";
-    self._originItem.removeAttribute("default-policy");
-    self._originItem.removeAttribute("requests-blocked");
+    this.isUncontrollableOrigin = true;
+    this.originNumRequestsItem.textContent = "";
+    this.originItem.removeAttribute("default-policy");
+    this.originItem.removeAttribute("requests-blocked");
 
     [
-      lists.otherOrigins,
-      lists.blockedDestinations,
-      lists.mixedDestinations,
-      lists.allowedDestinations,
-      lists.removeRules,
-      lists.addRules,
-    ].forEach(emptyList);
+      this.lists.otherOrigins,
+      this.lists.blockedDestinations,
+      this.lists.mixedDestinations,
+      this.lists.allowedDestinations,
+      this.lists.removeRules,
+      this.lists.addRules,
+    ].forEach(this.emptyList, this);
 
-    $id("rpc-other-origins").hidden = true;
-    $id("rpc-blocked-destinations").hidden = true;
-    $id("rpc-mixed-destinations").hidden = true;
-    $id("rpc-allowed-destinations").hidden = true;
+    this.$id("rpc-other-origins")!.hidden = true;
+    this.$id("rpc-blocked-destinations")!.hidden = true;
+    this.$id("rpc-mixed-destinations")!.hidden = true;
+    this.$id("rpc-allowed-destinations")!.hidden = true;
     // TODO: show some message about why the menu is empty.
-  };
+  }
 
-  self._populateList = function(list, values) {
-    emptyList(list);
+  public _populateList(list: IList, values: any) {
+    this.emptyList(list);
 
     // check whether there are objects of GUILocation or just strings
-    let guiLocations = values[0] && values[0] instanceof GUILocation;
+    const guiLocations = values[0] && values[0] instanceof GUILocation;
 
     if (true === guiLocations) {
       // get prefs
-      let sorting = cachedSettings.get("menu.sorting");
-      let showNumRequests = cachedSettings.get("menu.info.showNumRequests");
+      const sorting = this.cachedSettings.get("menu.sorting");
+      const showNumRequests =
+          this.cachedSettings.get("menu.info.showNumRequests");
 
       if (sorting === "numRequests") {
         values.sort(GUILocation.sortByNumRequestsCompareFunction);
@@ -301,9 +371,10 @@ export function loadMenuIntoWindow(window) {
         values.sort(GUILocation.compareFunction);
       }
 
-      for (let i in values) {
-        let guiLocation = values[i];
-        let props = guiLocation.properties;
+      // tslint:disable-next-line:forin
+      for (const i in values) {
+        const guiLocation = values[i];
+        const props = guiLocation.properties;
 
         let num;
         if (true === showNumRequests) {
@@ -313,32 +384,36 @@ export function loadMenuIntoWindow(window) {
             }+${props.numAllowedRequests})`;
           }
         }
-        let newitem = self._addListItem(list, "rpc-od-item", guiLocation, num);
+        const newitem = this._addListItem(
+            list, "rpc-od-item", guiLocation, num,
+        );
 
         newitem.setAttribute(
             "default-policy",
-            props.numDefaultPolicyRequests > 0 ? "true" : "false"
+            props.numDefaultPolicyRequests > 0 ? "true" : "false",
         );
         newitem.setAttribute(
             "requests-blocked",
-            props.numBlockedRequests > 0 ? "true" : "false"
+            props.numBlockedRequests > 0 ? "true" : "false",
         );
       }
     } else {
       values.sort();
-      for (let i in values) {
-        self._addListItem(list, "rpc-od-item", values[i]);
+      // tslint:disable-next-line:forin
+      for (const i in values) {
+        this._addListItem(list, "rpc-od-item", values[i]);
       }
     }
-  };
+  }
 
-  self._populateOrigin = function() {
-    self._originDomainnameItem.textContent = self._currentBaseDomain;
-    self._isUncontrollableOrigin = false;
+  public _populateOrigin() {
+    this.originDomainnameItem.textContent = this.currentBaseDomain;
+    this.isUncontrollableOrigin = false;
 
-    let showNumRequests = cachedSettings.get("menu.info.showNumRequests");
+    const showNumRequests =
+        this.cachedSettings.get("menu.info.showNumRequests");
 
-    let props = self._getOriginGUILocationProperties();
+    const props = this._getOriginGUILocationProperties();
 
     let numRequests = "";
     if (true === showNumRequests) {
@@ -346,54 +421,58 @@ export function loadMenuIntoWindow(window) {
         numRequests = `${props.numRequests}\u00a0(` +
             `${props.numBlockedRequests}+${props.numAllowedRequests})`;
       } else {
-        numRequests = props.numRequests;
+        numRequests = `${props.numRequests}`;
       }
     }
-    self._originNumRequestsItem.textContent = numRequests;
+    this.originNumRequestsItem.textContent = numRequests;
 
-    self._originItem.setAttribute(
+    this.originItem.setAttribute(
         "default-policy",
-        props.numDefaultPolicyRequests > 0 ? "true" : "false"
+        props.numDefaultPolicyRequests > 0 ? "true" : "false",
     );
-    self._originItem.setAttribute(
+    this.originItem.setAttribute(
         "requests-blocked",
-        props.numBlockedRequests > 0 ? "true" : "false"
+        props.numBlockedRequests > 0 ? "true" : "false",
     );
-  };
+  }
 
-  self._populateOtherOrigins = function() {
-    let guiOrigins = self._getOtherOriginsAsGUILocations();
-    self._populateList(lists.otherOrigins, guiOrigins);
-    $id("rpc-other-origins").hidden = guiOrigins.length === 0;
-  };
+  public _populateOtherOrigins() {
+    const guiOrigins = this._getOtherOriginsAsGUILocations();
+    this._populateList(this.lists.otherOrigins!, guiOrigins);
+    this.$id("rpc-other-origins")!.hidden = guiOrigins.length === 0;
+  }
 
-  self._populateDestinations = function(originIdentifier) {
-    let destsWithBlockedRequests = self._getBlockedDestinationsAsGUILocations();
-    let destsWithAllowedRequests = self._getAllowedDestinationsAsGUILocations();
+  public _populateDestinations() {
+    const destsWithBlockedRequests =
+        this._getBlockedDestinationsAsGUILocations();
+    const destsWithAllowedRequests =
+        this._getAllowedDestinationsAsGUILocations();
 
-    let destsWithSolelyBlockedRequests = [];
-    let destsMixed = [];
-    let destsWithSolelyAllowedRequests = [];
+    const destsWithSolelyBlockedRequests = [];
+    const destsMixed = [];
+    const destsWithSolelyAllowedRequests = [];
 
     // Set operations would be nice. These are small arrays, so keep it simple.
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < destsWithBlockedRequests.length; i++) {
-      let blockedGUIDest = destsWithBlockedRequests[i];
+      const blockedGUIDest = destsWithBlockedRequests[i];
 
       if (false === GUILocation.existsInArray(
           blockedGUIDest,
-          destsWithAllowedRequests
+          destsWithAllowedRequests,
       )) {
         destsWithSolelyBlockedRequests.push(blockedGUIDest);
       } else {
         destsMixed.push(blockedGUIDest);
       }
     }
+    // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < destsWithAllowedRequests.length; i++) {
-      let allowedGUIDest = destsWithAllowedRequests[i];
+      const allowedGUIDest = destsWithAllowedRequests[i];
 
-      let indexRawBlocked = GUIDestination.
+      const indexRawBlocked = GUIDestination.
           indexOfDestInArray(allowedGUIDest, destsWithBlockedRequests);
-      let destsMixedIndex = GUIDestination.
+      const destsMixedIndex = GUIDestination.
           indexOfDestInArray(allowedGUIDest, destsMixed);
 
       if (indexRawBlocked === -1) {
@@ -402,7 +481,7 @@ export function loadMenuIntoWindow(window) {
         if (destsMixedIndex !== -1) {
           log.info(`Merging dest: <${allowedGUIDest}>`);
           destsMixed[destsMixedIndex] = GUIDestination.merge(
-              allowedGUIDest, destsMixed[destsMixedIndex]
+              allowedGUIDest, destsMixed[destsMixedIndex],
           );
         } else {
           // If the allowedGUIDest is in destsWithBlockedRequests and
@@ -416,133 +495,143 @@ export function loadMenuIntoWindow(window) {
       }
     }
 
-    self._populateList(
-        lists.blockedDestinations,
-        destsWithSolelyBlockedRequests
+    this._populateList(
+        this.lists.blockedDestinations!,
+        destsWithSolelyBlockedRequests,
     );
-    $id("rpc-blocked-destinations").hidden =
+    this.$id("rpc-blocked-destinations")!.hidden =
         destsWithSolelyBlockedRequests.length === 0;
 
-    self._populateList(lists.mixedDestinations, destsMixed);
-    $id("rpc-mixed-destinations").hidden = destsMixed.length === 0;
+    this._populateList(this.lists.mixedDestinations!, destsMixed);
+    this.$id("rpc-mixed-destinations")!.hidden = destsMixed.length === 0;
 
-    self._populateList(
-        lists.allowedDestinations,
-        destsWithSolelyAllowedRequests
+    this._populateList(
+        this.lists.allowedDestinations!,
+        destsWithSolelyAllowedRequests,
     );
-    $id("rpc-allowed-destinations").hidden =
+    this.$id("rpc-allowed-destinations")!.hidden =
         destsWithSolelyAllowedRequests.length === 0;
-  };
+  }
 
   // eslint-disable-next-line complexity
-  self._populateDetails = function() {
-    let origin = self._currentlySelectedOrigin;
-    let dest = self._currentlySelectedDest;
+  public _populateDetails() {
+    const origin = this.currentlySelectedOrigin;
+    const dest = this.currentlySelectedDest;
 
-    emptyList(lists.removeRules);
-    emptyList(lists.addRules);
+    this.emptyList(this.lists.removeRules!);
+    this.emptyList(this.lists.addRules!);
 
-    let ruleData = {
-      "o": {
-        "h": self._addWildcard(origin),
+    const ruleData: IRuleSpec = {
+      o: {
+        h: this._addWildcard(origin),
       },
     };
 
-    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, cachedSettings
-    );
+    const mayPermRulesBeAdded = this.privateBrowsingService.
+        mayPermanentRulesBeAdded(this.window);
 
     // Note: in PBR we'll need to still use the old string for the temporary
     // rule. We won't be able to use just "allow temporarily".
 
-    if (!self._currentlySelectedDest) {
-      if (cachedSettings.alias.isDefaultAllow()) {
+    if (!this.currentlySelectedDest) {
+      if (this.cachedSettings.alias.isDefaultAllow()) {
         if (mayPermRulesBeAdded === true) {
-          self._addMenuItemDenyOrigin(lists.addRules, ruleData);
+          this._addMenuItemDenyOrigin(this.lists.addRules!, ruleData);
         }
-        self._addMenuItemTempDenyOrigin(lists.addRules, ruleData);
+        this._addMenuItemTempDenyOrigin(this.lists.addRules!, ruleData);
       } else {
         if (mayPermRulesBeAdded === true) {
-          self._addMenuItemAllowOrigin(lists.addRules, ruleData);
+          this._addMenuItemAllowOrigin(this.lists.addRules!, ruleData);
         }
-        self._addMenuItemTempAllowOrigin(lists.addRules, ruleData);
+        this._addMenuItemTempAllowOrigin(this.lists.addRules!, ruleData);
       }
     }
 
     if (dest) {
       ruleData.d = {
-        "h": self._addWildcard(dest),
+        h: this._addWildcard(dest),
       };
       const destOnlyRuleData = {
-        "d": {
-          "h": self._addWildcard(dest),
+        d: {
+          h: this._addWildcard(dest),
         },
       };
-      // if (cachedSettings.alias.isDefaultAllow()) {
-      if (self._isCurrentlySelectedDestAllowed ||
-          !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
-              !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+      // if (this.cachedSettings.alias.isDefaultAllow()) {
+      if (this.isCurrentlySelectedDestAllowed ||
+          !this.policy.ruleExists(C.RULE_ACTION_DENY, ruleData) &&
+              !this.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         // show "Block requests" if the destination was allowed
         // OR if there's no blocking rule (i.e. the request was blocked
         // "by default") -- this enables support for blacklisting.
-        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-            !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+        if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !this.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
-            self._addMenuItemDenyOriginToDest(lists.addRules, ruleData);
+            this._addMenuItemDenyOriginToDest(this.lists.addRules!, ruleData);
           }
-          self._addMenuItemTempDenyOriginToDest(lists.addRules, ruleData);
+          this._addMenuItemTempDenyOriginToDest(this.lists.addRules!, ruleData);
         }
 
-        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !this.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
-            self._addMenuItemDenyDest(lists.addRules, destOnlyRuleData);
+            this._addMenuItemDenyDest(this.lists.addRules!, destOnlyRuleData);
           }
-          self._addMenuItemTempDenyDest(lists.addRules, destOnlyRuleData);
+          this._addMenuItemTempDenyDest(this.lists.addRules!, destOnlyRuleData);
         }
       }
-      if (self._isCurrentlySelectedDestBlocked ||
-          !rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-              !rp.policy.ruleExists(
+      if (this.isCurrentlySelectedDestBlocked ||
+          !this.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+              !this.policy.ruleExists(
                   C.RULE_ACTION_ALLOW,
-                  destOnlyRuleData
+                  destOnlyRuleData,
               )) {
         // show "Allow requests" if the destination was blocked
         // OR if there's no allow-rule (i.e. the request was allowed
         // "by default") -- this enables support for whitelisting.
-        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-            !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+        if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+            !this.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
           if (mayPermRulesBeAdded === true) {
-            self._addMenuItemAllowOriginToDest(lists.addRules, ruleData);
+            this._addMenuItemAllowOriginToDest(this.lists.addRules!, ruleData);
           }
-          self._addMenuItemTempAllowOriginToDest(lists.addRules, ruleData);
+          this._addMenuItemTempAllowOriginToDest(
+              this.lists.addRules!,
+              ruleData,
+          );
         }
 
-        if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-            !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+        if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+            !this.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
           if (mayPermRulesBeAdded === true) {
-            self._addMenuItemAllowDest(lists.addRules, destOnlyRuleData);
+            this._addMenuItemAllowDest(this.lists.addRules!, destOnlyRuleData);
           }
-          self._addMenuItemTempAllowDest(lists.addRules, destOnlyRuleData);
+          this._addMenuItemTempAllowDest(
+              this.lists.addRules!,
+              destOnlyRuleData,
+          );
         }
       }
     }
 
-    if (self._currentlySelectedDest) {
-      if (!cachedSettings.alias.isDefaultAllow() &&
-          !cachedSettings.alias.isDefaultAllowSameDomain()) {
-        self._populateDetailsAddSubdomainAllowRules(lists.addRules);
+    if (this.currentlySelectedDest) {
+      if (!this.cachedSettings.alias.isDefaultAllow() &&
+          !this.cachedSettings.alias.isDefaultAllowSameDomain()) {
+        this._populateDetailsAddSubdomainAllowRules(this.lists.addRules!);
       }
     }
 
-    self._populateDetailsRemoveAllowRules(lists.removeRules);
-    self._populateDetailsRemoveDenyRules(lists.removeRules);
-  };
+    this._populateDetailsRemoveAllowRules(this.lists.removeRules!);
+    this._populateDetailsRemoveDenyRules(this.lists.removeRules!);
+  }
 
-  self._addListItem = function(list, cssClass, value, numRequests) {
+  public _addListItem(
+      list: IList,
+      cssClass: string,
+      value: string,
+      numRequests?: number,
+  ) {
     const box = document.createElement("div");
     box.setAttribute("class", `${cssClass} listen-click`);
-    box.addEventListener("click", self.itemSelected, false);
+    box.addEventListener("click", this.itemSelected, false);
     list.insertBefore(box, null);
 
     const destLabel = document.createElement("span");
@@ -552,108 +641,116 @@ export function loadMenuIntoWindow(window) {
 
     if (numRequests) {
       const numReqLabel = document.createElement("span");
-      numReqLabel.textContent = numRequests;
+      numReqLabel.textContent = `${numRequests}`;
       numReqLabel.setAttribute("class", "numRequests");
       box.insertBefore(numReqLabel, null);
     }
 
     return box;
-  };
+  }
 
-  self._disableIfNoChildren = function(el) {
+  public _disableIfNoChildren(el: HTMLElement) {
     // TODO: this isn't working.
     // eslint-disable-next-line no-param-reassign
     el.hidden = el.firstChild ? false : true;
-  };
+  }
 
-  self._setPrivateBrowsingStyles = function() {
-    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, cachedSettings
-    );
-    let val = mayPermRulesBeAdded === true ? "" : "privatebrowsing";
-    $id("rpc-details").setAttribute("class", val);
-  };
+  public _setPrivateBrowsingStyles() {
+    const mayPermRulesBeAdded = this.privateBrowsingService.
+        mayPermanentRulesBeAdded(this.window);
+    const val = mayPermRulesBeAdded === true ? "" : "privatebrowsing";
+    this.$id("rpc-details")!.setAttribute("class", val);
+  }
 
-  self._resetSelectedOrigin = function() {
-    self._originItem.setAttribute("selected-origin", "false");
-    for (let i = 0; i < lists.otherOrigins.childNodes.length; i++) {
-      const child = lists.otherOrigins.childNodes[i];
+  public _resetSelectedOrigin() {
+    this.originItem.setAttribute("selected-origin", "false");
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < this.lists.otherOrigins!.childNodes.length; i++) {
+      const child = this.lists.otherOrigins!.childNodes[i] as IListItem;
       child.setAttribute("selected-origin", "false");
     }
-  };
+  }
 
-  self._resetSelectedDest = function() {
-    for (let i = 0; i < lists.blockedDestinations.childNodes.length; i++) {
-      let child = lists.blockedDestinations.childNodes[i];
+  public _resetSelectedDest() {
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0;
+         i < this.lists.blockedDestinations!.childNodes.length;
+         i++) {
+      const child = this.lists.blockedDestinations!.childNodes[i] as IListItem;
       child.setAttribute("selected-dest", "false");
     }
-    for (let i = 0; i < lists.mixedDestinations.childNodes.length; i++) {
-      let child = lists.mixedDestinations.childNodes[i];
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < this.lists.mixedDestinations!.childNodes.length; i++) {
+      const child = this.lists.mixedDestinations!.childNodes[i] as IListItem;
       child.setAttribute("selected-dest", "false");
     }
-    for (let i = 0; i < lists.allowedDestinations.childNodes.length; i++) {
-      let child = lists.allowedDestinations.childNodes[i];
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0;
+         i < this.lists.allowedDestinations!.childNodes.length;
+         i++) {
+      const child = this.lists.allowedDestinations!.childNodes[i] as IListItem;
       child.setAttribute("selected-dest", "false");
     }
-  };
+  }
 
-  self._activateOriginItem = function(item) {
+  public _activateOriginItem(item: IListItem) {
     if (item.id === "rpc-origin") {
       // it's _the_ origin
-      if (self._isUncontrollableOrigin) {
+      if (this.isUncontrollableOrigin) {
         return;
       }
-      self._currentlySelectedOrigin = self._originDomainnameItem.textContent;
-    } else if (item.parentNode.id === "rpc-other-origins-list") {
+      this.currentlySelectedOrigin = this.originDomainnameItem.textContent;
+    } else if ((item.parentNode as IList).id === "rpc-other-origins-list") {
       // it's an otherOrigin
-      self._currentlySelectedOrigin =
-          item.getElementsByClassName("domainname")[0].textContent;
+      this.currentlySelectedOrigin =
+          item.getElementsByClassName("domainname")[0].textContent!;
     }
-    self._currentlySelectedDest = null;
+    this.currentlySelectedDest = null;
     // TODO: if the document's origin (rather than an other origin) is being
     // activated, then regenerate the other origins list, as well.
-    self._resetSelectedOrigin();
+    this._resetSelectedOrigin();
     item.setAttribute("selected-origin", "true");
-    self._populateDestinations();
-    self._resetSelectedDest();
-    self._populateDetails();
-  };
+    this._populateDestinations();
+    this._resetSelectedDest();
+    this._populateDetails();
+  }
 
-  self._activateDestinationItem = function(item) {
-    self._currentlySelectedDest =
+  public _activateDestinationItem(item: IListItem) {
+    this.currentlySelectedDest =
         item.getElementsByClassName("domainname")[0].textContent;
 
-    if (item.parentNode.id === "rpc-blocked-destinations-list") {
-      self._isCurrentlySelectedDestBlocked = true;
-      self._isCurrentlySelectedDestAllowed = false;
-    } else if (item.parentNode.id === "rpc-allowed-destinations-list") {
-      self._isCurrentlySelectedDestBlocked = false;
-      self._isCurrentlySelectedDestAllowed = true;
+    const itemParent = item.parentNode as IList;
+    if (itemParent.id === "rpc-blocked-destinations-list") {
+      this.isCurrentlySelectedDestBlocked = true;
+      this.isCurrentlySelectedDestAllowed = false;
+    } else if (itemParent.id === "rpc-allowed-destinations-list") {
+      this.isCurrentlySelectedDestBlocked = false;
+      this.isCurrentlySelectedDestAllowed = true;
     } else {
-      self._isCurrentlySelectedDestBlocked = true;
-      self._isCurrentlySelectedDestAllowed = true;
+      this.isCurrentlySelectedDestBlocked = true;
+      this.isCurrentlySelectedDestAllowed = true;
     }
 
-    self._resetSelectedDest();
+    this._resetSelectedDest();
     item.setAttribute("selected-dest", "true");
-    self._populateDetails();
-  };
+    this._populateDetails();
+  }
 
-  function openSiteInfoTab(domain) {
-    let url = `https://www.mywot.com/en/scorecard/${domain}`;
-    window.openUILinkIn(url, "tab", {
-      relatedToCurrent: true,
+private openSiteInfoTab(domain: string) {
+    const url = `https://www.mywot.com/en/scorecard/${domain}`;
+    this.window.openUILinkIn(url, "tab", {
       inBackground: true,
+      relatedToCurrent: true,
     });
   }
 
-  function maybeOpenSiteInfoTab(item) {
+private maybeOpenSiteInfoTab(item: IListItem) {
     let domain = null;
 
     if (item.value) {
       domain = item.value;
     } else {
-      let domainLabel = item.querySelector(".domainname");
+      const domainLabel = item.querySelector(".domainname");
 
       if (domainLabel !== null) {
         domain = domainLabel.textContent;
@@ -666,51 +763,52 @@ export function loadMenuIntoWindow(window) {
       return;
     }
 
-    let dialogMessage = browser.i18n.getMessage("siteInfoConfirm",
+    const dialogMessage = browser.i18n.getMessage("siteInfoConfirm",
         [domain, "https://www.mywot.com"]);
-    let alwaysAskPrefName = "confirmSiteInfo";
-    let confirmed = confirm(dialogMessage, alwaysAskPrefName, {
+    const alwaysAskPrefName = "confirmSiteInfo";
+    const confirmed = this.confirm(dialogMessage, alwaysAskPrefName, {
       // close the menu if the dialog needs to be shown
-      onBeforeDialog: self.close,
+      onBeforeDialog: this.close,
     });
     if (confirmed) {
-      openSiteInfoTab(domain);
+      this.openSiteInfoTab(domain);
     }
   }
 
-  self.itemSelected = function(event) {
+  public itemSelected(event: MouseEvent) {
     // We retrieve the element on which the listener was added to always
     // get the div (and not one span or textnode children)
-    let item = event.currentTarget;
+    const item = event.currentTarget as IListItem;
     // TODO: rather than compare IDs, this should probably compare against
     // the elements we already have stored in variables. That is, assuming
     // equality comparisons work that way here.
+    const itemParent = item.parentNode as IList;
     if (item.id === "rpc-origin" ||
-        item.parentNode.id === "rpc-other-origins-list") {
+        itemParent.id === "rpc-other-origins-list") {
       if (event.button === 1) {
-        maybeOpenSiteInfoTab(item);
+        this.maybeOpenSiteInfoTab(item);
       } else {
-        self._activateOriginItem(item);
+        this._activateOriginItem(item);
       }
-    } else if (item.parentNode.id === "rpc-blocked-destinations-list" ||
-               item.parentNode.id === "rpc-mixed-destinations-list" ||
-               item.parentNode.id === "rpc-allowed-destinations-list") {
+    } else if (itemParent.id === "rpc-blocked-destinations-list" ||
+               itemParent.id === "rpc-mixed-destinations-list" ||
+               itemParent.id === "rpc-allowed-destinations-list") {
       if (event.button === 1) {
-        maybeOpenSiteInfoTab(item);
+        this.maybeOpenSiteInfoTab(item);
       } else {
-        self._activateDestinationItem(item);
+        this._activateDestinationItem(item);
       }
-    } else if (item.parentNode.id === "rpc-rules-remove" ||
-               item.parentNode.id === "rpc-rules-add") {
-      self._processRuleSelection(item);
+    } else if (itemParent.id === "rpc-rules-remove" ||
+               itemParent.id === "rpc-rules-add") {
+      this._processRuleSelection(item);
     } else {
       console.error("Unable to figure out which item type was selected.");
     }
-  };
+  }
 
-  self._processRuleSelection = function(item) {
-    const ruleData = item.requestpolicyRuleData;
-    const ruleAction = item.requestpolicyRuleAction;
+  public _processRuleSelection(item: IListItem) {
+    const ruleData: IRuleSpec = item.requestpolicyRuleData;
+    const ruleAction: RuleActionChange = item.requestpolicyRuleAction;
 
     let undo;
     if (item.getAttribute("selected-rule") === "true") {
@@ -738,10 +836,10 @@ export function loadMenuIntoWindow(window) {
     // TODO: does all of this get replaced with a generic rule processor that
     // only cares whether it's an allow/deny and temporary and drops the
     // ruleData argument straight into the ruleset?
-    /* eslint-disable no-unused-vars */
+    // @ts-ignore
     let origin;
+    // @ts-ignore
     let dest;
-    /* eslint-enable no-unused-vars */
     if (ruleData.o && ruleData.o.h) {
       origin = ruleData.o.h;
     }
@@ -749,56 +847,53 @@ export function loadMenuIntoWindow(window) {
       dest = ruleData.d.h;
     }
 
-    if (!self._ruleChangeQueues[ruleAction]) {
-      self._ruleChangeQueues[ruleAction] = {};
-    }
-
     if (undo) {
-      delete self._ruleChangeQueues[ruleAction][canonicalRule];
+      delete this.ruleChangeQueues[ruleAction][canonicalRule];
     } else {
-      self._ruleChangeQueues[ruleAction][canonicalRule] = ruleData;
+      this.ruleChangeQueues[ruleAction][canonicalRule] = ruleData;
     }
-  };
+  }
 
-  self.processQueuedRuleChanges = function() {
+  public processQueuedRuleChanges() {
     let rulesChanged = false;
-    for (let ruleAction in self._ruleChangeQueues) {
-      for (let canonicalRule in self._ruleChangeQueues[ruleAction]) {
-        let ruleData = self._ruleChangeQueues[ruleAction][canonicalRule];
-        self._processRuleChange(ruleAction, ruleData);
+    for (const ruleAction of RULE_ACTION_CHANGES) {
+      // tslint:disable-next-line:forin
+      for (const canonicalRule
+           of Object.keys(this.ruleChangeQueues[ruleAction])) {
+        const ruleData = this.ruleChangeQueues[ruleAction][canonicalRule];
+        this._processRuleChange(ruleAction, ruleData);
         rulesChanged = true;
       }
+      this.ruleChangeQueues[ruleAction] = {};
     }
-
-    self._ruleChangeQueues = {};
     return rulesChanged;
-  };
+  }
 
-  self._processRuleChange = function(ruleAction, ruleData) {
+  public _processRuleChange(ruleAction: RuleActionChange, ruleData: IRuleSpec) {
     switch (ruleAction) {
       case "allow":
-        rp.policy.addAllowRule(ruleData);
+        this.policy.addAllowRule(ruleData);
         break;
       case "allow-temp":
-        rp.policy.addTemporaryAllowRule(ruleData);
+        this.policy.addTemporaryAllowRule(ruleData);
         break;
       case "stop-allow":
-        rp.policy.removeAllowRule(ruleData);
+        this.policy.removeAllowRule(ruleData);
         break;
       case "deny":
-        rp.policy.addDenyRule(ruleData);
+        this.policy.addDenyRule(ruleData);
         break;
       case "deny-temp":
-        rp.policy.addTemporaryDenyRule(ruleData);
+        this.policy.addTemporaryDenyRule(ruleData);
         break;
       case "stop-deny":
-        rp.policy.removeDenyRule(ruleData);
+        this.policy.removeDenyRule(ruleData);
         break;
       default:
         // eslint-disable-next-line no-throw-literal
-        throw `action not implemented: ${ruleAction}`;
+        throw new Error(`action not implemented: ${ruleAction}`);
     }
-  };
+  }
 
   // Note by @jsamuel:
   // „It's been too long since I looked at some of the new code.
@@ -806,37 +901,39 @@ export function loadMenuIntoWindow(window) {
   //  levels and just use what is currently called LEVEL_SOP. If using anything
   //  else there will be errors from within getDeniedRequests().“
 
-  self._getBlockedDestinationsAsGUILocations = function() {
-    const reqSet = requestMemory.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument
+  public _getBlockedDestinationsAsGUILocations() {
+    const reqSet = this.requestMemory.getDeniedRequests(
+        this.currentlySelectedOrigin, this.allRequestsOnDocument,
     );
     const requests = reqSet.getAllMergedOrigins();
 
     const result = [];
-    for (let destBase in requests) {
+    // tslint:disable-next-line:forin
+    for (const destBase in requests) {
       const properties = new GUILocationProperties();
       properties.accumulate(requests[destBase], C.RULE_ACTION_DENY);
       result.push(new GUIDestination(destBase, properties));
     }
     return result;
-  };
+  }
 
-  self._getAllowedDestinationsAsGUILocations = function() {
-    const reqSet = requestMemory.getAllowedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument
+  public _getAllowedDestinationsAsGUILocations() {
+    const reqSet = this.requestMemory.getAllowedRequests(
+        this.currentlySelectedOrigin, this.allRequestsOnDocument,
     );
     const requests = reqSet.getAllMergedOrigins();
 
     const result = [];
-    for (let destBase in requests) {
+    // tslint:disable-next-line:forin
+    for (const destBase in requests) {
       // For everybody except users with default deny who are not allowing all
       // requests to the same domain:
       // Ignore the selected origin's domain when listing destinations.
       if (
-        cachedSettings.alias.isDefaultAllow() ||
-          cachedSettings.alias.isDefaultAllowSameDomain()
+        this.cachedSettings.alias.isDefaultAllow() ||
+          this.cachedSettings.alias.isDefaultAllowSameDomain()
       ) {
-        if (destBase === self._currentlySelectedOrigin) {
+        if (destBase === this.currentlySelectedOrigin) {
           continue;
         }
       }
@@ -846,43 +943,45 @@ export function loadMenuIntoWindow(window) {
       result.push(new GUIDestination(destBase, properties));
     }
     return result;
-  };
+  }
 
   /**
    * TODO: optimize this for performance (_getOriginGUILocationProperties and
    * _getOtherOriginsAsGUILocations could be merged.)
    *
-   * @return {GUILocationProperties}
-   *         the properties of the "main" origin (the one in the location bar).
+   * Get the properties of the "main" origin (the one in the location bar).
    */
-  self._getOriginGUILocationProperties = function() {
-    const allRequests = self._allRequestsOnDocument.getAll();
+  public _getOriginGUILocationProperties(): GUILocationProperties {
+    const allRequests = this.allRequestsOnDocument.getAll();
 
     const properties = new GUILocationProperties();
 
-    for (let originUri in allRequests) {
-      const originBase = uriService.getBaseDomain(originUri);
-      if (originBase !== self._currentBaseDomain) {
+    // tslint:disable-next-line:forin
+    for (const originUri in allRequests) {
+      const originBase = this.uriService.getBaseDomain(originUri);
+      if (originBase !== this.currentBaseDomain) {
         continue;
       }
 
-      for (let destBase in allRequests[originUri]) {
+      // tslint:disable-next-line:forin
+      for (const destBase in allRequests[originUri]) {
         properties.accumulate(allRequests[originUri][destBase]);
       }
     }
     return properties;
-  };
+  }
 
-  self._getOtherOriginsAsGUILocations = function() {
-    const allRequests = self._allRequestsOnDocument.getAll();
+  public _getOtherOriginsAsGUILocations() {
+    const allRequests = this.allRequestsOnDocument.getAll();
 
-    const allowSameDomain = cachedSettings.alias.isDefaultAllow() ||
-        cachedSettings.alias.isDefaultAllowSameDomain();
+    const allowSameDomain = this.cachedSettings.alias.isDefaultAllow() ||
+        this.cachedSettings.alias.isDefaultAllowSameDomain();
 
-    const guiOrigins = [];
-    for (let originUri in allRequests) {
-      const originBase = uriService.getBaseDomain(originUri);
-      if (originBase === self._currentBaseDomain) {
+    const guiOrigins: GUIOrigin[] = [];
+    // tslint:disable-next-line:forin
+    for (const originUri in allRequests) {
+      const originBase = this.uriService.getBaseDomain(originUri);
+      if (originBase === this.currentBaseDomain) {
         continue;
       }
 
@@ -895,8 +994,8 @@ export function loadMenuIntoWindow(window) {
       // }
 
       const guiOriginsIndex = GUIOrigin.indexOfOriginInArray(
-          originBase,
-          guiOrigins
+          originBase!,
+          guiOrigins,
       );
       let properties;
       if (guiOriginsIndex === -1) {
@@ -906,7 +1005,7 @@ export function loadMenuIntoWindow(window) {
       }
       let addThisOriginBase = false;
 
-      for (let destBase in allRequests[originUri]) {
+      for (const destBase in allRequests[originUri]) {
         // Search for a destBase which wouldn't be allowed by the default
         // policy.
         // TODO: some users might want to know those "other origins" as well.
@@ -924,314 +1023,415 @@ export function loadMenuIntoWindow(window) {
       }
 
       if (addThisOriginBase && guiOriginsIndex === -1) {
-        guiOrigins.push(new GUIOrigin(originBase, properties));
+        guiOrigins.push(new GUIOrigin(originBase!, properties));
       }
     }
     return guiOrigins;
-  };
+  }
 
-  self._isIPAddressOrSingleName = function(hostname) {
-    return uriService.isIPAddress(hostname) ||
+  public _isIPAddressOrSingleName(hostname: string) {
+    return this.uriService.isIPAddress(hostname) ||
         hostname.indexOf(".") === -1;
-  };
+  }
 
-  self._addWildcard = function(hostname) {
-    if (self._isIPAddressOrSingleName(hostname)) {
+  public _addWildcard(hostname: string) {
+    if (this._isIPAddressOrSingleName(hostname)) {
       return hostname;
     } else {
       return `*.${hostname}`;
     }
-  };
+  }
 
   // TODO: the 12 _addMenuItem* functions below hopefully can be refactored.
 
   // Stop allowing
 
-  self._addMenuItemStopAllowingOrigin = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopAllowingOrigin(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const originHost = ruleData.o.h;
+    const originHost = ruleData.o!.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(
-        list, ruleData, "stopAllowingOrigin",
-        [originHost], ruleAction, "rpc-stop-rule rpc-stop-allow"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopAllowingOrigin",
+        [originHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-allow",
     );
-  };
+  }
 
-  self._addMenuItemStopAllowingDest = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopAllowingDest(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const destHost = ruleData.d.h;
+    const destHost = ruleData.d!.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(
-        list, ruleData, "stopAllowingDestination",
-        [destHost], ruleAction, "rpc-stop-rule rpc-stop-allow"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopAllowingDestination",
+        [destHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-allow",
     );
-  };
+  }
 
-  self._addMenuItemStopAllowingOriginToDest = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopAllowingOriginToDest(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
     const ruleAction = subscriptionOverride ? "deny" : "stop-allow";
-    return self._addMenuItemHelper(
-        list, ruleData,
-        "stopAllowingOriginToDestination", [originHost, destHost], ruleAction,
-        "rpc-stop-rule rpc-stop-allow"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopAllowingOriginToDestination",
+        [originHost!, destHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-allow",
     );
-  };
+  }
 
   // Allow
 
-  self._addMenuItemAllowOrigin = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "allowOrigin",
-        [originHost], "allow", "rpc-start-rule rpc-allow"
+  public _addMenuItemAllowOrigin(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowOrigin",
+        [originHost!],
+        "allow",
+        "rpc-start-rule rpc-allow",
     );
-  };
+  }
 
-  self._addMenuItemAllowDest = function(list, ruleData) {
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "allowDestination",
-        [destHost], "allow", "rpc-start-rule rpc-allow"
+  public _addMenuItemAllowDest(list: IList, ruleData: IRuleSpec) {
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowDestination",
+        [destHost!],
+        "allow",
+        "rpc-start-rule rpc-allow",
     );
-  };
+  }
 
-  self._addMenuItemAllowOriginToDest = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "allowOriginToDestination",
-        [originHost, destHost], "allow", "rpc-start-rule rpc-allow"
+  public _addMenuItemAllowOriginToDest(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowOriginToDestination",
+        [originHost!, destHost!],
+        "allow",
+        "rpc-start-rule rpc-allow",
     );
-  };
+  }
 
   // Allow temp
 
-  self._addMenuItemTempAllowOrigin = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "allowOriginTemporarily",
-        [originHost], "allow-temp", "rpc-start-rule rpc-allow rpc-temporary"
+  public _addMenuItemTempAllowOrigin(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowOriginTemporarily",
+        [originHost!],
+        "allow-temp",
+        "rpc-start-rule rpc-allow rpc-temporary",
     );
-  };
+  }
 
-  self._addMenuItemTempAllowDest = function(list, ruleData) {
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData,
-        "allowDestinationTemporarily", [destHost], "allow-temp",
-        "rpc-start-rule rpc-allow rpc-temporary"
+  public _addMenuItemTempAllowDest(list: IList, ruleData: IRuleSpec) {
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowDestinationTemporarily",
+        [destHost!],
+        "allow-temp",
+        "rpc-start-rule rpc-allow rpc-temporary",
     );
-  };
+  }
 
-  self._addMenuItemTempAllowOriginToDest = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData,
-        "allowOriginToDestinationTemporarily", [originHost, destHost],
-        "allow-temp", "rpc-start-rule rpc-allow rpc-temporary"
+  public _addMenuItemTempAllowOriginToDest(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "allowOriginToDestinationTemporarily",
+        [originHost!, destHost!],
+        "allow-temp",
+        "rpc-start-rule rpc-allow rpc-temporary",
     );
-  };
+  }
 
   // Stop denying
 
-  self._addMenuItemStopDenyingOrigin = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopDenyingOrigin(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const originHost = ruleData.o.h;
+    const originHost = ruleData.o!.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(
-        list, ruleData, "stopDenyingOrigin",
-        [originHost], ruleAction, "rpc-stop-rule rpc-stop-deny"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopDenyingOrigin",
+        [originHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-deny",
     );
-  };
+  }
 
-  self._addMenuItemStopDenyingDest = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopDenyingDest(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const destHost = ruleData.d.h;
+    const destHost = ruleData.d!.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(
-        list, ruleData, "stopDenyingDestination",
-        [destHost], ruleAction, "rpc-stop-rule rpc-stop-deny"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopDenyingDestination",
+        [destHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-deny",
     );
-  };
+  }
 
-  self._addMenuItemStopDenyingOriginToDest = function(
-      list, ruleData,
-      subscriptionOverride
+  public _addMenuItemStopDenyingOriginToDest(
+      list: IList,
+      ruleData: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
     const ruleAction = subscriptionOverride ? "allow" : "stop-deny";
-    return self._addMenuItemHelper(
-        list, ruleData,
-        "stopDenyingOriginToDestination", [originHost, destHost], ruleAction,
-        "rpc-stop-rule rpc-stop-deny"
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "stopDenyingOriginToDestination",
+        [originHost!, destHost!],
+        ruleAction,
+        "rpc-stop-rule rpc-stop-deny",
     );
-  };
+  }
 
   // Deny
 
-  self._addMenuItemDenyOrigin = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "denyOrigin",
-        [originHost], "deny", "rpc-start-rule rpc-deny"
+  public _addMenuItemDenyOrigin(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyOrigin",
+        [originHost!],
+        "deny",
+        "rpc-start-rule rpc-deny",
     );
-  };
+  }
 
-  self._addMenuItemDenyDest = function(list, ruleData) {
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "denyDestination",
-        [destHost], "deny", "rpc-start-rule rpc-deny"
+  public _addMenuItemDenyDest(list: IList, ruleData: IRuleSpec) {
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyDestination",
+        [destHost!],
+        "deny",
+        "rpc-start-rule rpc-deny",
     );
-  };
+  }
 
-  self._addMenuItemDenyOriginToDest = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "denyOriginToDestination",
-        [originHost, destHost], "deny", "rpc-start-rule rpc-deny"
+  public _addMenuItemDenyOriginToDest(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyOriginToDestination",
+        [originHost!, destHost!],
+        "deny",
+        "rpc-start-rule rpc-deny",
     );
-  };
+  }
 
   // Deny temp
 
-  self._addMenuItemTempDenyOrigin = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "denyOriginTemporarily",
-        [originHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+  public _addMenuItemTempDenyOrigin(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyOriginTemporarily",
+        [originHost!],
+        "deny-temp",
+        "rpc-start-rule rpc-deny rpc-temporary",
     );
-  };
+  }
 
-  self._addMenuItemTempDenyDest = function(list, ruleData) {
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData, "denyDestinationTemporarily",
-        [destHost], "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+  public _addMenuItemTempDenyDest(list: IList, ruleData: IRuleSpec) {
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyDestinationTemporarily",
+        [destHost!],
+        "deny-temp",
+        "rpc-start-rule rpc-deny rpc-temporary",
     );
-  };
+  }
 
-  self._addMenuItemTempDenyOriginToDest = function(list, ruleData) {
-    const originHost = ruleData.o.h;
-    const destHost = ruleData.d.h;
-    return self._addMenuItemHelper(
-        list, ruleData,
-        "denyOriginToDestinationTemporarily", [originHost, destHost],
-        "deny-temp", "rpc-start-rule rpc-deny rpc-temporary"
+  public _addMenuItemTempDenyOriginToDest(list: IList, ruleData: IRuleSpec) {
+    const originHost = ruleData.o!.h;
+    const destHost = ruleData.d!.h;
+    return this._addMenuItemHelper(
+        list,
+        ruleData,
+        "denyOriginToDestinationTemporarily",
+        [originHost!, destHost!],
+        "deny-temp",
+        "rpc-start-rule rpc-deny rpc-temporary",
     );
-  };
+  }
 
-  self._addMenuItemHelper = function(list, ruleData, fmtStrName, fmtStrArgs,
-      ruleAction, cssClass) {
-    const label = browser.i18n.getMessage(fmtStrName, fmtStrArgs);
-    const item = self._addListItem(list, "rpc-od-item", label);
+  public _addMenuItemHelper(
+      list: IList,
+      ruleData: IRuleSpec,
+      fmtStrName:
+          "stopAllowingOrigin" |
+          "stopAllowingDestination" |
+          "stopAllowingOriginToDestination" |
+          "allowOrigin" |
+          "allowDestination" |
+          "allowOriginToDestination" |
+          "allowOriginTemporarily" |
+          "allowDestinationTemporarily" |
+          "allowOriginToDestinationTemporarily" |
+          "stopDenyingOrigin" |
+          "stopDenyingDestination" |
+          "stopDenyingOriginToDestination" |
+          "denyOrigin" |
+          "denyDestination" |
+          "denyOriginToDestination" |
+          "denyOriginTemporarily" |
+          "denyDestinationTemporarily" |
+          "denyOriginToDestinationTemporarily",
+      fmtStrArgs: string[],
+      ruleAction: RuleActionChange,
+      cssClass: string,
+  ) {
+    const label = this.i18n.getMessage(fmtStrName, fmtStrArgs);
+    const item = this._addListItem(list, "rpc-od-item", label) as IListItem;
     item.requestpolicyRuleData = ruleData;
     item.requestpolicyRuleAction = ruleAction;
     // var statustext = ''; // TODO
     item.setAttribute("class", `rpc-od-item ${cssClass}`);
     const canonicalRule = Ruleset.rawRuleToCanonicalString(ruleData);
-    if (self._ruleChangeQueues[ruleAction]) {
-      if (self._ruleChangeQueues[ruleAction][canonicalRule]) {
+    if (this.ruleChangeQueues[ruleAction]) {
+      if (this.ruleChangeQueues[ruleAction][canonicalRule]) {
         item.setAttribute("selected-rule", "true");
       }
     }
     return item;
-  };
+  }
 
-  self._addMenuItemRemoveAllowRule = function(
-      list, rawRule,
-      subscriptionOverride
+  public _addMenuItemRemoveAllowRule(
+      list: IList,
+      rawRule: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
     if (rawRule.o && rawRule.d) {
-      return self._addMenuItemStopAllowingOriginToDest(
+      return this._addMenuItemStopAllowingOriginToDest(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else if (rawRule.o) {
-      return self._addMenuItemStopAllowingOrigin(
+      return this._addMenuItemStopAllowingOrigin(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else if (rawRule.d) {
-      return self._addMenuItemStopAllowingDest(
+      return this._addMenuItemStopAllowingDest(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else {
       // eslint-disable-next-line no-throw-literal
-      throw "Invalid rule data: no origin or destination parts.";
+      throw new Error("Invalid rule data: no origin or destination parts.");
     }
-  };
+  }
 
-  self._addMenuItemRemoveDenyRule = function(
-      list, rawRule,
-      subscriptionOverride
+  public _addMenuItemRemoveDenyRule(
+      list: IList,
+      rawRule: IRuleSpec,
+      subscriptionOverride: boolean,
   ) {
     if (rawRule.o && rawRule.d) {
-      return self._addMenuItemStopDenyingOriginToDest(
+      return this._addMenuItemStopDenyingOriginToDest(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else if (rawRule.o) {
-      return self._addMenuItemStopDenyingOrigin(
+      return this._addMenuItemStopDenyingOrigin(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else if (rawRule.d) {
-      return self._addMenuItemStopDenyingDest(
+      return this._addMenuItemStopDenyingDest(
           list, rawRule,
-          subscriptionOverride
+          subscriptionOverride,
       );
     } else {
       // eslint-disable-next-line no-throw-literal
-      throw "Invalid rule data: no origin or destination parts.";
+      throw new Error("Invalid rule data: no origin or destination parts.");
     }
-  };
+  }
 
-  self._populateDetailsRemoveAllowRules = function(list) {
+  public _populateDetailsRemoveAllowRules(list: IList) {
     // TODO: can we avoid calling getAllowedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = requestMemory.getAllowedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    const reqSet = this.requestMemory.getAllowedRequests(
+        this.currentlySelectedOrigin, this.allRequestsOnDocument,
     );
-    let requests = reqSet.getAllMergedOrigins();
+    const requests = reqSet.getAllMergedOrigins();
 
     // var rules = {};
 
-    let userRules = {};
-    let subscriptionRules = {};
+    const userRules: IRuleSpecObj = {};
+    const subscriptionRules: IRuleSpecObj = {};
 
     // reqSet.print('allowedRequests');
 
     // TODO: there is no dest if no dest is selected (origin only).
-    // var destBase = uriService.getBaseDomain(
-    //      self._currentlySelectedDest);
+    // var destBase = this.uriService.getBaseDomain(
+    //      this._currentlySelectedDest);
 
-    for (let destBase in requests) {
-      if (self._currentlySelectedDest &&
-          self._currentlySelectedDest !== destBase) {
+    for (const destBase in requests) {
+      if (this.currentlySelectedDest &&
+          this.currentlySelectedDest !== destBase) {
         continue;
       }
 
-      for (let destIdent in requests[destBase]) {
+      // tslint:disable-next-line:forin
+      for (const destIdent in requests[destBase]) {
         const destinations = requests[destBase][destIdent];
-        for (let destUri in destinations) {
+        // tslint:disable-next-line:forin
+        for (const destUri in destinations) {
           // This will be null when the request was denied because of a default
           // allow rule. However about any other time?
           // TODO: we at least in default allow mode, we need to give an option
@@ -1246,17 +1446,18 @@ export function loadMenuIntoWindow(window) {
           // at the first RequestResult object, but at all. (there might be
           // several requests with identical origin and destination URI.)
 
-          for (let i in results.matchedAllowRules) {
-            let [ruleset, match] = results.matchedAllowRules[i];
-            let rawRule = Ruleset.matchToRawRule(match);
+          // tslint:disable-next-line:forin
+          for (const i in results.matchedAllowRules) {
+            const [ruleset, match] = results.matchedAllowRules[i];
+            const rawRule = Ruleset.matchToRawRule(match);
 
-            if (!self._currentlySelectedDest) {
+            if (!this.currentlySelectedDest) {
               if (rawRule.d && rawRule.d.h) {
                 continue;
               }
             }
 
-            let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
+            const rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
             // log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
@@ -1270,46 +1471,50 @@ export function loadMenuIntoWindow(window) {
       }
     }
 
-    for (let i in userRules) {
-      self._addMenuItemRemoveAllowRule(list, userRules[i], false);
+    // tslint:disable-next-line:forin
+    for (const i in userRules) {
+      this._addMenuItemRemoveAllowRule(list, userRules[i], false);
     }
     // TODO: for subscription rules, we need the effect of the menu item to be
     // adding a deny rule instead of removing an allow rule. However, the text
     // used for the item needs to be the same as removing an allow rule.
-    for (let i in subscriptionRules) {
-      self._addMenuItemRemoveAllowRule(list, subscriptionRules[i], true);
+    // tslint:disable-next-line:forin
+    for (const i in subscriptionRules) {
+      this._addMenuItemRemoveAllowRule(list, subscriptionRules[i], true);
     }
-  };
+  }
 
-  self._populateDetailsRemoveDenyRules = function(list) {
+  public _populateDetailsRemoveDenyRules(list: IList) {
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = requestMemory.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    const reqSet = this.requestMemory.getDeniedRequests(
+        this.currentlySelectedOrigin, this.allRequestsOnDocument,
     );
-    let requests = reqSet.getAllMergedOrigins();
+    const requests = reqSet.getAllMergedOrigins();
 
     // var rules = {};
 
-    let userRules = {};
-    let subscriptionRules = {};
+    const userRules: IRuleSpecObj = {};
+    const subscriptionRules: IRuleSpecObj = {};
 
     reqSet.print("deniedRequests", log.log.bind(log));
 
     // TODO: there is no dest if no dest is selected (origin only).
-    // var destBase = uriService.getBaseDomain(
-    //     self._currentlySelectedDest);
+    // var destBase = this.uriService.getBaseDomain(
+    //     this._currentlySelectedDest);
 
-    for (let destBase in requests) {
-      if (self._currentlySelectedDest &&
-        self._currentlySelectedDest !== destBase) {
+    for (const destBase in requests) {
+      if (this.currentlySelectedDest &&
+        this.currentlySelectedDest !== destBase) {
         continue;
       }
 
-      for (let destIdent in requests[destBase]) {
-        let destinations = requests[destBase][destIdent];
-        for (let destUri in destinations) {
+      // tslint:disable-next-line:forin
+      for (const destIdent in requests[destBase]) {
+        const destinations = requests[destBase][destIdent];
+        // tslint:disable-next-line:forin
+        for (const destUri in destinations) {
           // This will be null when the request was denied because of a default
           // deny rule. However about any other time?
           // TODO: we at least in default deny mode, we need to give an option
@@ -1320,21 +1525,22 @@ export function loadMenuIntoWindow(window) {
             continue;
           }
 
-          let results = destinations[destUri][0]; // TODO: Do not look only
+          const results = destinations[destUri][0]; // TODO: Do not look only
           // at the first RequestResult object, but at all. (there may be
           // several requests with identical origin and destination URI.)
 
-          for (let i in results.matchedDenyRules) {
-            let [ruleset, match] = results.matchedDenyRules[i];
-            let rawRule = Ruleset.matchToRawRule(match);
+          // tslint:disable-next-line:forin
+          for (const i in results.matchedDenyRules) {
+            const [ruleset, match] = results.matchedDenyRules[i];
+            const rawRule = Ruleset.matchToRawRule(match);
 
-            if (!self._currentlySelectedDest) {
+            if (!this.currentlySelectedDest) {
               if (rawRule.d && rawRule.d.h) {
                 continue;
               }
             }
 
-            let rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
+            const rawRuleStr = Ruleset.rawRuleToCanonicalString(rawRule);
             // log.info("matched allow rule: " + rawRuleStr);
             // This is how we remove duplicates: if two rules have the same
             // canonical string, they'll have in the same key.
@@ -1348,79 +1554,79 @@ export function loadMenuIntoWindow(window) {
       }
     }
 
-    for (let i in userRules) {
-      self._addMenuItemRemoveDenyRule(list, userRules[i], false);
+    // tslint:disable-next-line:forin
+    for (const i in userRules) {
+      this._addMenuItemRemoveDenyRule(list, userRules[i], false);
     }
     // TODO: for subscription rules, we need the effect of the menu item to be
     // adding an allow rule instead of removing a deny rule. However, the text
     // used for the item needs to be the same as removing a deny rule.
-    for (let i in subscriptionRules) {
-      self._addMenuItemRemoveDenyRule(list, subscriptionRules[i], true);
+    // tslint:disable-next-line:forin
+    for (const i in subscriptionRules) {
+      this._addMenuItemRemoveDenyRule(list, subscriptionRules[i], true);
     }
-  };
+  }
 
-  self._populateDetailsAddSubdomainAllowRules = function(list) {
-    let origin = self._currentlySelectedOrigin;
+  public _populateDetailsAddSubdomainAllowRules(list: IList) {
+    const origin = this.currentlySelectedOrigin;
 
     // TODO: can we avoid calling getDeniedRequests here and reuse a result
     // from calling it earlier?
 
-    let reqSet = requestMemory.getDeniedRequests(
-        self._currentlySelectedOrigin, self._allRequestsOnDocument
+    const reqSet = this.requestMemory.getDeniedRequests(
+        this.currentlySelectedOrigin, this.allRequestsOnDocument,
     );
-    let requests = reqSet.getAllMergedOrigins();
+    const requests = reqSet.getAllMergedOrigins();
 
-    let destHosts = {};
+    const destHosts = new Set<string>();
 
-    for (let destBase in requests) {
-      if (self._currentlySelectedDest &&
-          self._currentlySelectedDest !== destBase) {
+    for (const destBase in requests) {
+      if (this.currentlySelectedDest &&
+          this.currentlySelectedDest !== destBase) {
         continue;
       }
-      for (let destIdent in requests[destBase]) {
-        let destinations = requests[destBase][destIdent];
-        for (let destUri in destinations) {
-          destHosts[uriService.getHost(destUri)] = null;
+      // tslint:disable-next-line:forin
+      for (const destIdent in requests[destBase]) {
+        const destinations = requests[destBase][destIdent];
+        // tslint:disable-next-line:forin
+        for (const destUri in destinations) {
+          destHosts.add(this.uriService.getHost(destUri)!);
         }
       }
     }
 
-    let mayPermRulesBeAdded = WindowUtils.mayPermanentRulesBeAdded(
-        window, cachedSettings
-    );
+    const mayPermRulesBeAdded = this.privateBrowsingService.
+        mayPermanentRulesBeAdded(this.window);
 
-    for (let destHost in destHosts) {
-      let ruleData = {
-        "o": {
-          "h": self._addWildcard(origin),
+    for (const destHost of destHosts.values()) {
+      const ruleData: IRuleSpec = {
+        d: {
+          h: destHost,
         },
-        "d": {
-          "h": destHost,
+        o: {
+          h: this._addWildcard(origin),
         },
       };
-      if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
-          !rp.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
+      if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, ruleData) &&
+          !this.policy.ruleExists(C.RULE_ACTION_DENY, ruleData)) {
         if (mayPermRulesBeAdded === true) {
-          self._addMenuItemAllowOriginToDest(list, ruleData);
+          this._addMenuItemAllowOriginToDest(list, ruleData);
         }
-        self._addMenuItemTempAllowOriginToDest(list, ruleData);
+        this._addMenuItemTempAllowOriginToDest(list, ruleData);
       }
 
-      let destOnlyRuleData = {
-        "d": {
-          "h": destHost,
+      const destOnlyRuleData = {
+        d: {
+          h: destHost,
         },
       };
-      if (!rp.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
-          !rp.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
+      if (!this.policy.ruleExists(C.RULE_ACTION_ALLOW, destOnlyRuleData) &&
+          !this.policy.ruleExists(C.RULE_ACTION_DENY, destOnlyRuleData)) {
         if (mayPermRulesBeAdded === true) {
-          self._addMenuItemAllowDest(list, destOnlyRuleData);
+          this._addMenuItemAllowDest(list, destOnlyRuleData);
         }
-        self._addMenuItemTempAllowDest(list, destOnlyRuleData);
+        this._addMenuItemTempAllowDest(list, destOnlyRuleData);
       }
     }
-  };
-
-  // eslint-disable-next-line no-param-reassign
-  window.rpcontinued.menu = self;
+  }
 }

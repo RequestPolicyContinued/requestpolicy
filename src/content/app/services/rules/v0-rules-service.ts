@@ -21,11 +21,11 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { IRuleSpec } from "app/policy/ruleset";
 import { UriService } from "app/services/uri-service";
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { IRuleSpec } from "lib/ruleset";
 
 declare const Cc: any;
 declare const Ci: any;

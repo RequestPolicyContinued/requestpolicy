@@ -20,123 +20,110 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Level as EnvLevel, MainEnvironment} from "lib/environment";
-import * as Utils from "lib/utils/misc-utils";
+import { API, JSMs, XPCOM } from "bootstrap/api/interfaces";
+import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
+import { Common } from "common/interfaces";
+import {
+  XpcomClassFactoryModule,
+} from "legacy/lib/classes/xpcom-class-factory-module";
 
 // =============================================================================
 // utilities, constants
 // =============================================================================
 
-const FILENAMES = {
-  "basicprefs": "basicprefs.html",
-  "advancedprefs": "advancedprefs.html",
-  "yourpolicy": "yourpolicy.html",
-  "defaultpolicy": "defaultpolicy.html",
-  "subscriptions": "subscriptions.html",
-  "oldrules": "oldrules.html",
-  "setup": "setup.html",
-  "experimental": "experimental.html",
-};
+type ID =
+    "advancedprefs" |
+    "basicprefs" |
+    "defaultpolicy" |
+    "experimental" |
+    "oldrules" |
+    "setup" |
+    "subscriptions" |
+    "yourpolicy";
 
-function getURI(aURI) {
-  let id;
-  let index = aURI.path.indexOf("?");
-  if (index >= 0 && aURI.path.length > index) {
-    id = aURI.path.substr(index + 1);
-  }
-  if (!id || !(id in FILENAMES)) {
-    id = "basicprefs";
-  }
-  let spec = `chrome://rpcontinued/content/settings/${FILENAMES[id]}`;
-  return Services.io.newURI(spec, null, null);
-}
+const FILENAMES = {
+  advancedprefs: "advancedprefs.html",
+  basicprefs: "basicprefs.html",
+  defaultpolicy: "defaultpolicy.html",
+  experimental: "experimental.html",
+  oldrules: "oldrules.html",
+  setup: "setup.html",
+  subscriptions: "subscriptions.html",
+  yourpolicy: "yourpolicy.html",
+};
 
 // =============================================================================
 // AboutRequestPolicy
 // =============================================================================
 
-export const AboutRequestPolicy = (function() {
-  let self = {};
+export class AboutUri extends XpcomClassFactoryModule {
+  protected readonly XPCOM_CATEGORIES = [];
 
-  self.classDescription = "about:requestpolicy";
-  self.contractID = "@mozilla.org/network/protocol/about;1?what=requestpolicy";
-  // eslint-disable-next-line new-cap
-  self.classID = ComponentsID("{77d4be21-6a28-4b91-9886-15ccd83795e8}");
-  self.QueryInterface = XPCOMUtils.generateQI([Ci.nsIAboutModule]);
+  protected classDescription = "about:requestpolicy";
+  protected contractID =
+      "@mozilla.org/network/protocol/about;1?what=requestpolicy";
+  protected interfaceID = "{77d4be21-6a28-4b91-9886-15ccd83795e8}";
 
-  self.getURIFlags = function(aURI) {
-    return Ci.nsIAboutModule.ALLOW_SCRIPT;
-  };
+  constructor(
+      moduleName: string,
+      parentLog: Common.ILog,
+      xpconnectService: XPConnectService,
+      xpcComponentInterfaces:
+          XPCOM.nsXPCComponents_Interfaces,
+      xpcComponentResults: XPCOM.nsXPCComponents_Results,
+      xpcComponentID: XPCOM.nsXPCComponents["ID"],
+      XPCOMUtils: JSMs.XPCOMUtils,
+      private readonly miscInfos: API.IMiscInfos,
+      private readonly ioService: XPCOM.nsIIOService2,
+  ) {
+    super(
+        `app.runtime.aboutUri`,
+        parentLog,
+        xpconnectService,
+        xpcComponentInterfaces,
+        xpcComponentResults,
+        xpcComponentID,
+        XPCOMUtils,
+    );
+  }
 
-  /**
-   * @param {nsIURI} aURI
-   * @param {nsILoadInfo} aLoadInfo Only available on Gecko 36+.
-   * @return {nsIChannel}
-   */
-  self.newChannel = function(aURI, aLoadInfo) {
-    let uri = getURI(aURI);
+  public getURIFlags(aURI: XPCOM.nsIURI) {
+    return this.xpcComponentInterfaces.nsIAboutModule.ALLOW_SCRIPT;
+  }
+
+  public newChannel(
+      aURI: XPCOM.nsIURI,
+      aLoadInfo: XPCOM.nsILoadInfo,
+  ): XPCOM.nsIChannel {
+    const uri = this.getURI(aURI);
     let channel;
-    if (LegacyApi.miscInfos.isGeckoVersionAtLeast("48.0a1")) {
+    if (this.miscInfos.isGeckoVersionAtLeast("48.0a1")) {
       // newChannelFromURIWithLoadInfo is available since Gecko 48.
-      channel = Services.io.newChannelFromURIWithLoadInfo(uri, aLoadInfo);
+      channel = this.ioService.newChannelFromURIWithLoadInfo!(uri, aLoadInfo);
     } else {
       // newChannel is obsolete since Gecko 48 (Bug 1254752)
-      channel = Services.io.newChannelFromURI(uri);
+      channel = this.ioService.newChannelFromURI!(uri);
     }
     channel.originalURI = aURI;
     return channel;
-  };
+  }
 
-  // ---------------------------------------------------------------------------
-  // nsIFactory interface implementation
-  // ---------------------------------------------------------------------------
+  protected getImplementedInterfaces() {
+    return super.getImplementedInterfaces().concat([
+      this.xpcComponentInterfaces.nsIAboutModule,
+    ]);
+  }
 
-  self.createInstance = function(outer, iid) {
-    if (outer) {
-      // eslint-disable-next-line no-throw-literal
-      throw Cr.NS_ERROR_NO_AGGREGATION;
+  private getURI(aURI: XPCOM.nsIURI) {
+    let id: ID | undefined;
+    const index = aURI.path.indexOf("?");
+    if (index >= 0 && aURI.path.length > index) {
+      id = aURI.path.substr(index + 1) as ID;
     }
-    // eslint-disable-next-line new-cap
-    return self.QueryInterface(iid);
-  };
-
-  function registerFactory() {
-    // eslint-disable-next-line new-cap
-    Cm.QueryInterface(Ci.nsIComponentRegistrar).
-        registerFactory(
-            self.classID, self.classDescription,
-            self.contractID, self
-        );
+    if (!id || !(id in FILENAMES)) {
+      id = "basicprefs";
+    }
+    const spec = `chrome://rpcontinued/content/settings/${FILENAMES[id]}`;
+    return this.ioService.newURI(spec, null, null);
   }
-
-  MainEnvironment.addStartupFunction(
-      EnvLevel.INTERFACE,
-      function() {
-        try {
-          registerFactory();
-        } catch (e) {
-          if (e.result === Cr.NS_ERROR_FACTORY_EXISTS) {
-            // When upgrading restartless the old factory might still exist.
-            Utils.runAsync(registerFactory);
-          } else {
-            console.error("Failed to register factory! Details:");
-            console.dir(e);
-          }
-        }
-      }
-  );
-
-  function unregisterFactory() {
-    // eslint-disable-next-line new-cap
-    let registrar = Cm.QueryInterface(Ci.nsIComponentRegistrar);
-
-    // This needs to run asynchronously, see Mozilla bug 753687
-    Utils.runAsync(function() {
-      registrar.unregisterFactory(self.classID, self);
-    });
-  }
-  MainEnvironment.addShutdownFunction(EnvLevel.INTERFACE,
-      unregisterFactory);
-
-  return self;
-})();
+}

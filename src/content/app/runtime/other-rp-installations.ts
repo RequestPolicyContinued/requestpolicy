@@ -21,12 +21,12 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { log } from "app/log";
-import {C} from "data/constants";
-import {FilteredManagement} from "lib/classes/filtered-management";
-import {NotificationID, Notifications} from "models/notifications";
-
-const {AMO} = C;
+import { Common } from "common/interfaces";
+import { C } from "data/constants";
+import { FilteredManagement } from "lib/classes/filtered-management";
+import { Module } from "lib/classes/module";
 
 // The other extension IDs of RequestPolicy.
 const ADDON_IDS = Object.freeze(new Set([
@@ -34,7 +34,7 @@ const ADDON_IDS = Object.freeze(new Set([
   "requestpolicy@requestpolicy.com",
   // Detect "RPC Legacy" (v0.5; AMO version).
   "rpcontinued@requestpolicy.org",
-  AMO ? // In the AMO version the non-AMO version needs to be detected.
+  C.AMO ? // In the AMO version the non-AMO version needs to be detected.
         "rpcontinued@non-amo.requestpolicy.org" :
         // In the non-AMO version the AMO version needs to be detected.
         "rpcontinued@amo.requestpolicy.org",
@@ -44,27 +44,38 @@ function isRP(aAddon: browser.management.ExtensionInfo)  {
   return ADDON_IDS.has(aAddon.id);
 }
 
-const RPManagement = new FilteredManagement(isRP);
+export class OtherRPInstallations extends Module {
+  private rpManagement = new FilteredManagement(isRP);
 
-function addNotification() {
-  Notifications.add(NotificationID.MultipleRPInstallations);
-}
+  constructor(
+      parentLog: Common.ILog,
+      private notifications: App.ui.INotifications,
+  ) {
+    super(`app.runtime.otherRPInstalls`, parentLog);
+  }
 
-function maybeAddNotification(aAddon: browser.management.ExtensionInfo) {
-  if (!isRP(aAddon)) return;
-  addNotification();
-}
-
-export const OtherRPInstallationsController = {
-  startup() {
-    RPManagement.getAll().then((addons) => {
+  protected startupSelf() {
+    const pDone = this.rpManagement.getAll().then((addons) => {
       const enabledAddons = addons.filter((addon) => addon.enabled);
       if (enabledAddons.length === 0) return;
-      addNotification();
+      this.addNotification();
     }).catch((e) => {
       log.error("Error getting the list of addons! Details:", e);
     });
+    const maybeAddNotification = this.maybeAddNotification.bind(this);
     browser.management.onEnabled.addListener(maybeAddNotification);
     browser.management.onInstalled.addListener(maybeAddNotification);
-  },
-};
+    return pDone;
+  }
+
+  private addNotification() {
+    this.notifications.notifications.add(
+      this.notifications.IDs.MultipleRPInstallations,
+    );
+  }
+
+  private maybeAddNotification(aAddon: browser.management.ExtensionInfo) {
+    if (!isRP(aAddon)) return;
+    this.addNotification();
+  }
+}

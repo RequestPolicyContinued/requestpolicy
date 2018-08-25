@@ -20,10 +20,10 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import {IListenInterface} from "lib/classes/listeners";
 import {OverridableSet} from "lib/classes/set";
 import {createListenersMap} from "lib/utils/listener-factories";
-import * as WindowUtils from "lib/utils/window-utils";
 
 export enum NotificationID {
   InitialSetup,
@@ -41,7 +41,7 @@ const URI_MAP = new Map([
   ],
 ]);
 
-class NotificationsClass extends OverridableSet<NotificationID> {
+export class NotificationsSet extends OverridableSet<NotificationID> {
   public onAdded: IListenInterface;
   public onDeleted: IListenInterface;
   public onTabOpened: IListenInterface;
@@ -51,7 +51,9 @@ class NotificationsClass extends OverridableSet<NotificationID> {
     "onTabOpened",
   ]).listenersMap;
 
-  constructor() {
+  constructor(
+      private readonly windowService: App.services.IWindowService,
+  ) {
     super();
     this.onAdded = this.eventListenersMap.onAdded.interface;
     this.onDeleted = this.eventListenersMap.onDeleted.interface;
@@ -72,11 +74,9 @@ class NotificationsClass extends OverridableSet<NotificationID> {
   }
 
   public openTab(aID: NotificationID): void {
-    const win = WindowUtils.getMostRecentBrowserWindow();
+    const win = this.windowService.getMostRecentBrowserWindow();
     const tabbrowser = win.getBrowser();
-    tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID));
+    tabbrowser.selectedTab = tabbrowser.addTab(URI_MAP.get(aID)!);
     this.eventListenersMap.onTabOpened.emit(aID);
   }
 }
-
-export const Notifications = new NotificationsClass();

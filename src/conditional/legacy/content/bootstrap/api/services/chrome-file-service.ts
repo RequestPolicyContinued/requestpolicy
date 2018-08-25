@@ -141,7 +141,7 @@ private sendHttpGet(url: string): Promise<XMLHttpRequest["responseText"]> {
  * see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.isSuccessCode
  */
 // tslint:enable:max-line-length
-private isSuccessCode(returnCode: XPCOM.nsResult): boolean {
+private isSuccessCode(returnCode: XPCOM.nsresult): boolean {
   // tslint:disable-next-line:no-bitwise
   return (returnCode & 0x80000000) === 0;
 }

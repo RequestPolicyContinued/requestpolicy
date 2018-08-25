@@ -43,6 +43,11 @@ export class JSMService {
     return this.import("resource://gre/modules/NetUtil.jsm").NetUtil;
   }
 
+  public getPrivateBrowsingUtils(): JSMs.PrivateBrowsingUtils {
+    return this.import("resource://gre/modules/PrivateBrowsingUtils.jsm").
+        PrivateBrowsingUtils;
+  }
+
   public getServices(): JSMs.Services {
     return this.import("resource://gre/modules/Services.jsm").Services;
   }

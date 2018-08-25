@@ -21,14 +21,13 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
 import {Module} from "lib/classes/module";
 import {RequestResult} from "lib/classes/request-result";
-import {RawRuleset, Ruleset} from "lib/ruleset";
-import { RulesetStorage } from "./ruleset-storage";
-import { Subscriptions } from "./subscriptions";
+import {RawRuleset, Ruleset} from "./ruleset";
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
@@ -54,8 +53,9 @@ export class Policy extends Module {
 
   constructor(
       log: Common.ILog,
-      public readonly subscriptions: Subscriptions,
-      public readonly rulesetStorage: RulesetStorage,
+      public readonly subscriptions: App.policy.ISubscriptions,
+      public readonly rulesetStorage: App.policy.IRulesetStorage,
+      public readonly uriService: App.services.IUriService,
   ) {
     super("app.policy", log);
   }
@@ -74,7 +74,8 @@ export class Policy extends Module {
     const pRawRuleset = this.rulesetStorage.loadRawRulesetFromFile("user");
     const p = pRawRuleset.then((aRawRuleset) => {
       this.userRulesetExistedOnStartup = !!aRawRuleset;
-      const rawRuleset = aRawRuleset || RawRuleset.create();
+      const rawRuleset = aRawRuleset ||
+          RawRuleset.create(this.log, this.uriService);
       this.userRulesets.user = {
         rawRuleset,
         ruleset: rawRuleset.toRuleset("user"),
@@ -111,7 +112,11 @@ export class Policy extends Module {
     return false;
   }
 
-  public addRule(ruleAction: RuleAction, ruleData: RuleData, noStore: boolean) {
+  public addRule(
+      ruleAction: RuleAction,
+      ruleData: RuleData,
+      noStore?: boolean,
+  ) {
     this.log.info(
         `addRule ${ruleAction} ${Ruleset.rawRuleToCanonicalString(ruleData)}`,
     );
@@ -221,7 +226,7 @@ export class Policy extends Module {
   }
 
   public revokeTemporaryRules() {
-    const rawRuleset = RawRuleset.create();
+    const rawRuleset = RawRuleset.create(this.log, this.uriService);
     this.userRulesets.temp = {
       rawRuleset,
       ruleset: rawRuleset.toRuleset("temp"),
@@ -316,7 +321,7 @@ export class Policy extends Module {
     return ruleData;
   }
 
-  public addRuleBySpec(aSpec: any, noStore: boolean) {
+  public addRuleBySpec(aSpec: any, noStore?: boolean) {
     const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
     const ruleData = this.getRuleData(aSpec.origin, aSpec.dest);
 

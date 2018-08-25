@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2018 Martin Kimmerle
+ * Copyright (c) 2014 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,23 +21,31 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
-import {Module} from "lib/classes/module";
-import { InitialSetup } from "./initial-setup";
+import { Module } from "lib/classes/module";
 
-export class Ui extends Module {
-  constructor(
-      log: Common.ILog,
-      private readonly initialSetup: InitialSetup,
-      private readonly notifications: App.ui.INotifications,
-  ) {
-    super("app.ui", log);
-  }
-
+export class WindowModule extends Module {
   protected get subModules() {
     return {
-      initialSetup: this.initialSetup,
-      notifications: this.notifications,
+      classicMenu: this.classicMenu,
+      keyboardShortcuts: this.keyboardShortcuts,
+      menu: this.menu,
+      overlay: this.overlay,
+      toolbarButton: this.toolbarButton,
     };
+  }
+
+  constructor(
+      parentLog: Common.ILog,
+      public readonly windowID: number,
+
+      private classicMenu: App.windows.window.IClassicMenu,
+      private keyboardShortcuts: API.windows.window.IKeyboardShortcutModule,
+      private menu: App.windows.window.IMenu,
+      private overlay: App.windows.window.IOverlay,
+      private toolbarButton: App.windows.window.IToolbarButton,
+  ) {
+    super(`app.windows[${windowID}]`, parentLog);
   }
 }

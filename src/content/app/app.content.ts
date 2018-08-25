@@ -23,6 +23,7 @@
 import { JSMs, XPCOM } from "bootstrap/api/interfaces";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
 import { MessageListenerModule } from "lib/classes/message-listener-module";
+import { getDOMWindowUtils } from "lib/utils/window-utils";
 import { AppContent } from "./app.content.module";
 import { ManagerForBlockedContent } from "./contentscript/blocked-content";
 import { ContentscriptModule } from "./contentscript/contentscript.module";
@@ -42,10 +43,8 @@ declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 declare const Services: JSMs.Services;
 declare const cfmm: XPCOM.nsIContentFrameMessageManager;
 
-const winUtil = cfmm.content.
-    QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
-    getInterface<XPCOM.nsIDOMWindowUtils>(Ci.nsIDOMWindowUtils);
-const {outerWindowID} = winUtil;
+const domWindowUtils = getDOMWindowUtils(cfmm.content);
+const {outerWindowID} = domWindowUtils;
 
 const storageReadyPromise = Promise.resolve();
 

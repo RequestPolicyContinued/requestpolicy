@@ -20,28 +20,33 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {rp} from "app/app.background";
+import { App } from "app/interfaces";
+import { Common } from "common/interfaces";
+import { Module } from "lib/classes/module";
+import { RequestResult } from "lib/classes/request-result";
 
-const uriService = rp.services.uri;
-const {cachedSettings} = rp.storage;
-const requestMemory = rp.webRequest.requestMemory;
+export class FramescriptServices extends Module {
+  private messageListeners = {
+    notifyDocumentLoaded: this.notifyDocumentLoaded.bind(this),
+  };
 
-const initFunctions = [];
+  constructor(
+      parentLog: Common.ILog,
+      private runtimeApi: typeof browser.runtime,
 
-export const FramescriptServices = {
-  init: function() {
-    for (let fn of initFunctions) {
-      fn();
-    }
-  },
-};
+      private requestMemory: App.webRequest.IRequestMemory,
+      private uriService: App.services.IUriService,
+      private cachedSettings: App.storage.ICachedSettings,
+  ) {
+    super("app.framescripts.services", parentLog);
+  }
 
-// notifyDocumentLoaded
+  protected startupSelf() {
+    this.runtimeApi.onMessage.addListener(this.onMessage.bind(this));
+    return Promise.resolve();
+  }
 
-(function() {
-  const messageListeners = {};
-
-  function containsNonBlacklistedRequests(aRequests) {
+  private containsNonBlacklistedRequests(aRequests: RequestResult[]) {
     for (let i = 0, len = aRequests.length; i < len; i++) {
       if (!aRequests[i].isOnBlacklist()) {
         // This request has not been blocked by the blacklist
@@ -51,25 +56,29 @@ export const FramescriptServices = {
     return false;
   }
 
-  messageListeners.notifyDocumentLoaded = function(
-      aMessage, aSender,
-      aSendResponse
+  private notifyDocumentLoaded(
+      aMessage: any,
+      aSender: browser.runtime.MessageSender,
+      aSendResponse: any,
   ) {
     const {documentURI} = aMessage;
     // The document URI could contain a "fragment" part.
-    const originURI = uriService.getUriObject(documentURI).specIgnoringRef;
+    const originURI = this.uriService.getUriObject(documentURI).specIgnoringRef;
 
-    const blockedURIs = {};
+    const blockedURIs: any = {};
 
-    if (cachedSettings.get("indicateBlockedObjects")) {
+    if (this.cachedSettings.get("indicateBlockedObjects")) {
       const indicateBlacklisted =
-          cachedSettings.get("indicateBlacklistedObjects");
+          this.cachedSettings.get("indicateBlacklistedObjects");
 
-      const rejectedRequests = requestMemory.requestSets.rejectedRequests.
+      const rejectedRequests = this.requestMemory.requestSets.rejectedRequests.
           getOriginUri(originURI);
-      for (let destBase in rejectedRequests) {
-        for (let destIdent in rejectedRequests[destBase]) {
-          for (let destUri in rejectedRequests[destBase][destIdent]) {
+      // tslint:disable-next-line:forin
+      for (const destBase in rejectedRequests) {
+        // tslint:disable-next-line:forin
+        for (const destIdent in rejectedRequests[destBase]) {
+          // tslint:disable-next-line:forin
+          for (const destUri in rejectedRequests[destBase][destIdent]) {
             // case 1: indicateBlacklisted == true
             //         ==> indicate the object has been blocked
             //
@@ -82,9 +91,9 @@ export const FramescriptServices = {
             //          ==> *do* indicate
             const requests = rejectedRequests[destBase][destIdent][destUri];
             if (indicateBlacklisted ||
-                containsNonBlacklistedRequests(requests)) {
+                this.containsNonBlacklistedRequests(requests)) {
               blockedURIs[destUri] = blockedURIs[destUri] ||
-                  {identifier: uriService.getIdentifier(destUri)};
+                  {identifier: this.uriService.getIdentifier(destUri)};
             }
           }
         }
@@ -93,20 +102,20 @@ export const FramescriptServices = {
 
     // send the list of blocked URIs back to the frame script
     aSendResponse({blockedURIs});
-  };
+  }
 
-  function onMessage(aMessage, aSender, aSendResponse) {
+  private onMessage(
+      aMessage: any,
+      aSender: browser.runtime.MessageSender,
+      aSendResponse: any,
+  ) {
     if (typeof aMessage.type === "undefined") {
       return;
     }
-    if (typeof messageListeners[aMessage.type] === "undefined") {
+    if (typeof (this.messageListeners as any)[aMessage.type] === "undefined") {
       return;
     }
-    return messageListeners[aMessage.type].
+    return (this.messageListeners as any)[aMessage.type].
         call(null, aMessage, aSender, aSendResponse);
   }
-
-  initFunctions.push(() => {
-    browser.runtime.onMessage.addListener(onMessage);
-  });
-})();
+}

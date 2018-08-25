@@ -39,6 +39,7 @@ declare const _pEmbeddedWebExtension: Promise<IEmbeddedWebExtension>;
 // @endif
 
 import { HttpChannelService } from "app/services/http-channel-service";
+import { PrivateBrowsingService } from "app/services/private-browsing-service";
 import { RequestSetService } from "app/services/request-set-service";
 import { MetadataMemory } from "app/web-request/metadata-memory";
 import { XPConnectService } from "bootstrap/api/services/xpconnect-service";
@@ -67,11 +68,13 @@ import { V0RulesService } from "./services/rules/v0-rules-service";
 import { RPServices } from "./services/services.module";
 import { UriService } from "./services/uri-service";
 import { VersionInfoService } from "./services/version-info-service";
+import { WindowService } from "./services/window-service";
 import { AsyncSettings } from "./storage/async-settings";
 import { CachedSettings } from "./storage/cached-settings";
 import { SETTING_SPECS } from "./storage/setting-specs";
 import { Storage } from "./storage/storage.module";
 import { InitialSetup } from "./ui/initial-setup";
+import { Notifications } from "./ui/notifications/notifications.module";
 import { Ui } from "./ui/ui.module";
 import { RPChannelEventSink } from "./web-request/channel-event-sink";
 import { RPContentPolicy } from "./web-request/content-policy";
@@ -150,19 +153,36 @@ const settingsMigration = new SettingsMigration(
 const storageReadyPromise = settingsMigration.whenReady;
 
 const jsmService = C.EXTENSION_TYPE === "legacy" ? new JSMService(Cu) : null;
+const mozPrivateBrowsingUtils = C.EXTENSION_TYPE === "legacy" ?
+    jsmService!.getPrivateBrowsingUtils() : null;
 const mozServices = C.EXTENSION_TYPE === "legacy" ?
     jsmService!.getServices() : null;
 const mozObserverService = C.EXTENSION_TYPE === "legacy" ?
     mozServices!.obs : null;
+const mozWindowMediator = C.EXTENSION_TYPE === "legacy" ?
+    mozServices!.wm : null;
 const xpcApi = C.EXTENSION_TYPE === "legacy" ? {
   prefsService: mozServices!.prefs,
   rpPrefBranch: LegacyApi.rpPrefBranch,
   tryCatchUtils: LegacyApi.tryCatchUtils,
 } : null;
 
-const rulesetStorage = new RulesetStorage(log, localStorageArea);
-const subscriptions = new Subscriptions(log, rulesetStorage, localStorageArea);
-const policy = new Policy(log, subscriptions, rulesetStorage);
+const xpconnectService = new XPConnectService();
+const uriService = new UriService(
+    log,
+    outerWindowID,
+    mozServices!.eTLD,
+    xpconnectService.getIDNService(),
+    mozServices!.io,
+);
+const rulesetStorage = new RulesetStorage(log, localStorageArea, uriService);
+const subscriptions = new Subscriptions(
+    log,
+    localStorageArea,
+    rulesetStorage,
+    uriService,
+);
+const policy = new Policy(log, subscriptions, rulesetStorage, uriService);
 const runtime = new Runtime(log, pEWEConnection);
 
 const asyncSettings = new AsyncSettings(
@@ -199,13 +219,10 @@ const httpChannelService = new HttpChannelService(
     mozServices!.io,
     tryCatchUtils,
 );
-const xpconnectService = new XPConnectService();
-const uriService = new UriService(
+const privateBrowsingService = new PrivateBrowsingService(
     log,
-    outerWindowID,
-    mozServices!.eTLD,
-    xpconnectService.getIDNService(),
-    mozServices!.io,
+    mozPrivateBrowsingUtils!,  // fixme
+    cachedSettings,
 );
 const requestService = new RequestService(
     log, httpChannelService, uriService, cachedSettings,
@@ -223,14 +240,21 @@ const versionInfoService = new VersionInfoService(
     browser.management,
     browser.runtime,
 );
+const windowService = new WindowService(
+    log,
+    Ci,
+    mozWindowMediator!,
+);
 const rpServices = new RPServices(
     log,
     httpChannelService,
+    privateBrowsingService,
     requestService,
     requestSetService,
     rulesServices,
     uriService,
     versionInfoService,
+    windowService,
 );
 
 const v0RulesMigration = C.EXTENSION_TYPE === "legacy" ?
@@ -246,10 +270,18 @@ const storageMigration = new StorageMigration(
 
 const migration = new Migration(log, storageMigration);
 
-const initialSetup = new InitialSetup(
-    log, cachedSettings, versionInfoService, xpcApi! /* FIXME */,
+const notifications = new Notifications(
+    log,
+    windowService,
 );
-const ui = new Ui(log, initialSetup);
+const initialSetup = new InitialSetup(
+    log,
+    cachedSettings,
+    versionInfoService,
+    notifications,
+    xpcApi!,  // FIXME
+);
+const ui = new Ui(log, initialSetup, notifications);
 
 const metadataMemory = new MetadataMemory(log);
 const requestMemory = new RequestMemory(log, requestSetService, uriService);

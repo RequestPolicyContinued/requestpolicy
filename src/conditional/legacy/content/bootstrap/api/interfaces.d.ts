@@ -26,16 +26,24 @@
 // tslint:disable:no-namespace
 
 export namespace XPCOM {
+  export type ACString = string;
   export type AString = string;
   export type char = number;
   export type DOMString = string;
   export type jsval = any;
   export type nsContentPolicyType = number;
   export type nsLoadFlags = number;
-  export type nsResult = number;
+  export type nsresult = number;
+  export type wstring = string;
+  export type nsIIDRef = nsIJSID;
 
   export interface nsISupports {
     QueryInterface<T extends nsISupports>(id: nsIJSID): T;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/base/nsIWeakReference.idl
+  export interface nsISupportsWeakReference {
+    GetWeakReference<T extends nsISupports>(): nsIWeakReference<T>;
   }
 
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.classes
@@ -67,7 +75,7 @@ export namespace XPCOM {
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIAsyncVerifyRedirectCallback.idl
   export interface nsIAsyncVerifyRedirectCallback extends nsISupports {
-    onRedirectVerifyCallback(result: nsResult): void;
+    onRedirectVerifyCallback(result: nsresult): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsICategoryManager.idl
@@ -183,7 +191,7 @@ export namespace XPCOM {
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindow.idl
-  export interface nsIDOMWindow extends nsISupports {}
+  export interface nsIDOMWindow extends nsISupports, Window {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindowUtils.idl
   export interface nsIDOMWindowUtils extends nsISupports {
@@ -199,6 +207,14 @@ export namespace XPCOM {
         aHost: string,
         aAdditionalParts?: number,
     ): string;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIEventTarget.idl
+  interface nsIEventTarget extends nsISupports {
+    DISPATCH_NORMAL: 0;
+    DISPATCH_SYNC: 1;
+    isOnCurrentThread(): boolean;
+    dispatch(event: nsIRunnable_without_nsISupports, flags: number): void;
   }
 
   export interface nsIFactory {}
@@ -266,12 +282,36 @@ export namespace XPCOM {
     init(file: nsIFile, ioFlags: number, perm: number, behaviorFlags: number): void;
   }
 
+  interface nsIProcessChecker extends nsISupports {
+    killChild(): boolean;
+    assertPermission(aPermission: DOMString): boolean;
+    assertContainApp(aManifestURL: DOMString): boolean;
+    assertAppHasPermission(aPermission: DOMString): boolean;
+    assertAppHasStatus(aStatus: number): boolean;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
   interface nsIProcessScriptLoader extends nsISupports {
     loadProcessScript(aURL: AString, aAllowDelayedLoad: boolean): void;
     removeDelayedProcessScript(aURL: AString): void;
     getDelayedProcessScripts(): jsval;
   }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/embedding/components/windowwatcher/nsIPromptService.idl
+  export interface nsIPromptService extends nsISupports {
+    confirmCheck(
+        aParent: nsIDOMWindow,
+        aDialogTitle: wstring,
+        aText: wstring,
+        aCheckMsg: wstring,
+        aCheckState: {
+          value: boolean,
+        },
+    ): boolean;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/embedding/components/windowwatcher/nsIPromptService2.idl
+  export interface nsIPromptService2 extends nsIPromptService {}
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsIProperties.idl
   export interface nsIProperties extends nsISupports {
@@ -325,6 +365,11 @@ export namespace XPCOM {
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIIOService.idl
   interface nsIIOService extends nsISupports {
     getProtocolHandler(aScheme: string): nsIProtocolHandler;
+    newChannelFromURI?: (aURI: nsIURI) => nsIChannel;
+    newChannelFromURIWithLoadInfo?: (
+        aURI: nsIURI,
+        aLoadInfo: nsILoadInfo,
+    ) => nsIChannel;
     newURI(
         aSpec: string,
         aOriginCharset: string | null,
@@ -352,7 +397,7 @@ export namespace XPCOM {
     requests: nsISimpleEnumerator;
 
     addRequest(aRequest: nsIRequest, aContext: nsISupports): void;
-    removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsResult): void;
+    removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsresult): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsILoadInfo.idl
@@ -466,7 +511,7 @@ export namespace XPCOM {
   export interface nsIObserverService extends nsISupports {
     addObserver(anObserver: nsIObserver_without_nsISupports, aTopic: string, ownsWeak: boolean): void;
     enumerateObservers(aTopic: string): nsISimpleEnumerator;
-    notifyObservers(aSubject: nsISupports, aTopic: string, someData: string): void;
+    notifyObservers(aSubject: nsISupports | null, aTopic: string, someData: string): void;
     removeObserver(anObserver: nsIObserver_without_nsISupports, aTopic: string): void;
   }
 
@@ -538,9 +583,9 @@ export namespace XPCOM {
     loadFlags: nsLoadFlags;
     loadGroup: nsILoadGroup;
     name: string;
-    status: nsResult;
+    status: nsresult;
 
-    cancel(aStatus: nsResult): void;
+    cancel(aStatus: nsresult): void;
     isPending(): boolean;
     resume(): void;
     suspend(): void;
@@ -554,8 +599,95 @@ export namespace XPCOM {
     onStopRequest(
         aRequest: nsIRequest,
         aContext: nsISupports,
-        aStatusCode: nsResult,
+        aStatusCode: nsresult,
     ): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIRunnable.idl
+  export interface nsIRunnable_without_nsISupports {
+    run(): void;
+  }
+
+  type nsIRunnable = nsIRunnable_without_nsISupports & nsISupports;
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHEntry.idl
+  export interface nsISHEntry extends nsISupports {
+    readonly URI: nsIURI;
+    originalURI: nsIURI;
+    loadReplace: boolean;
+    readonly title: wstring;
+    readonly isSubFrame: boolean;
+    setURI(aURI: nsIURI): void;
+    referrerURI: nsIURI;
+    referrerPolicy: number;
+    // contentViewer: nsIContentViewer;
+    sticky: boolean;
+    windowState: nsISupports;
+
+    addChildShell(shell: nsIDocShellTreeItem): void;
+    childShellAt(index: number): nsIDocShellTreeItem;
+    clearChildShells(): void;
+    // refreshURIList: nsISupportsArray;
+    syncPresentationState(): void;
+    setTitle(aTitle: AString): void;
+    postData: nsIInputStream;
+    // layoutHistoryState: nsILayoutHistoryState;
+    parent: nsISHEntry;
+    loadType: number;
+    ID: number;
+    cacheKey: nsISupports;
+    saveLayoutStateFlag: boolean;
+    expirationStatus: boolean;
+    contentType: ACString;
+    URIWasModified: boolean;
+
+    setScrollPosition(x: number, y: number): void;
+    getScrollPosition(x: number, y: number): void;
+    clone(): nsISHEntry;
+    setIsSubFrame(aFlag: boolean): void;
+
+    // getAnyContentViewer(ownerEntry: nsISHEntry): nsIContentViewer;
+    owner: nsISupports;
+    // stateData: nsIStructuredCloneContainer;
+
+    isDynamicallyAdded(): boolean;
+    hasDynamicallyAddedChild(): boolean;
+    docshellID: number;
+
+    // readonly BFCacheEntry: nsIBFCacheEntry;
+    adoptBFCacheEntry(aEntry: nsISHEntry): void;
+    abandonBFCacheEntry(): void;
+    sharesDocumentWith(aEntry: nsISHEntry): boolean;
+    readonly isSrcdocEntry: boolean;
+    srcdocData: AString;
+    baseURI: nsIURI;
+  }
+
+    // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHistory.idl
+  export interface nsISHistory extends nsISupports {
+    readonly count: number;
+    readonly index: number;
+    readonly requestedIndex: number;
+    maxLength: number;
+
+    getEntryAtIndex(index: number, modifyIndex: boolean): nsISHEntry;
+    PurgeHistory(numEntries: number): void;
+    addSHistoryListener(aListener: nsISHistoryListener): void;
+    removeSHistoryListener(aListener: nsISHistoryListener): void;
+    readonly SHistoryEnumerator: nsISimpleEnumerator;
+    reloadCurrentEntry(): void;
+    getIndexOfEntry(aEntry: nsISHEntry): number;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHistoryListener.idl
+  export interface nsISHistoryListener extends nsISupports {
+    OnHistoryNewEntry(aNewURI: nsIURI): void;
+    OnHistoryGoBack(aBackURI: nsIURI): boolean;
+    OnHistoryGoForward(aForwardURI: nsIURI): boolean;
+    OnHistoryReload(aReloadURI: nsIURI, aReloadFlags: number): boolean;
+    OnHistoryGotoIndex(aIndex: number, aGotoURI: nsIURI): boolean;
+    OnHistoryPurge(aNumEntries: number): boolean;
+    OnHistoryReplaceEntry(aIndex: number): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/caps/nsIScriptSecurityManager.idl
@@ -580,6 +712,17 @@ export namespace XPCOM {
         aOffset: number,
         aCount: number,
     ): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/layout/base/nsIStyleSheetService.idl
+  interface nsIStyleSheetService extends nsISupports {
+    AGENT_SHEET: 0;
+    USER_SHEET: 1;
+    AUTHOR_SHEET: 2;
+
+    loadAndRegisterSheet(sheetURI: nsIURI, type: number): void;
+    sheetRegistered(sheetURI: nsIURI, type: number): boolean;
+    unregisterSheet(sheetURI: nsIURI, type: number): void;
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISupportsPrimitives.idl
@@ -625,6 +768,22 @@ export namespace XPCOM {
     close(): void;
   }
 
+  interface nsIThread extends nsIEventTarget {
+    shutdown(): void;
+    hasPendingEvents(): boolean;
+    processNextEvent(mayWait: boolean): boolean;
+    asyncShutdown(): void;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIThreadManager.idl
+  export interface nsIThreadManager extends nsISupports {
+    DEFAULT_STACK_SIZE: 0;
+    newThread(creationFlags: number, stackSize: number): nsIThread;
+    readonly mainThread: nsIThread;
+    readonly currentThread: nsIThread;
+    readonly isMainThread: boolean;
+  }
+
   export interface nsIURI extends nsISupports {
     asciiHost: string;
     asciiSpec: string;
@@ -655,10 +814,115 @@ export namespace XPCOM {
     compare(a: string, b: string): number;
   }
 
+  export interface nsIWeakReference<T extends nsISupports> extends nsISupports {
+    QueryReferent(uuid: nsIIDRef): T;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIWebNavigation.idl
+  export interface nsIWebNavigation extends nsISupports {
+    readonly canGoBack: boolean;
+    readonly canGoForward: boolean;
+    goBack(): void;
+    goForward(): void;
+    gotoIndex(index: number): void;
+    loadURI(
+        aURI: wstring,
+        aLoadFlags: number,
+        aReferrer: nsIURI,
+        aPostData: nsIInputStream,
+        aHeaders: nsIInputStream,
+    ): void;
+    loadURIWithOptions(
+        aURI: wstring,
+        aLoadFlags: number,
+        aReferrer: nsIURI,
+        aReferrerPolicy: number,
+        aPostData: nsIInputStream,
+        aHeaders: nsIInputStream,
+        aBaseURI: nsIURI,
+    ): void;
+    reload(aReloadFlags: number): void;
+    stop(aStopFlags: number): void;
+    readonly document: nsIDOMDocument;
+    readonly currentURI: nsIURI;
+    readonly referringURI: nsIURI;
+    readonly sessionHistory: nsISHistory;
+  }
+
+  export interface nsIWebProgress extends nsISupports {
+    readonly DOMWindow: nsIDOMWindow;
+    readonly DOMWindowID: number;
+    readonly isTopLevel: boolean;
+    readonly isLoadingDocument: boolean;
+    readonly loadType: number;
+
+    addProgressListener(
+        aListener: nsIWebProgressListener,
+        aNotifyMask?: number,
+    ): void;
+    removeProgressListener(
+        aListener: nsIWebProgressListener,
+    ): void;
+  }
+
+  export interface nsIWebProgressListener extends nsISupports {
+    onStateChange?: (
+        aWebProgress: nsIWebProgress,
+        aRequest: nsIRequest,
+        aStateFlags: number,
+        aStatus: nsresult,
+    ) => void;
+
+    onProgressChange?: (
+        aWebProgress: nsIWebProgress,
+        aRequest: nsIRequest,
+        aCurSelfProgress: number,
+        aMaxSelfProgress: number,
+        aCurTotalProgress: number,
+        aMaxTotalProgress: number,
+    ) => void;
+
+    onLocationChange?: (
+        aWebProgress: nsIWebProgress,
+        aRequest: nsIRequest,
+        aLocation: nsIURI,
+        aFlags?: number,
+    ) => void;
+
+    onStatusChange?: (
+        aWebProgress: nsIWebProgress,
+        aRequest: nsIRequest,
+        aStatus: nsresult,
+        aMessage: wstring,
+    ) => void;
+
+    onSecurityChange?: (
+        aWebProgress: nsIWebProgress,
+        aRequest: nsIRequest,
+        aState: number,
+    ) => void;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediator.idl
   export interface nsIWindowMediator extends nsISupports {
-    getMostRecentWindow(aWindowType: string | null): nsIDOMWindow;
+    addListener(aListener: nsIWindowMediatorListener_without_nsISupports): void;
+    removeListener(aListener: nsIWindowMediatorListener_without_nsISupports): void;
+    getEnumerator(aWindowType: wstring | null): nsISimpleEnumerator;
+    getMostRecentWindow(aWindowType: wstring | null): nsIDOMWindow;
   }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediatorListener.idl
+  export interface nsIWindowMediatorListener_without_nsISupports {
+    onWindowTitleChange(
+        window: nsIXULWindow,
+        newTitle: wstring,
+    ): void;
+
+    onOpenWindow(window: nsIXULWindow): void;
+    onCloseWindow(window: nsIXULWindow): void;
+  }
+  export type nsIWindowMediatorListener =
+      nsIWindowMediatorListener_without_nsISupports & nsISupports;
 
   export interface nsIXULAppInfo extends nsISupports {
     appBuildID: string;
@@ -683,6 +947,10 @@ export namespace XPCOM {
     XPCOMABI1: string;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIXULWindow.idl
+  export interface nsIXULWindow extends nsISupports {
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsPIDOMWindow.h
   export interface nsPIDOMWindow extends nsIDOMWindow {}
 
@@ -694,16 +962,23 @@ export namespace XPCOM {
   }
 
   export interface nsXPCComponents_Classes {
+    "@mozilla.org/appshell/appShellService;1": XPCOM.nsIJSCID;
     "@mozilla.org/categorymanager;1": XPCOM.nsIJSCID;
+    "@mozilla.org/content/style-sheet-service;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/intl/converter-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-input-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/file-output-stream;1": XPCOM.nsIJSCID;
     "@mozilla.org/network/idn-service;1": XPCOM.nsIJSCID;
     "@mozilla.org/supports-string;1": XPCOM.nsIJSCID;
+    "@mozilla.org/xmlextras/xmlhttprequest;1": XPCOM.nsIJSCID;
+    "@mozilla.org/xre/app-info;1": XPCOM.nsIJSCID;
   }
 
   export interface nsXPCComponents_Interfaces {
+    nsIAboutModule: XPCOM.nsIJSID & {
+      ALLOW_SCRIPT: 1;
+    };
     nsICategoryManager: XPCOM.nsIJSID;
     nsIChannel: XPCOM.nsIJSID & {
       LOAD_INITIAL_DOCUMENT_URI: number;
@@ -729,6 +1004,9 @@ export namespace XPCOM {
     nsIDOMWindow: XPCOM.nsIJSID;
     nsIDOMWindowUtils: XPCOM.nsIJSID;
     nsIDOMXULElement: XPCOM.nsIJSID;
+    nsIEventTarget: XPCOM.nsIJSID & {
+      DISPATCH_NORMAL: 0;
+    };
     nsIFactory: XPCOM.nsIJSID;
     nsIFile: XPCOM.nsIJSID;
     nsIFileInputStream: XPCOM.nsIJSID;
@@ -741,21 +1019,28 @@ export namespace XPCOM {
     nsILoadContext: XPCOM.nsIJSID;
     nsIObserver: XPCOM.nsIJSID;
     nsIPrefBranch2: XPCOM.nsIJSID;
+    nsISHistoryListener: XPCOM.nsIJSID;
+    nsIStyleSheetService: XPCOM.nsIJSID;
+    nsISupports: XPCOM.nsIJSID;
     nsISupportsString: XPCOM.nsIJSID;
     nsISupportsWeakReference: XPCOM.nsIJSID;
     nsIURI: XPCOM.nsIJSID;
+    nsIWeakReference: XPCOM.nsIJSID;
     nsIWebNavigation: XPCOM.nsIJSID;
+    nsIXMLHttpRequest: XPCOM.nsIJSID;
+    nsIXULAppInfo: XPCOM.nsIJSID;
   }
 
   export interface nsXPCComponents_Manager extends nsIComponentManager {
   }
 
   export interface nsXPCComponents_Results {
-    NS_ERROR_FACTORY_EXISTS: nsResult;
-    NS_ERROR_FAILURE: nsResult;
-    NS_ERROR_NO_AGGREGATION: nsResult;
-    NS_ERROR_NO_INTERFACE: nsResult;
-    NS_OK: nsResult;
+    NS_ERROR_FACTORY_EXISTS: nsresult;
+    NS_ERROR_FAILURE: nsresult;
+    NS_ERROR_NO_AGGREGATION: nsresult;
+    NS_ERROR_NO_INTERFACE: nsresult;
+    NS_NOINTERFACE: nsresult;
+    NS_OK: nsresult;
   }
 
   export interface nsXPCComponents_Utils {
@@ -790,6 +1075,14 @@ export namespace JSMs {
     addTypeListener(listener: TypeListener): void;
     removeTypeListener(listener: TypeListener): void;
     getURIForResourceInFile(aFile: XPCOM.nsIFile, aPath: string): XPCOM.nsIURI;
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/CustomizableUI.jsm
+  type WidgetGroupWrapper = any;
+  export interface ICustomizableUI {
+    AREA_NAVBAR: "nav-bar";
+    createWidget(aWidgetSpecification: any): WidgetGroupWrapper;
+    destroyWidget(aWidgetId: any): void;
   }
 
   export interface IHttpRequestOptions {
@@ -830,7 +1123,7 @@ export namespace JSMs {
         aSource: XPCOM.nsIURI | XPCOM.nsIFile | XPCOM.nsIChannel | XPCOM.nsIInputStream | string,
         aCallback: (
             inputStream: XPCOM.nsIInputStream,
-            status: XPCOM.nsResult,
+            status: XPCOM.nsresult,
         ) => void,
     ): void;
 
@@ -871,6 +1164,7 @@ export namespace JSMs {
     prefs: XPCOM.nsIPrefService & XPCOM.nsIPrefBranch & XPCOM.nsIPrefBranch2;
     scriptloader: XPCOM.mozIJSSubScriptLoader;
     scriptSecurityManager: XPCOM.nsIScriptSecurityManager;
+    tm: XPCOM.nsIThreadManager;
     vc: XPCOM.nsIVersionComparator;
     wm: XPCOM.nsIWindowMediator;
   }
@@ -888,12 +1182,16 @@ export namespace XUL {
     readonly defaultView: contentWindow;
   }
 
-  export type chromeWindow = XPCOM.nsIDOMWindow & Window & {
+  export type chromeWindow = XPCOM.nsIDOMWindow & Window & utilityOverlay & {
     document: chromeDocument;
     gBrowser: tabBrowser | null;  // bug 1009938 - may be null in SeaMonkey
+    gContextMenu: nsContextMenu;
+    gContextMenuContentData: any;
     getBrowser(): tabBrowser;
-
-    rpcontinued: any;  // FIXME
+    messageManager:
+        XPCOM.nsIFrameScriptLoader &
+        XPCOM.nsIMessageListenerManager &
+        XPCOM.nsIMessageBroadcaster;
   }
 
   export type contentWindow = XPCOM.nsIDOMWindow & Window & {
@@ -907,15 +1205,105 @@ export namespace XUL {
     ownerDocument: contentDocument;
   }
 
+  export interface notification extends Element {
+    accessibleType: number;
+    image: string,
+    label: string,
+    priority: number,
+    persistence: number,
+    type: string;
+    value: string;
+  }
+
+  export interface notificationbox {
+    readonly PRIORITY_INFO_LOW: number;
+    readonly PRIORITY_INFO_MEDIUM: number;
+    readonly PRIORITY_INFO_HIGH: number;
+    readonly PRIORITY_WARNING_LOW: number;
+    readonly PRIORITY_WARNING_MEDIUM: number;
+    readonly PRIORITY_WARNING_HIGH: number;
+    readonly PRIORITY_CRITICAL_LOW: number;
+    readonly PRIORITY_CRITICAL_MEDIUM: number;
+    readonly PRIORITY_CRITICAL_HIGH: number;
+    readonly PRIORITY_CRITICAL_BLOCK: number;
+
+    currentNotification: any;
+    allNotifications: any;
+    notificationsHidden: any;
+
+    appendNotification(
+        label: string,
+        value: string,
+        image: string,
+        priority: number,
+        buttons: any,
+        eventCallback?: () => void,
+    ): notification;
+    getNotificationWithValue(value: string): notification | null;
+    removeTransientNotifications(): void;
+  }
+
+  interface nsContextMenu {
+    target: Node;
+    linkURL: string;
+  }
+
+  type popupPosition =
+      "before_start" | "before_end" | "after_start" | "after_end" |
+      "start_before" | "start_after" | "end_before" | "end_after" |
+      "overlap" | "after_pointer";
+
+  // <menupopup>
+  export type menupopup = Element & XPCOM.nsIDOMXULElement & {
+    accessibleType: number;
+    anchorNode: XPCOM.nsIDOMElement;
+    position: popupPosition;
+    state: "closed" | "open" | "showing" | "hiding";
+    triggerNode: XPCOM.nsIDOMNode;
+
+    hidePopup(): void;
+    openPopup(
+        anchor: Node | null,
+        position: popupPosition,
+        x: number,
+        y?: number,
+        isContextMenu?: boolean,
+        attributesOverride?: boolean,
+        triggerEvent?: Event,
+    ): void;
+  }
+
   // <tabbrowser>
-  export interface tabBrowser extends XPCOM.nsIDOMXULElement {
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/tabbrowser
+  export interface tabBrowser extends XPCOM.nsIDOMXULElement, XPCOM.nsIWebProgress {
     currentURI: XPCOM.nsIURI;
+    selectedBrowser: XUL.browser;
+    selectedTab: XUL.tab;
     tabContainer: tabContainer;
+    webNavigation: XPCOM.nsIWebNavigation;
+    tabs: NodeList,
+
+    addTab(
+        URL: string,
+        params?: {
+          referrerURI: string,
+          charset: any,
+          postData: any,
+          owner: any,
+          allowThirdPartyFixup: any,
+          relatedToCurrent: any,
+        }
+    ): XUL.tab;
+    getBrowserAtIndex(index: number): XUL.browser;
+    getNotificationBox(browser: XUL.browser): notificationbox;
   }
 
   // <tabs>
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/tabs
   export interface tabContainer extends XPCOM.nsIDOMXULElement {
+    readonly childNodes: tab[];
     readonly children: tab[];
+    selectedIndex: number;
   }
 
   // <tab>
@@ -923,11 +1311,35 @@ export namespace XUL {
     readonly linkedBrowser: browser;
   }
 
+  interface OpenUILinkInParams {
+    allowThirdPartyFixup?: boolean;
+    postData?: XPCOM.nsIInputStream;
+    referrerURI?: XPCOM.nsIURI;
+    relatedToCurrent?: boolean;
+    inBackground?: boolean;
+    skipTabAnimation?: boolean;
+    allowPinnedTabHostChange?: boolean;
+    allowPopups?: boolean;
+    userContextId?: number;
+  }
+
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/browser/base/content/utilityOverlay.js
+  export interface utilityOverlay {
+    openUILinkIn(
+        url: string,
+        where: "current" | "tab" | "tabshifted" | "window" | "save",
+        aAllowThirdPartyFixup?: boolean | OpenUILinkInParams,
+        aPostData?: XPCOM.nsIInputStream,
+        aReferrerURI?: XPCOM.nsIURI,
+    ): void;
+  }
+
   // <browser>
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/browser
   export interface browser extends XPCOM.nsIDOMXULElement {
     readonly contentWindow: contentWindow;
     currentURI: XPCOM.nsIURI;
+    messageManager: XPCOM.nsIProcessChecker & XPCOM.nsIFrameScriptLoader & XPCOM.nsIMessageListenerManager & XPCOM.nsIMessageSender
     readonly ownerGlobal: chromeWindow;
   }
 }
@@ -953,6 +1365,7 @@ import {
 import { PrefObserver } from "./storage/pref-observer";
 import { Storage } from "./storage/storage.module";
 import { SyncLocalStorageArea } from "./storage/sync-local-storage-area";
+import { KeyboardShortcutModule } from "app/windows/window/keyboard-shortcut-module";
 
 import * as TryCatchUtils from "lib/utils/try-catch-utils";
 
@@ -999,6 +1412,19 @@ export namespace API {
         namesToTypesMap: {[key: string]: PrefType},
     ) => IPrefBranch;
     export type PrefObserverFactory = () => PrefObserver;
+  }
+
+  export namespace windows {
+    export namespace window {
+      export type IKeyboardShortcutModule = KeyboardShortcutModule;
+      export type KeyboardShortcutFactory = (
+          id: string,
+          defaultCombo: string,
+          callback: () => void,
+          userEnabledPrefName: string,
+          userComboPrefName: string,
+      ) => IKeyboardShortcutModule;
+    }
   }
 
   export type IManifest = Manifest;

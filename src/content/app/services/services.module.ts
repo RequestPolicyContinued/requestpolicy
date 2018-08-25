@@ -28,11 +28,13 @@ export class RPServices extends Module {
   constructor(
       log: Common.ILog,
       public readonly httpChannel: App.services.IHttpChannelService,
+      public readonly privateBrowsing: App.services.IPrivateBrowsingService,
       public readonly request: App.services.IRequestService,
       public readonly requestSet: App.services.IRequestSetService,
       public readonly rules: App.services.IRulesServices,
       public readonly uri: App.services.IUriService,
       public readonly versionInfo: App.services.IVersionInfoService,
+      public readonly windows: App.services.IWindowService,
   ) {
     super("app.services", log);
   }
@@ -40,11 +42,13 @@ export class RPServices extends Module {
   protected get subModules() {
     return {
       httpChannel: this.httpChannel,
+      privateBrowsing: this.privateBrowsing,
       request: this.request,
       requestSet: this.requestSet,
       rules: this.rules,
       uri: this.uri,
       versionInfo: this.versionInfo,
+      windows: this.windows,
     };
   }
 }

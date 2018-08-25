@@ -256,10 +256,10 @@ export class Log implements Common.ILog {
               console.error(`Log: Constant "${condition.C}" does not exist!`);
               return;
             }
-            if (typeof C[condition.C] !== "boolean") {
+            if (typeof (C as any)[condition.C] !== "boolean") {
               console.warn(`Log: C["${condition.C}"] is not a bool.`);
             }
-            conditionFulfilled = !!C[condition.C];
+            conditionFulfilled = !!(C as any)[condition.C];
             break;
 
           default:

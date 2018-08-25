@@ -22,47 +22,42 @@
  */
 
 /**
- * Function that takes a DOM Element or an Array of DOM elements and removes
- * all their children.
- *
- * @param {(Element|Array<Element>)} aElements
+ * Remove all children of one or more DOM element.
  */
-export function removeChildren(aElements) {
+export function removeChildren(aElements: Element | Element[]) {
   // If aElements is not an Array, put the element in an Array.
-  let elements = Array.isArray(aElements) ? aElements : [aElements];
+  const elements = Array.isArray(aElements) ? aElements : [aElements];
   // Note on `isArray` (above):
   //     using `instanceof` did not work. For details see
+  // tslint:disable-next-line:max-line-length
   //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 
-  for (let el of elements) {
+  for (const el of elements) {
     while (el.firstChild) {
       el.removeChild(el.firstChild);
     }
   }
 }
 
-function isThisElementVisible(aElement) {
+function isThisElementVisible(aElement: Element) {
   if (!aElement || !aElement.getClientRects) {
     return false;
   }
-  let rects = aElement.getClientRects();
+  const rects = aElement.getClientRects();
   if (rects.length === 0) {
     return false;
   }
-  let rect = rects[0];
+  const rect = rects[0];
   return rect.width > 0 && rect.height > 0;
 }
 
 /**
  * Check if the element and all of its parent elements is visible.
- *
- * @param  {Element} aElement
- * @return {boolean}
  */
-export function isElementVisible(aElement) {
+export function isElementVisible(aElement: Element): boolean {
   if (!isThisElementVisible(aElement)) {
     return false;
   }
-  let parent = aElement.parentElement;
+  const parent = aElement.parentElement;
   return parent !== null ? isElementVisible(parent) : true;
 }

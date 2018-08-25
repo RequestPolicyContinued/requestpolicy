@@ -171,7 +171,7 @@ export class RequestMemory extends Module {
    * the most recent iframe that loaded that source uri. It may also help in
    * cases where the user has multiple tabs/windows open to the same page.
    */
-  public getAllRequestsInBrowser(browser: XUL.tabBrowser): RequestSet {
+  public getAllRequestsInBrowser(browser: XUL.browser): RequestSet {
     // var origins = {};
     const reqSet = new RequestSet();
 

@@ -21,22 +21,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
-import { JSMs, XPCOM, XUL } from "bootstrap/api/interfaces";
-
-const PrivateBrowsingUtils: JSMs.PrivateBrowsingUtils = Cu.import(
-    "resource://gre/modules/PrivateBrowsingUtils.jsm", {},
-).PrivateBrowsingUtils;
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
 
 declare const Ci: XPCOM.nsXPCComponents_Interfaces;
-declare const Services: JSMs.Services;
-
-export function getMostRecentWindow(aWindowType = null) {
-  return Services.wm.getMostRecentWindow(aWindowType);
-}
-
-export const getMostRecentBrowserWindow =
-    getMostRecentWindow.bind(null, "navigator:browser");
 
 export function getChromeWindow(
     aContentWindow: XUL.contentWindow,
@@ -94,23 +81,22 @@ export function contentWindowHasAssociatedTab(
   return getBrowserForWindow(contentWindow) !== null;
 }
 
-//
-// Private Browsing
-//
-
-export function isWindowPrivate(aWindow: XPCOM.nsIDOMWindow) {
-  return PrivateBrowsingUtils.isWindowPrivate(aWindow);
+export function getDOMWindowUtils(
+    window: XUL.chromeWindow | XUL.contentWindow,
+) {
+  return window.
+      QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
+      getInterface<XPCOM.nsIDOMWindowUtils>(Ci.nsIDOMWindowUtils);
 }
 
-/**
- * Should it be possible to add permanent rules in that window?
- */
-export function mayPermanentRulesBeAdded(
-    aWindow: XPCOM.nsIDOMWindow,
-    storage: App.storage.ICachedSettings,
-): boolean {
-  return isWindowPrivate(aWindow) === false ||
-      storage.get("privateBrowsingPermanentWhitelisting");
+export function getDOMWindowFromXULWindow(
+    xulWindow: XPCOM.nsIXULWindow,
+): XPCOM.nsIDOMWindow {
+  return xulWindow.
+      QueryInterface<XPCOM.nsIInterfaceRequestor>(
+          Ci.nsIInterfaceRequestor,
+      ).
+      getInterface<XPCOM.nsIDOMWindow>(Ci.nsIDOMWindow);
 }
 
 //

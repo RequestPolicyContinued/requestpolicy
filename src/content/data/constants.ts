@@ -20,9 +20,9 @@
  * ***** END LICENSE BLOCK *****
  */
 
-/* global RUN_ID */ // see bootstrap.jsm
+declare const RUN_ID: number;  // see bootstrap.jsm
 
-const env = (str) => str[0] !== "undefined";
+const env = (str: TemplateStringsArray) => str[0] !== "undefined";
 
 export const C = {
   LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */`,
@@ -32,6 +32,7 @@ export const C = {
   LOG_MESSAGE_LISTENERS: env`/* @echo LOG_MESSAGE_LISTENERS */`,
   LOG_REQUESTS: env`/* @echo LOG_REQUESTS */`,
 
+  // tslint:disable-next-line:object-literal-sort-keys
   AMO: env`/* @echo AMO */`,
   BUILD_ALIAS: `/* @echo BUILD_ALIAS */`,
   EXTENSION_TYPE: `/* @echo EXTENSION_TYPE */`,
@@ -56,7 +57,8 @@ export const C = {
 
   FIREFOX_ID: "{ec8030f7-c20a-464f-9b0e-13a3a9e97384}",
   SEAMONKEY_ID: "{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}",
-  // We need a random RUN_ID because of https://bugzilla.mozilla.org/show_bug.cgi?id=1202125
+  // We need a random RUN_ID because of
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1202125
   get MMID() { // message manager ID
     return `${this.EXTENSION_ID}_${this.RUN_ID}`;
   },

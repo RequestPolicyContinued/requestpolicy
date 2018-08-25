@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2017 Martin Kimmerle
+ * Copyright (c) 2018 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,26 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {promiseObserverTopic} from "legacy/lib/utils/xpcom-utils";
-import * as WindowUtils from "lib/utils/window-utils";
-import {Windows} from "models/windows";
+export class BoundMethods {
+  private map = new Map();
 
-function areWindowsAvailable() {
-  if (WindowUtils.getMostRecentBrowserWindow() === null) {
-    return false;
+  constructor(private target: any) {}
+
+  public get<T extends Function>(fn: T): T {
+    if (!this.map.has(fn)) {
+      this.map.set(fn, fn.bind(this.target));
+    }
+    return this.map.get(this.target);
   }
-  try {
-    Windows.forEachOpenWindow((win) => WindowUtils.getTabBrowser(win));
-  } catch (e) {
-    return false;
-  }
-  return true;
 }
-
-function promiseSessionstoreWindowsRestored() {
-  return promiseObserverTopic("sessionstore-windows-restored").
-      then(() => undefined);
-}
-
-export const pWindowsAvailable = areWindowsAvailable() ? Promise.resolve() :
-  promiseSessionstoreWindowsRestored();

@@ -22,15 +22,15 @@
 
 import {rp} from "app/app.background";
 import {log} from "app/log";
+import {
+  SUBSCRIPTION_ADDED_TOPIC,
+  SUBSCRIPTION_REMOVED_TOPIC,
+} from "app/policy/subscription";
 import { API } from "bootstrap/api/interfaces";
 import {C} from "data/constants";
 import * as XpcomUtils from "legacy/lib/utils/xpcom-utils";
 import {Environment, MainEnvironment} from "lib/environment";
 import {ManagerForPrefObservers} from "lib/manager-for-pref-observer";
-import {
-  SUBSCRIPTION_ADDED_TOPIC,
-  SUBSCRIPTION_REMOVED_TOPIC,
-} from "lib/subscription";
 import * as RuleUtils from "lib/utils/rule-utils";
 import * as WindowUtils from "lib/utils/window-utils";
 

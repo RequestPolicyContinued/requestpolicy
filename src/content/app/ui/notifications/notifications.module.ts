@@ -2,7 +2,7 @@
  * ***** BEGIN LICENSE BLOCK *****
  *
  * RequestPolicy - A Firefox extension for control over cross-site requests.
- * Copyright (c) 2018 Martin Kimmerle
+ * Copyright (c) 2017 Martin Kimmerle
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,22 +22,34 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import {Module} from "lib/classes/module";
-import { InitialSetup } from "./initial-setup";
+import { Module } from "lib/classes/module";
+import { NotificationID, NotificationsSet } from "./notifications-set";
 
-export class Ui extends Module {
-  constructor(
-      log: Common.ILog,
-      private readonly initialSetup: InitialSetup,
-      private readonly notifications: App.ui.INotifications,
-  ) {
-    super("app.ui", log);
+export class Notifications extends Module implements App.ui.INotifications {
+  public readonly notifications = new NotificationsSet(this.windowService);
+  public readonly IDs = NotificationID;
+
+  protected get startupPreconditions() {
+    return [
+      this.windowService.whenReady,
+      this.windowService.pWindowsAvailable,
+    ];
   }
 
-  protected get subModules() {
-    return {
-      initialSetup: this.initialSetup,
-      notifications: this.notifications,
+  constructor(
+      parentLog: Common.ILog,
+      private windowService: App.services.IWindowService,
+  ) {
+    super(`app.ui.notifications`, parentLog);
+  }
+
+  protected startupSelf() {
+    const showNotification = (id: NotificationID) => {
+      this.notifications.openTab(id);
     };
+    this.notifications.forEach(showNotification);
+    this.notifications.onAdded.addListener(showNotification);
+
+    return Promise.resolve();
   }
 }

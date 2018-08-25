@@ -14,7 +14,7 @@ describe("I18nUtils", function() {
   let I18nUtils;
 
   before(function() {
-    I18nUtils = require("bootstrap/api/i18n/i18n-utils");
+    I18nUtils = require("legacy/lib/utils/i18n-utils");
   });
 
   describe("normalizeToBCP47(tag)", function() {

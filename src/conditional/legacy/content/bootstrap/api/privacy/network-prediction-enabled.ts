@@ -30,7 +30,7 @@ export class NetworkPredictionEnabledSetting extends Module
       log: Common.ILog,
       private rootPrefBranch: API.storage.IPrefBranch,
   ) {
-    super("browser.privacy.network.networkPredictionEnabled", log);
+    super("API.privacy.network.networkPredictionEnabled", log);
   }
 
   public set({value}: {value: any}) {

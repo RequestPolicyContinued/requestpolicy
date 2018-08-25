@@ -30,6 +30,8 @@ const pify = require("pify");
 const config = require("./config.json");
 
 const promiseStat = pify(fs.stat);
+const promiseLstat = pify(fs.stat);
+const promiseReadlink = pify(fs.readlink);
 
 // -----------------------------------------------------------------------------
 // constants, utilities
@@ -147,36 +149,58 @@ function promiseMtime(path) {
   return promiseStat(path).then(({mtime}) => mtime);
 }
 
-const getDependenciesMaxMtime = (function() {
-  let pMaxMtime;
+function promiseMtimes(path, mtimes = []) {
+  return promiseLstat(path).then((stats) => {
+    const mtimes2 = mtimes.concat([stats.mtime]);
+    if (stats.isSymbolicLink()) {
+      // eslint-disable-next-line promise/no-nesting
+      const p = promiseReadlink(path).then(
+          (linkTarget) => promiseMtimes(linkTarget, mtimes2)
+      );
+      // eslint-disable-next-line promise/no-nesting
+      p.catch((e) => {
+        console.error(`readlink("${path}"):`, e);
+      });
+      return p;
+    }
+    return mtimes2;
+  });
+}
+
+const getDependenciesMtimes = (function() {
+  let pMtimes;
 
   let dependencies = [
     "config.json",
     "gulpfile.js",
     "package.json",
     "tsconfig.json",
+    "src/conditional/legacy/webextension/tsconfig.json",
   ].map((filename) => `${rootDir}/${filename}`);
 
-  return function getDependenciesMtime() {
-    if (!pMaxMtime) {
-      let pMtimes = dependencies.map(promiseMtime);
-      pMaxMtime = Promise.all(pMtimes).then(promiseMaxDate);
+  return function getDependenciesMtimes() {
+    if (!pMtimes) {
+      const pMtimeArrays = dependencies.map((dep) => promiseMtimes(dep));
+      pMtimes = Promise.all(pMtimeArrays).
+          then((mtimeArrays) => {
+            let mtimes = [];
+            mtimeArrays.forEach((mtimeArray) => {
+              mtimes = mtimes.concat(mtimeArray);
+            });
+            return mtimes;
+          });
     }
-    return pMaxMtime;
+    return pMtimes;
   };
 })();
 
-function compareLastModifiedTime(stream, sourceFile, targetPath) {
-  return Promise.all([
-    getDependenciesMaxMtime().
-        then((maxMtime) => maxDate([maxMtime, sourceFile.stat.mtime])),
-    promiseMtime(targetPath),
-  ]).then(([depsMaxMtime, targetMtime]) => {
-    if (depsMaxMtime > targetMtime) {
-      stream.push(sourceFile);
-    }
-    return;
-  });
+async function compareLastModifiedTime(stream, sourceFile, targetPath) {
+  const depsMaxDate = await getDependenciesMtimes().then(promiseMaxDate);
+  const sourceMaxDate = await promiseMtimes(sourceFile.path).then(promiseMaxDate);
+  const targetMtime = await promiseMtime(targetPath);
+  if (depsMaxDate > targetMtime || sourceMaxDate > targetMtime) {
+    stream.push(sourceFile);
+  }
 }
 
 function _sanitizeArgsForAddTask(aFn) {
@@ -451,6 +475,8 @@ BUILDS.forEach((build) => {
               "content/**/*.xul",
               "locale/*/*.dtd",
               "locale/*/*.properties",
+              "webextension/background.html",
+              "webextension/lib/third-party/**/*.js",
             ]);
             break;
         }
@@ -495,6 +521,7 @@ BUILDS.forEach((build) => {
             "content/bootstrap-data/manifest.json",
             "content/_locales/**/messages.json",
             "skin/*.css",
+            "webextension/manifest.json",
           ] : []
       ));
 
@@ -523,6 +550,11 @@ BUILDS.forEach((build) => {
           additionalFiles: extensionType === "legacy" ? [
             "bootstrap.js",
           ] : [],
+        },
+        "embedded-we": {
+          moduleRoot: "webextension",
+          tsConfigPath: "src/conditional/legacy/webextension/tsconfig.json",
+          additionalFiles: [],
         },
       };
 
@@ -604,6 +636,9 @@ BUILDS.forEach((build) => {
       }
 
       addJsBuildTask("main");
+      if (extensionType === "legacy") {
+        addJsBuildTask("embedded-we");
+      }
     });
   });
 });

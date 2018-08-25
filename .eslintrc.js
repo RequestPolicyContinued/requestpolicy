@@ -10,7 +10,7 @@ module.exports = {
   ],
 
   "parserOptions": {
-    "ecmaVersion": 2015,
+    "ecmaVersion": 2017,
     "ecmaFeatures": {
     },
   },
@@ -53,6 +53,7 @@ module.exports = {
           "body": 1,
         },
         "FunctionExpression": {
+          // FIXME: 2 AND "first"
           "parameters": 2,
           "body": 1,
         },

@@ -250,7 +250,9 @@ declare const $: typeof JQuery;
         if (searchTimeoutId !== null) {
           window.clearTimeout(searchTimeoutId);
         }
-        searchTimeoutId = window.setTimeout(() => {
+        // FIXME: use 'setTimeout' of 'Module'
+        // tslint:disable-next-line:max-line-length
+        searchTimeoutId = window.setTimeout(() => {  // badword-linter:allow:window.setTimeout:
           populateRuleTable(event.target.value);
         }, SEARCH_DELAY);
       }, false);

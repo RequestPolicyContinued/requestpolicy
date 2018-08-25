@@ -31,6 +31,10 @@ export class JSMService {
     return this.import("resource://gre/modules/AddonManager.jsm").AddonManager;
   }
 
+  public getCustomizableUI(): JSMs.CustomizableUI {
+    return this.import("resource:///modules/CustomizableUI.jsm").CustomizableUI;
+  }
+
   public getFileUtils(): JSMs.FileUtils {
     return this.import("resource://gre/modules/FileUtils.jsm").FileUtils;
   }
@@ -41,6 +45,11 @@ export class JSMService {
 
   public getNetUtil(): JSMs.NetUtil {
     return this.import("resource://gre/modules/NetUtil.jsm").NetUtil;
+  }
+
+  public getPrivateBrowsingUtils(): JSMs.PrivateBrowsingUtils {
+    return this.import("resource://gre/modules/PrivateBrowsingUtils.jsm").
+        PrivateBrowsingUtils;
   }
 
   public getServices(): JSMs.Services {

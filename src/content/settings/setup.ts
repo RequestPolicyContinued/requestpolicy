@@ -21,8 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { UserSubscriptionsInfo } from "app/policy/subscription";
 import * as JQuery from "jquery";
-import { UserSubscriptionsInfo } from "lib/subscription";
 import {BackgroundPage} from "main";
 import {$id} from "./common";
 
@@ -76,7 +76,6 @@ declare const $: typeof JQuery;
       allow_sameorg: {},
       deny_trackers: {},
     };
-    const userSubs = rp.policy.subscriptions.getSubscriptions();
     // tslint:disable-next-line:forin
     for (const subName in subs) {
       const subInfo: UserSubscriptionsInfo = {};
@@ -84,13 +83,13 @@ declare const $: typeof JQuery;
       subInfo.official[subName] = true;
       // FIXME: Add a pref to disable subscriptions globally (#713)
       if (enableSubs) {
-        userSubs.addSubscription("official", subName);
+        rp.policy.subscriptions.addSubscription("official", subName);
         Services.obs.notifyObservers(
             null, SUBSCRIPTION_ADDED_TOPIC,
             JSON.stringify(subInfo),
         );
       } else {
-        userSubs.removeSubscription("official", subName);
+        rp.policy.subscriptions.removeSubscription("official", subName);
         Services.obs.notifyObservers(
             null, SUBSCRIPTION_REMOVED_TOPIC,
             JSON.stringify(subInfo),

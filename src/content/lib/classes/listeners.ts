@@ -22,36 +22,50 @@
 
 import { OverridableSet } from "lib/classes/set";
 
-export type Listener = (...args: any[]) => void;
+export type Listener<Trv = void> = (...args: any[]) => Trv | Promise<Trv>;
 
-export interface IListenInterface {
-  addListener: (listener: Listener) => void;
-  removeListener: (listener: Listener) => void;
-  hasListener: (listener: Listener) => boolean;
+export interface IListenInterface<Trv = void> {
+  addListener: (listener: Listener<Trv>) => void;
+  removeListener: (listener: Listener<Trv>) => void;
+  hasListener: (listener: Listener<Trv>) => boolean;
 }
 
-export class Listeners extends OverridableSet<Listener> {
-  public readonly interface: IListenInterface = {
+export class Listeners<Trv = void> extends OverridableSet<Listener<Trv>> {
+  public readonly interface: IListenInterface<Trv> = {
     addListener: this.add.bind(this),
     hasListener: this.has.bind(this),
     removeListener: this.delete.bind(this),
   };
 
-  public emit(...args: any[]) {
-    const returnValues: any[] = [];
+  public add(listener: Listener<Trv>) {
+    if (typeof listener !== "function") {
+      throw new Error(`'${listener}' is not a function!`);
+    }
+    return super.add(listener);
+  }
+
+  public emit(...args: any[]): Trv[] | Promise<Trv[]> {
+    const returnValues: Array<Trv | Promise<Trv>> = [];
     let withPromises = false;
-    // tslint:disable-next-line prefer-const
-    for (let listener of this.values()) {
-      const rv: any = listener(...args);
-      if (rv && typeof rv.then === "function") {
+    for (const listener of this.values()) {
+      let rv: Trv | Promise<Trv>;
+      try {
+        rv = listener(...args);
+      } catch (e) {
+        rv = Promise.reject(e);
+      }
+      if (rv && typeof (rv as Promise<Trv>).then === "function") {
         withPromises = true;
+        (rv as Promise<Trv>).catch((e) => console.dir(e));
       }
       if (rv !== undefined) {
         returnValues.push(rv);
       }
     }
-    if (!withPromises) return returnValues;
+    if (!withPromises) return returnValues as Trv[];
     return Promise.all(returnValues.map(
-        (rv) => typeof rv.then === "function" ? rv : Promise.resolve(rv)));
+        (rv) => typeof (rv as any).then === "function" ?
+            rv as Promise<Trv> :
+            Promise.resolve(rv)));
   }
 }

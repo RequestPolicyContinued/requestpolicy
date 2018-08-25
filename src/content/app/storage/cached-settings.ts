@@ -21,26 +21,33 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { objectEntries } from "lib/utils/js-utils";
+import { getInfosOfStorageChange } from "lib/utils/storage-utils";
 
 interface IDefaultValues {
   [key: string]: string | number | boolean;
 }
 
-export class CachedSettings extends Module {
+export class CachedSettings extends Module
+implements App.storage.ICachedSettings {
   public readonly alias: {[a: string]: (...keys: any[]) => any} = {};
 
-  protected get startupPreconditions() {
-    return [
-      this.storageReadyPromise,
-    ];
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
   }
 
   private cachedKeys: string[];
   private cachedKeysSet: Set<string>;
   private defaultValues: IDefaultValues;
+
+  private get storageArea() { return this.storageApi.local; }
 
   constructor(
       log: Common.ILog,
@@ -53,9 +60,8 @@ export class CachedSettings extends Module {
           boolAliases: Array<[string, string]>,
           defaultValues: IDefaultValues,
       },
-      private storageReadyPromise: Promise<void>,
+      private storageApi: App.storage.IStorageApiWrapper,
       private rpPrefBranch: API.storage.IPrefBranch,
-      private prefsService: API.ILegacyApi["prefsService"],
   ) {
     super("app.storage.cachedSettings", log);
 
@@ -97,20 +103,27 @@ export class CachedSettings extends Module {
     throw new Error(`Invalid key "${aKeys}"`);
   }
 
-  public set(aKeys: {[key: string]: any}) {
+  public set(aKeys: {[key: string]: any}): Promise<void> {
+    const p = this.set_(aKeys);
+    p.catch((e) => {
+      console.error("Error when saving to storage:");
+      console.dir({error: e, keys: aKeys});
+    });
+    return p;
+  }
+
+  public set_(aKeys: {[key: string]: any}): Promise<void> {
     this.assertReady();
-    try {
-      Object.keys(aKeys).forEach((key) => {
-        this.rpPrefBranch.set(key, aKeys[key]);
-      });
-      this.prefsService.savePrefFile(null);
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error when saving to storage! Details:");
-      console.dir(aKeys);
-      console.dir(error);
-      return Promise.reject(error);
-    }
+    return this.storageArea.set(aKeys);
+  }
+
+  protected startupSelf() {
+    // observe storage changes and compare them w/ the cached ones
+    // (for legacy browsers with about:config)
+    this.storageApi.onChanged.addListener(
+        this.observeStorageChange.bind(this),
+    );
+    return MaybePromise.resolve(undefined);
   }
 
   private getRaw(aKey: string): any {
@@ -119,5 +132,15 @@ export class CachedSettings extends Module {
     }
     const result = this.rpPrefBranch.get(aKey);
     return result === undefined ? this.defaultValues[aKey] : result;
+  }
+
+  private observeStorageChange(aChanges: API.storage.api.ChangeDict) {
+    const {keysToRemove, keysToSet} = getInfosOfStorageChange(aChanges);
+    keysToRemove.forEach((key) => {
+      // reset to default
+    });
+    objectEntries(keysToSet).forEach(([key, value]) => {
+      // set value
+    });
   }
 }

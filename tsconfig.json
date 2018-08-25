@@ -22,7 +22,7 @@
       // "es2017.object" // support since Fx47
     ],
     "typeRoots": [
-      // no "node_modules/@types"!
+      // no node types!
       "node_modules/web-ext-types"
     ],
 
@@ -46,6 +46,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "**/third-party/static"
+    "**/third-party/static",
+    "src/conditional/legacy/webextension/"
   ]
 }

@@ -2,10 +2,26 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "esnext",
+    "lib": [
+      "esnext",
+    ],
     "noImplicitAny": false,
+    "types": [
+      "../../node_modules/@types/node",
+      "../../node_modules/@types/mocha",
+      "../../node_modules/web-ext-types/global",
+    ],
+    "paths": {
+      "*": [
+        "content/*",
+        "conditional/legacy/content/*",
+        "conditional/legacy/webextension/*",
+        "conditional/ui-testing/content/*",
+        "conditional/webextension/content/*",
+      ]
+    }
   },
   "include": [
-    "../../src",
-    ".",
+    "./**/*",
   ],
 }

@@ -12,6 +12,7 @@
     "chai-as-promised": "^7.1.1",
     "coffeelint": "^1.16.0",
     "coffeescript": "^1.12.6",
+    "deep-freeze": "0.0.1",
     "del": "^3.0.0",
     "eslint": "^4.15.0",
     "eslint-config-google": "^0.9.1",
@@ -30,17 +31,19 @@
     "gulp-zip": "^4.0.0",
     "merge-stream": "^1.0.1",
     "mocha": "^3.4.2",
+    "mocha-repeat": "^0.1.0",
     "pify": "^3.0.0",
     "sinon": "^4.0.0",
     "sinon-chrome": "^2.2.1",
     "source-map-support": "^0.4.18",
     "ts-node": "^4.1.0",
     "tslint": "^5.5.0",
-    "typescript": "^2.4.2",
+    "typescript": "^2.9.2",
     "web-ext-types": "github:myrdd/web-ext-types#8d773c8"
   },
   "dependencies": {
     "jquery": "^3.3.1",
-    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator#3b77635"
+    "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator#3b77635",
+    "requirejs": "^2.3.5"
   }
 }

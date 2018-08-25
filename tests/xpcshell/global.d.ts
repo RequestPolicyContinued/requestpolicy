@@ -17,6 +17,7 @@ declare const do_get_file: any;
 declare const do_get_profile: any;
 
 // xpcshell testing
+declare const add_task: any;
 declare const add_test: any;
 declare const do_test_finished: any;
 declare const do_test_pending: any;

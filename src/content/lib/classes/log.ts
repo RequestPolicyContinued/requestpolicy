@@ -256,10 +256,10 @@ export class Log implements Common.ILog {
               console.error(`Log: Constant "${condition.C}" does not exist!`);
               return;
             }
-            if (typeof C[condition.C] !== "boolean") {
+            if (typeof (C as any)[condition.C] !== "boolean") {
               console.warn(`Log: C["${condition.C}"] is not a bool.`);
             }
-            conditionFulfilled = !!C[condition.C];
+            conditionFulfilled = !!(C as any)[condition.C];
             break;
 
           default:
@@ -345,15 +345,17 @@ export class Log implements Common.ILog {
   ) {
     const shouldLog = this.shouldLog(aLevel);
     if (shouldLog === false) return;
+    const forceLog = shouldLog === true;
 
     const msgs = typeof aMsg === "object" ? aMsg : [aMsg];
 
     const isPromise = typeof this.enabled !== "boolean";
-    if (!isPromise) {
+    if (!isPromise || forceLog) {
       // shouldLog is definitely true
-      return this.logNowInternal(aLevel, aFnName, msgs, aDirArgs);
+      const rv = this.logNowInternal(aLevel, aFnName, msgs, aDirArgs);
+      if (!isPromise) return rv;
+      // promises are also added to the delayed log
     }
-    const forceLog = shouldLog === true;
     const delayedLog = this.getDelayedLog(this.enabled as Promise<boolean>);
     if (!delayedLog) {
       console.error(`delayedLog for ${this.enabled} is undefined`);

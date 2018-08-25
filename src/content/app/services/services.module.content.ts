@@ -27,9 +27,10 @@ import { Module } from "lib/classes/module";
 export class RPContentServices extends Module {
   constructor(
       log: Common.ILog,
+      protected readonly outerWindowID: number,
       public readonly uri: UriService,
   ) {
-    super("AppContent.services", log);
+    super(`AppContent[${outerWindowID}].services`, log);
   }
 
   protected get subModules() {

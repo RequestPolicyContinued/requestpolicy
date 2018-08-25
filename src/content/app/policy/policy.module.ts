@@ -21,14 +21,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { App } from "app/interfaces";
+import { XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
-import {IUri} from "lib/classes/uri";
-import {RequestResult} from "lib/request-result";
-import {RawRuleset, Ruleset} from "lib/ruleset";
-import { RulesetStorage } from "./ruleset-storage";
-import { Subscriptions } from "./subscriptions";
+import {RequestResult} from "lib/classes/request-result";
+import {RawRuleset, Ruleset} from "./ruleset";
 
 export const RULES_CHANGED_TOPIC = "rpcontinued-rules-changed";
 
@@ -41,17 +41,27 @@ function notifyRulesChanged() {
   Services.obs.notifyObservers(null, RULES_CHANGED_TOPIC, null);
 }
 
-export class Policy extends Module {
+export class Policy extends Module implements App.IPolicy {
+  // protected get debugEnabled() { return true; }
+
   public userRulesetExistedOnStartup: boolean;
   private userRulesets: any = {};
 
+  protected get subModules() {
+    return {
+      rulesetStorage: this.rulesetStorage,
+      subscriptions: this.subscriptions,
+    };
+  }
+
   constructor(
       log: Common.ILog,
-      public readonly subscriptions: Subscriptions,
-      public readonly rulesetStorage: RulesetStorage,
+      public readonly rulesetStorage: App.policy.IRulesetStorage,
+      public readonly subscriptions: App.policy.ISubscriptions,
+
+      private readonly uriService: App.services.IUriService,
   ) {
     super("app.policy", log);
-    this.subscriptions = subscriptions;
   }
 
   public getUserRulesets() {
@@ -68,7 +78,8 @@ export class Policy extends Module {
     const pRawRuleset = this.rulesetStorage.loadRawRulesetFromFile("user");
     const p = pRawRuleset.then((aRawRuleset) => {
       this.userRulesetExistedOnStartup = !!aRawRuleset;
-      const rawRuleset = aRawRuleset || RawRuleset.create();
+      const rawRuleset = aRawRuleset ||
+          RawRuleset.create(this.log, this.uriService);
       this.userRulesets.user = {
         rawRuleset,
         ruleset: rawRuleset.toRuleset("user"),
@@ -105,7 +116,11 @@ export class Policy extends Module {
     return false;
   }
 
-  public addRule(ruleAction: RuleAction, ruleData: RuleData, noStore: boolean) {
+  public addRule(
+      ruleAction: RuleAction,
+      ruleData: RuleData,
+      noStore?: boolean,
+  ) {
     this.log.info(
         `addRule ${ruleAction} ${Ruleset.rawRuleToCanonicalString(ruleData)}`,
     );
@@ -215,7 +230,7 @@ export class Policy extends Module {
   }
 
   public revokeTemporaryRules() {
-    const rawRuleset = RawRuleset.create();
+    const rawRuleset = RawRuleset.create(this.log, this.uriService);
     this.userRulesets.temp = {
       rawRuleset,
       ruleset: rawRuleset.toRuleset("temp"),
@@ -225,11 +240,17 @@ export class Policy extends Module {
     notifyRulesChanged();
   }
 
-  public checkRequestAgainstUserRules(origin: IUri, dest: IUri) {
+  public checkRequestAgainstUserRules(
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
+  ) {
     return this.checkRequest(origin, dest, this.userRulesets);
   }
 
-  public checkRequestAgainstSubscriptionRules(origin: IUri, dest: IUri) {
+  public checkRequestAgainstSubscriptionRules(
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
+  ) {
     const result = new RequestResult();
     const subscriptionRulesets = this.subscriptions.getRulesets();
     // tslint:disable-next-line:forin
@@ -241,8 +262,8 @@ export class Policy extends Module {
   }
 
   public checkRequest(
-      origin: IUri,
-      dest: IUri,
+      origin: XPCOM.nsIURI,
+      dest: XPCOM.nsIURI,
       aRuleset: any,
       aResult?: RequestResult,
   ) {
@@ -304,7 +325,7 @@ export class Policy extends Module {
     return ruleData;
   }
 
-  public addRuleBySpec(aSpec: any, noStore: boolean) {
+  public addRuleBySpec(aSpec: any, noStore?: boolean) {
     const ruleAction = aSpec.allow ? C.RULE_ACTION_ALLOW : C.RULE_ACTION_DENY;
     const ruleData = this.getRuleData(aSpec.origin, aSpec.dest);
 
@@ -316,18 +337,12 @@ export class Policy extends Module {
   }
 
   // ---------------------------------------------------------------------------
-  // private functions
+  // protected functions
   // ---------------------------------------------------------------------------
 
-  protected get subModules() {
-    return {
-      rulesetStorage: this.rulesetStorage,
-      subscriptions: this.subscriptions,
-    };
-  }
-
-  protected async startupSelf() {
-    await this.loadUserRules();
+  protected startupSelf() {
+    const p = this.loadUserRules();
+    return MaybePromise.resolve(p);
   }
 
   // ---------------------------------------------------------------------------

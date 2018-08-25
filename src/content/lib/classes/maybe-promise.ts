@@ -34,6 +34,19 @@ type IMaybePromiseSpec<T> = {
 };
 
 export class MaybePromise<T> {
+  public static all<U = any>(aPromises: Array<MaybePromise<U> | Promise<U>>) {
+    const rv: U[] = [];
+    let promiseChain: MaybePromise<void> =
+        MaybePromise.resolve(undefined) as MaybePromise<void>;
+
+    aPromises.forEach((p, index) => {
+      promiseChain = promiseChain.then(() => p).then((value) => {
+        rv[index] = value;
+      });
+    });
+    return promiseChain.then(() => rv);
+  }
+
   public static resolve<U>(aVal: U | Promise<U> | MaybePromise<U>) {
     if (aVal instanceof MaybePromise) return aVal as MaybePromise<U>;
     if (isThenable(aVal)) {
@@ -49,8 +62,8 @@ export class MaybePromise<T> {
     }
   }
 
-  public static reject<U>(aRejectValue: U) {
-    return new MaybePromise({
+  public static reject<TResolve, TReject = any>(aRejectValue: TReject) {
+    return new MaybePromise<TResolve>({
       rejectionValue: aRejectValue,
       status: "rejected",
     });
@@ -76,10 +89,18 @@ export class MaybePromise<T> {
     }
   }
 
-  public then(
-      aThen?: <U>(val: T) => U,
+  public then<U>(
+      aThen: undefined,
       aCatch?: (val: any) => any,
-  ): any {
+  ): MaybePromise<T>;
+  public then<U>(
+      aThen: (val: T) => (U | Promise<U> | MaybePromise<U>),
+      aCatch?: (val: any) => any,
+  ): MaybePromise<U>;
+  public then<U>(
+      aThen?: (val: T) => (U | Promise<U> | MaybePromise<U>),
+      aCatch?: (val: any) => any,
+  ): MaybePromise<U | T> {
     if (this.status === "PROMISE") {
       return MaybePromise.resolve(this.promise!.then(aThen, aCatch));
     }
@@ -88,19 +109,19 @@ export class MaybePromise<T> {
         try {
           return MaybePromise.resolve(aCatch(this.rejectionValue));
         } catch (e) {
-          return MaybePromise.reject(e);
+          return MaybePromise.reject(e) as MaybePromise<U>;
         }
       }
-      return MaybePromise.reject(this.rejectionValue);
+      return MaybePromise.reject(this.rejectionValue) as MaybePromise<U>;
     }
     if (aThen) {
       try {
         return MaybePromise.resolve(aThen(this.resolutionValue!));
       } catch (e) {
-        return MaybePromise.reject(e);
+        return MaybePromise.reject(e) as MaybePromise<U>;
       }
     }
-    return MaybePromise.resolve(this.resolutionValue);
+    return MaybePromise.resolve(this.resolutionValue!);
   }
 
   public catch(aCatch: (val: any) => any) {

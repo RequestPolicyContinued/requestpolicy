@@ -22,6 +22,7 @@
 
 import { API, JSMs } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
 
@@ -51,7 +52,7 @@ export class Management extends Module implements API.management.IManagement {
       log: Common.ILog,
       private addonManager: JSMs.AddonManager,
   ) {
-    super("browser.management", log);
+    super("API.management", log);
   }
 
   public get backgroundApi() {
@@ -77,8 +78,7 @@ export class Management extends Module implements API.management.IManagement {
             reject();
           }
         } catch (e) {
-          console.error("browser.management.get()");
-          console.dir(e);
+          this.log.error("get() failed:", e);
           reject(e);
         }
       });
@@ -107,11 +107,12 @@ export class Management extends Module implements API.management.IManagement {
     return this.get("/* @echo EXTENSION_ID */");
   }
 
-  protected async startupSelf() {
+  protected startupSelf() {
     this.addonManager.addAddonListener(this.addonListener);
+    return MaybePromise.resolve(undefined);
   }
 
-  protected async shutdownSelf() {
+  protected shutdownSelf(): void {
     this.addonManager.removeAddonListener(this.addonListener);
   }
 

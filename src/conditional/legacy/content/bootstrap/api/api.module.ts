@@ -39,6 +39,7 @@ export class Api extends Module {
       private readonly rpPrefBranch: API.storage.IPrefBranch,
       private readonly prefObserverFactory: API.storage.PrefObserverFactory,
       private readonly tryCatchUtils: API.ITryCatchUtils,
+      private readonly xulService: API.services.IXulService,
   ) {
     super("API", log);
   }
@@ -84,6 +85,7 @@ export class Api extends Module {
       rpPrefBranch: this.rpPrefBranch,
       storage: {},
       tryCatchUtils: this.tryCatchUtils,
+      xulService: this.xulService,
     };
   }
 

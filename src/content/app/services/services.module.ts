@@ -20,27 +20,37 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { RulesServices } from "app/services/rules/rules-services.module";
-import { UriService } from "app/services/uri-service";
-import { VersionInfoService } from "app/services/version-info-service";
+import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class RPServices extends Module {
   constructor(
       log: Common.ILog,
-      public readonly rules: RulesServices,
-      public readonly uri: UriService,
-      public readonly versionInfo: VersionInfoService,
+      public readonly httpChannel: App.services.IHttpChannelService,
+      public readonly privateBrowsing: App.services.IPrivateBrowsingService,
+      public readonly redirections: App.services.IRedirectionService,
+      public readonly request: App.services.IRequestService,
+      public readonly requestSet: App.services.IRequestSetService,
+      public readonly rules: App.services.IRulesServices,
+      public readonly uri: App.services.IUriService,
+      public readonly versionInfo: App.services.IVersionInfoService,
+      public readonly windows: App.services.IWindowService,
   ) {
     super("app.services", log);
   }
 
   protected get subModules() {
     return {
+      httpChannel: this.httpChannel,
+      privateBrowsing: this.privateBrowsing,
+      redirections: this.redirections,
+      request: this.request,
+      requestSet: this.requestSet,
       rules: this.rules,
       uri: this.uri,
       versionInfo: this.versionInfo,
+      windows: this.windows,
     };
   }
 }

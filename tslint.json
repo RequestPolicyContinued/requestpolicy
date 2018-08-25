@@ -10,7 +10,9 @@
       "parameters",
       "statements"
     ],
+    "ban-types": [true, "browser"],
     "curly": [true, "ignore-same-line"],
+    "import-spacing": false,
     "indent": [
       true, "spaces", 2
     ],

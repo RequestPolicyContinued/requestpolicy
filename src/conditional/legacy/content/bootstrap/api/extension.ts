@@ -27,7 +27,7 @@ export class Extension extends Module {
   private backgroundPage: any;
 
   constructor(log: Common.ILog) {
-    super("browser.extension", log);
+    super("API.extension", log);
   }
 
   public get backgroundApi() {

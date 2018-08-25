@@ -21,7 +21,9 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { createListenersMap } from "lib/utils/listener-factories";
 
@@ -33,10 +35,10 @@ type IDefaultSettings = IObject<tSettingValue>;
 
 export class AsyncSettings extends Module
     implements App.storage.IAsyncSettings {
-  protected get startupPreconditions() {
-    return [
-      this.storageReadyPromise,
-    ];
+  protected get dependencies() {
+    return {
+      storageApi: this.storageApi,
+    };
   }
 
   private changeEventListener = this.onChangedEvent.bind(this);
@@ -45,14 +47,19 @@ export class AsyncSettings extends Module
   // tslint:disable-next-line:member-ordering
   public onChanged = this.events.interfaces.onChanged;
 
+  private get storageArea() { return this.storageApi.local; }
+
   constructor(
       log: Common.ILog,
-      private storageApi: typeof browser.storage,
-      private storageArea: browser.storage.StorageArea,
+      protected readonly outerWindowID: number | null,
+      private storageApi: App.storage.IStorageApiWrapper,
       private defaultSettings: IDefaultSettings,
-      private storageReadyPromise: Promise<void>,
   ) {
-    super("app.storage.asyncSettings", log);
+    super(
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
+        `.storage.asyncSettings`,
+        log,
+    );
   }
 
   public get(aKeys: "" | string | string[]): Promise<any> {
@@ -75,19 +82,18 @@ export class AsyncSettings extends Module
 
   protected startupSelf() {
     this.storageApi.onChanged.addListener(this.changeEventListener);
-    return Promise.resolve();
+    return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
     this.storageApi.onChanged.removeListener(this.changeEventListener);
-    return Promise.resolve();
   }
 
   private onChangedEvent(
-      changes: IObject<browser.storage.StorageChange>,
+      changes: API.storage.api.ChangeDict,
       areaName: string,
   ) {
-    const changes2: IObject<browser.storage.StorageChange> = {};
+    const changes2: API.storage.api.ChangeDict = {};
     Object.keys(changes).forEach((key) => {
       if (!this.defaultSettings.hasOwnProperty(key)) return;
       const change = changes[key];

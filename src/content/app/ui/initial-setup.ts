@@ -22,17 +22,18 @@
  */
 
 import { App } from "app/interfaces";
+import { NotificationID } from "app/ui/notifications/notifications-set";
 import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
-import {NotificationID, Notifications} from "models/notifications";
 
-export class InitialSetup extends Module {
-  protected get startupPreconditions() {
-    return [
-      this.cachedSettings.whenReady,
-      this.versionInfo.whenReady,
-    ];
+export class InitialSetup extends Module implements App.ui.IInitialSetup {
+  protected get dependencies() {
+    return {
+      cachedSettings: this.cachedSettings,
+      versionInfo: this.versionInfo,
+    };
   }
 
   private onNotificationsTabOpenedListener =
@@ -42,6 +43,7 @@ export class InitialSetup extends Module {
       log: Common.ILog,
       private cachedSettings: App.storage.ICachedSettings,
       private versionInfo: App.services.IVersionInfoService,
+      private notifications: App.ui.INotifications,
       private xpcApi: {
         rpPrefBranch: API.ILegacyApi["rpPrefBranch"],
       },
@@ -49,13 +51,14 @@ export class InitialSetup extends Module {
     super("app.ui.initialSetup", log);
   }
 
-  public async startupSelf() {
-    return this.maybeShowSetupTab();
+  public startupSelf() {
+    this.maybeShowSetupTab();
+    return MaybePromise.resolve(undefined);
   }
 
   private onNotificationsTabOpened(aId: NotificationID) {
     if (aId !== NotificationID.InitialSetup) return;
-    Notifications.onTabOpened.removeListener(
+    this.notifications.notifications.onTabOpened.removeListener(
         this.onNotificationsTabOpenedListener,
     );
     this.cachedSettings.set({welcomeWindowShown: true}).
@@ -78,9 +81,9 @@ export class InitialSetup extends Module {
       }
     }
 
-    Notifications.onTabOpened.addListener(
+    this.notifications.notifications.onTabOpened.addListener(
         this.onNotificationsTabOpenedListener,
     );
-    Notifications.add(NotificationID.InitialSetup);
+    this.notifications.notifications.add(NotificationID.InitialSetup);
   }
 }

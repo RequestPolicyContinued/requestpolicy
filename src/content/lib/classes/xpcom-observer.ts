@@ -20,13 +20,15 @@
  * ***** END LICENSE BLOCK *****
  */
 
-declare const Services: any;
+import { JSMs } from "bootstrap/api/interfaces";
+import {
+  XPCOMObserverCallback,
+  XPCOMObserverTopic,
+} from "lib/classes/xpcom-observer-module";
 
-// "known" observer topics
-export type XPCOMObserverTopic = "sessionstore-windows-restored";
+declare const Services: JSMs.Services;
 
-type XPCOMObserverCallback =
-    (subject: any, topic: XPCOMObserverTopic, data: any) => void;
+export {XPCOMObserverCallback, XPCOMObserverTopic};
 
 export class XPCOMObserver {
   private observer: {observe: XPCOMObserverCallback};

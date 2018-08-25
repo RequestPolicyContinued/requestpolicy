@@ -26,16 +26,21 @@ import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
 export class AppContent extends Module {
+  // protected get debugEnabled() { return true; }
+
   constructor(
       log: Common.ILog,
+      protected readonly outerWindowID: number,
+      public readonly contentSide: App.IContentSide,
       public readonly services: RPContentServices,
       public readonly storage: App.IStorage,
   ) {
-    super("AppContent", log);
+    super(`AppContent[${outerWindowID}]`, log);
   }
 
   public get subModules() {
     return {
+      contentSide: this.contentSide,
       services: this.services,
       storage: this.storage,
     };

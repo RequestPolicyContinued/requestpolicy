@@ -22,6 +22,8 @@
 
 import { API, XPCOM } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
+import { MaybePromise } from "lib/classes/maybe-promise";
 import {Module} from "lib/classes/module";
 import {IKeysWithDefaults} from "lib/classes/object-interface";
 import {createListenersMap} from "lib/utils/listener-factories";
@@ -30,18 +32,22 @@ type xpcomPrefBranch = XPCOM.nsIPrefBranch;
 type prefObserver = XPCOM.nsIObserver_without_nsISupports<xpcomPrefBranch>;
 
 export class Storage extends Module {
+  protected get debugEnabled() { return C.LOG_STORAGE_MIGRATION; }
+
   private events = createListenersMap(["onChanged"]);
 
+  private ignorePrefObserverChangesTemporarily = false;
   private prefObserver: prefObserver = {
     observe: this.observePrefChange.bind(this),
   };
+  private slsaChangedListener = this.onSlsaChanged.bind(this);
 
   constructor(
       log: Common.ILog,
       private slsa: API.storage.ISyncLocalStorageArea,
       private rpPrefBranch: API.storage.IPrefBranch,
   ) {
-    super("browser.storage", log);
+    super("API.storage", log);
   }
 
   public get backgroundApi() {
@@ -61,30 +67,39 @@ export class Storage extends Module {
 
   protected startupSelf() {
     this.rpPrefBranch.addObserver("", this.prefObserver);
-    return Promise.resolve();
+    this.slsa.onChanged.addListener(this.slsaChangedListener);
+    return MaybePromise.resolve(undefined);
   }
 
-  protected shutdownSelf() {
+  protected shutdownSelf(): void {
+    this.slsa.onChanged.removeListener(this.slsaChangedListener);
     this.rpPrefBranch.removeObserver("", this.prefObserver);
-    return Promise.resolve();
   }
 
   private getLocal(
       aKeys: string | string[] | IKeysWithDefaults | null | undefined,
   ) {
-    return Promise.resolve(this.slsa.get(aKeys));
-  }
-
-  private setLocal(aKeys: {[k: string]: any}) {
     try {
-      return Promise.resolve(this.slsa.set(aKeys));
+      return Promise.resolve(this.slsa.get(aKeys));
     } catch (e) {
       return Promise.reject(e);
     }
   }
 
-  private removeLocal(aKeys: string | string[]): Promise<void> {
+  private setLocal(aKeys: {[k: string]: any}) {
+    this.ignorePrefObserverChangesTemporarily = true;
     try {
+      return Promise.resolve(this.slsa.set(aKeys));
+    } catch (e) {
+      return Promise.reject(e);
+    } finally {
+      this.ignorePrefObserverChangesTemporarily = false;
+    }
+  }
+
+  private removeLocal(aKeys: string | string[]): Promise<void> {
+      this.ignorePrefObserverChangesTemporarily = true;
+      try {
       const result = this.slsa.remove(aKeys);
       if (result && "errors" in result) {
         return Promise.reject(result.errors);
@@ -92,6 +107,8 @@ export class Storage extends Module {
       return Promise.resolve();
     } catch (e) {
       return Promise.reject(e);
+    } finally {
+      this.ignorePrefObserverChangesTemporarily = false;
     }
   }
 
@@ -100,10 +117,18 @@ export class Storage extends Module {
       aTopic: "nsPref:changed",
       aData: string,
   ) {
+    if (this.ignorePrefObserverChangesTemporarily) return;
     const prefName = aData;
     const newValue = this.rpPrefBranch.get(prefName);
-    const changes: browser.storage.StorageChange =
-        newValue === undefined ? {} : {newValue};
-    this.events.listenersMap.onChanged.emit({changes});
+    const changes: API.storage.api.ChangeDict = {
+      [prefName]: newValue === undefined ? {} : {newValue},
+    };
+    this.debugLog.log(`emitting pref changes:`, changes);
+    this.events.listenersMap.onChanged.emit(changes);
+  }
+
+  private onSlsaChanged(aChanges: API.storage.api.ChangeDict) {
+    this.debugLog.log(`emitting pref changes:`, aChanges);
+    this.events.listenersMap.onChanged.emit(aChanges);
   }
 }

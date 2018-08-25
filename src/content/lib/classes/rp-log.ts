@@ -21,6 +21,7 @@
  */
 
 import { App } from "app/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Log, LogLevel } from "lib/classes/log";
 
 export class RPLog extends Log {
@@ -48,7 +49,7 @@ export class RPLog extends Log {
       const enable = result.log as boolean;
 
       this.asyncSettings.onChanged.addListener(
-          this.onStorageChange.bind(this),
+          this.onStorageChanged.bind(this),
       );
 
       return enable;
@@ -59,9 +60,9 @@ export class RPLog extends Log {
     this.setEnabled(pEnabled);
   }
 
-  private onStorageChange(
-      aChanges: {[key: string]: browser.storage.StorageChange},
-      aAreaName: browser.storage.StorageName,
+  private onStorageChanged(
+      aChanges: API.storage.api.ChangeDict,
+      aAreaName: API.storage.api.StorageName,
   ) {
     if (aChanges.hasOwnProperty("log")) {
       this.setEnabled(aChanges.log.newValue);

@@ -7,7 +7,7 @@
 {assert} = require "chai"
 {deepEqual} = assert
 
-{RequestResult} = require "lib/request-result"
+{RequestResult} = require "lib/classes/request-result"
 
 describe "RequestResult", ->
   #=============================================================================

@@ -78,6 +78,9 @@ const keys: {
   "lastAppVersion": {
     cached: true, defaultValue: "0.0",
   },
+  "lastStorageChange": {
+    cached: false, defaultValue: "", // do not cache
+  },
   "lastVersion": {
     cached: true, defaultValue: "0.0",
   },

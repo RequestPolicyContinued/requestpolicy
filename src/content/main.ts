@@ -20,8 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import {Controllers} from "lib/classes/controllers";
-
 import {C} from "data/constants";
 import {
   COMMONJS_UNLOAD_SUBJECT,
@@ -30,33 +28,10 @@ import {
 import {Level as EnvLevel, MainEnvironment} from "lib/environment";
 
 import {rp} from "app/app.background";
-import "main/about-uri";
-import "main/content-policy";
-import "main/window-manager";
-
-import {
-  KeyboardShortcutController,
-} from "controllers/keyboard-shortcut-controller";
-import {
-  NotificationsController,
-} from "controllers/notification-controller";
-import {
-  OtherRPInstallationsController,
-} from "controllers/other-rp-installations-controller";
 
 // @if BUILD_ALIAS='ui-testing'
 import "ui-testing/services";
 // @endif
-
-let allControllers: Array<{[key: string]: any}> = [];
-const controllersToBeStartedUp = [
-  KeyboardShortcutController,
-
-  OtherRPInstallationsController,
-
-  NotificationsController,
-];
-allControllers = allControllers.concat(controllersToBeStartedUp);
 
 // =============================================================================
 
@@ -84,9 +59,8 @@ const shutdownMessage = `${C.MM_PREFIX}shutdown`;
 // =============================================================================
 
 function shutdown(aShutdownArgs: any) {
-  (new Controllers(allControllers)).shutdown();
   MainEnvironment.shutdown(aShutdownArgs);
-  rp.shutdown().catch(log.onError("main shutdown"));
+  rp.shutdown();
 }
 
 declare const Services: any;
@@ -134,6 +108,4 @@ Services.obs.addObserver(observer, "sdk:loader:destroy", false);
   } catch (e) {
     logSevereError("startup() failed!", e);
   }
-
-  (new Controllers(controllersToBeStartedUp)).startup();
 })();

@@ -21,6 +21,8 @@
  * ***** END LICENSE BLOCK *****
  */
 
+import { XPCOM, XUL } from "bootstrap/api/interfaces";
+
 /**
  * Functions with expected exceptions.
  *
@@ -29,9 +31,7 @@
  * list of files to be skipped.
  */
 
-declare const Ci: any;
-
-import * as WindowUtils from "lib/utils/window-utils";
+declare const Ci: XPCOM.nsXPCComponents_Interfaces;
 
 const value = <T = any>(val: T) => ({value: val});
 const error = <T = any>(err: T) => ({error: err, value: null});
@@ -46,9 +46,12 @@ interface RV<T = any> {
 // xpcom
 //
 
-export function queryInterface(object: any, interf: any): RV {
+export function queryInterface<T extends XPCOM.nsISupports>(
+    object: XPCOM.nsISupports,
+    interf: XPCOM.nsIJSID,
+): RV<T> {
   try {
-    return value(object.QueryInterface(interf));
+    return value(object.QueryInterface<T>(interf));
   } catch (e) {
     return error(e);
   }
@@ -58,17 +61,19 @@ export function queryInterface(object: any, interf: any): RV {
 // http channel
 //
 
-export function getDocShellFromHttpChannel(httpChannel: any) {
+export function getDocShellFromHttpChannel(httpChannel: XPCOM.nsIHttpChannel) {
   try {
     return value(httpChannel.notificationCallbacks.
-        QueryInterface(Ci.nsIInterfaceRequestor).
-        getInterface(Ci.nsIDocShell));
+        QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
+        getInterface<XPCOM.nsIDocShell>(Ci.nsIDocShell));
   } catch (e) {
     return error(e);
   }
 }
 
-export function getLoadContextFromHttpChannel(httpChannel: any) {
+export function getLoadContextFromHttpChannel(
+    httpChannel: XPCOM.nsIHttpChannel,
+): RV<XPCOM.nsILoadContext> {
   // more info on the load context:
   // https://developer.mozilla.org/en-US/Firefox/Releases/
   //   3.5/Updating_extensions
@@ -77,13 +82,13 @@ export function getLoadContextFromHttpChannel(httpChannel: any) {
   try {
     /* eslint-disable new-cap */
     return value(httpChannel.notificationCallbacks.
-        QueryInterface(Ci.nsIInterfaceRequestor).
-        getInterface(Ci.nsILoadContext));
+        QueryInterface<XPCOM.nsIInterfaceRequestor>(Ci.nsIInterfaceRequestor).
+        getInterface<XPCOM.nsILoadContext>(Ci.nsILoadContext));
     /* eslint-enable new-cap */
   } catch (ex) {
     try {
       return value(httpChannel.loadGroup.notificationCallbacks.
-          getInterface(Ci.nsILoadContext));
+          getInterface<XPCOM.nsILoadContext>(Ci.nsILoadContext));
     } catch (ex2) {
       // FIXME: the Load Context can't be found in case a favicon
       //        request is redirected, that is, the server responds
@@ -96,9 +101,9 @@ export function getLoadContextFromHttpChannel(httpChannel: any) {
 }
 
 export function getRequestHeaderFromHttpChannel(
-    httpChannel: any,
+    httpChannel: XPCOM.nsIHttpChannel,
     header: string,
-) {
+): RV<string> {
   try {
     return value(httpChannel.getRequestHeader("X-moz"));
   } catch (e) {
@@ -112,7 +117,10 @@ export function getRequestHeaderFromHttpChannel(
 
 export {getAppLocale} from "./try-catch-utils.mpl";
 
-export function getBrowserFromLoadContext(loadContext: any) {
+export function getBrowserFromLoadContext(
+    loadContext: XPCOM.nsILoadContext,
+    getBrowserForWindow: (win: any) => any,
+): RV<XPCOM.nsIDOMElement> {
   try {
     if (loadContext.topFrameElement) {
       // the top frame element should be already the browser element
@@ -120,14 +128,17 @@ export function getBrowserFromLoadContext(loadContext: any) {
     } else {
       // we hope the associated window is available. in multiprocessor
       // firefox it's not available.
-      return value(WindowUtils.getBrowserForWindow(loadContext.topWindow));
+      return value(getBrowserForWindow(loadContext.topWindow));
     }
   } catch (e) {
     return error(e);
   }
 }
 
-export function addSessionHistoryListener(gBrowser: any, listener: any): RV {
+export function addSessionHistoryListener(
+    gBrowser: XUL.tabBrowser,
+    listener: XPCOM.nsISHistoryListener,
+): RV<null> {
   try {
     gBrowser.webNavigation.sessionHistory.addSHistoryListener(listener);
     return value(null);
@@ -136,7 +147,10 @@ export function addSessionHistoryListener(gBrowser: any, listener: any): RV {
   }
 }
 
-export function removeSessionHistoryListener(gBrowser: any, listener: any): RV {
+export function removeSessionHistoryListener(
+    gBrowser: XUL.tabBrowser,
+    listener: XPCOM.nsISHistoryListener,
+): RV<null> {
   try {
     gBrowser.webNavigation.sessionHistory.removeSHistoryListener(listener);
     return value(null);

@@ -22,27 +22,30 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import { IModule, Module } from "lib/classes/module";
+import { Module } from "lib/classes/module";
 
 export class Storage extends Module implements App.IStorage {
-  protected get startupPreconditions() {
-    return [
-      this.storageReadyPromise,
-    ];
-  }
-
   constructor(
       log: Common.ILog,
+      protected readonly outerWindowID: number | null,
+      public readonly apiWrapper: App.storage.IStorageApiWrapper,
       public readonly asyncSettings: App.storage.IAsyncSettings,
       public readonly cachedSettings: App.storage.ICachedSettings | null,
-      private storageReadyPromise: Promise<void>,
+      public readonly storageAvailabilityController:
+          App.storage.IStorageAvailabilityController,
   ) {
-    super("app.storage", log);
+    super(
+        (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
+        `.storage`,
+        log,
+    );
   }
 
   protected get subModules() {
-    const rv: {[k: string]: IModule} = {
+    const rv: {[k: string]: Module} = {
+      apiWrapper: this.apiWrapper,
       asyncSettings: this.asyncSettings,
+      storageAvailabilityController: this.storageAvailabilityController,
     };
     if (this.cachedSettings !== null) {
       rv.cachedSettings = this.cachedSettings;

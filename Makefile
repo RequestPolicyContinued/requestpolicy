@@ -417,10 +417,11 @@ integration-tests: mocha-integration-tests
 
 _mocha_test_targets = mocha-tests mocha-unit-tests mocha-integration-tests
 .PHONY: $(_mocha_test_targets)
-mocha-tests: ALIASES := unit
+mocha-tests: ALIASES := unit legacy-integration
 mocha-unit-tests: ALIASES := unit
+mocha-integration-tests: ALIASES := legacy-integration
 $(_mocha_test_targets): node-packages
-	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/ \
+	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/:src/conditional/legacy/webextension/ \
 	$(MOCHA) \
 		--recursive \
 		--compilers coffee:coffeescript/register \
@@ -471,9 +472,10 @@ static-analysis: lint check-locales
 #-------------------------------------------------------------------------------
 
 .PHONY: lint
-lint: lint-coffee lint-js lint-python lint-ts lint-xpi
+lint: lint-anytype lint-coffee lint-js lint-python lint-ts lint-xpi
 
 .PHONY: lint-coffee lint-js lint-python lint-ts lint-xpi
+lint-anytype: bad-words-linter
 lint-coffee: coffeelint
 lint-js: eslint
 lint-python: pycodestyle
@@ -501,15 +503,25 @@ pycodestyle: python-packages
 ts: node-packages
 	@echo $@
 	@$(TSC) --noEmit
-	@#$(TSC) --noEmit -p tests/mocha     # failing
+	@$(TSC) --noEmit -p src/conditional/legacy/webextension/tsconfig.json
+	@#$(TSC) --noEmit -p tests/mocha
 	@#$(TSC) --noEmit -p tests/xpcshell  # failing
 tslint: node-packages
 	@echo $@
 	@$(TSLINT) --project tsconfig.json \
 		--exclude '**/third-party/**/*' \
 		--exclude '**/*.d.ts' \
+		--exclude 'src/conditional/legacy/webextension/**/*' \
 		'src/**/*.ts' \
 		| $(_remove_leading_empty_lines)
+	@$(TSLINT) --project src/conditional/legacy/webextension/tsconfig.json \
+		--exclude '**/third-party/**/*' \
+		'src/conditional/legacy/webextension/**/*.ts' \
+		| $(_remove_leading_empty_lines)
+
+bad-words-linter:
+	@echo $@
+	@./scripts/lint-bad-words src/
 
 #-------------------------------------------------------------------------------
 # localization checks

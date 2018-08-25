@@ -8,7 +8,6 @@ const {PrefBranch} = require("bootstrap/api/storage/pref-branch");
 const {Storage} = require("bootstrap/api/storage/storage.module");
 const {SyncLocalStorageArea} = require("bootstrap/api/storage/sync-local-storage-area");
 const {Log} = require("lib/classes/log");
-const {defer} = require("lib/utils/js-utils");
 
 const log = new Log();
 const xpconnectService = new XPConnectService();
@@ -31,194 +30,206 @@ function createStorageApi() {
   return new Storage(log, syncLocalStorageArea, rpPrefBranch);
 }
 
-// @ts-ignore
-function run_test() {
-  run_next_test();
-}
-
 //
 // get()
 //
 
 ["foo", ["foo"], {foo: "DEFAULT"}].forEach((getParameter) => {
-  add_test(function() {
+  add_task(function * () {
     // setup
     rpPrefBranch.set("foo", "bar");
     const storageApi = createStorageApi();
     storageApi.startup();
-    do_test_pending();
 
     // eslint-disable-next-line arrow-body-style
-    storageApi.whenReady.then(() => {
-      // exercise
-      return storageApi.backgroundApi.local.get(getParameter);
-    }).then((result) => {
-      // verify
-      Assert.deepEqual(result, {foo: "bar"});
+    yield storageApi.whenReady;
 
-      // cleanup
-      rpPrefBranch.reset("foo");
-      storageApi.shutdown();
+    // exercise
+    const result = yield storageApi.backgroundApi.local.get(getParameter);
 
-      do_test_finished();
-      return;
-    }).catch((e) => {
-      console.dir(e);
-      Assert.ok(false, e);
-    });
+    // verify
+    Assert.deepEqual(result, {foo: "bar"});
 
-    run_next_test();
+    // cleanup
+    rpPrefBranch.reset("foo");
+    storageApi.shutdown();
   });
 });
 
-add_test(function() {
+add_task(function * () {
   // setup
   const storageApi = createStorageApi();
   storageApi.startup();
-  do_test_pending();
 
   // eslint-disable-next-line arrow-body-style
-  storageApi.whenReady.then(() => {
-    // exercise
-    return storageApi.backgroundApi.local.get({foo: "DEFAULT"});
-  }).then((result) => {
-    // verify
-    Assert.deepEqual(result, {foo: "DEFAULT"});
+  yield storageApi.whenReady;
 
-    // cleanup
-    storageApi.shutdown();
+  // exercise
+  const result = yield storageApi.backgroundApi.local.get({foo: "DEFAULT"});
 
-    do_test_finished();
-    return;
-  }).catch((e) => {
-    console.dir(e);
-    Assert.ok(false, e);
-  });
+  // verify
+  Assert.deepEqual(result, {foo: "DEFAULT"});
 
-  run_next_test();
+  // cleanup
+  storageApi.shutdown();
 });
 
 //
-// onChanged
+// onChanged (pref branch)
 //
 
 // pref change
-[true, 42, "someValue"].forEach((testValue) => {
-  add_test(function() {
+[true, 42, "someValue-pref-changed"].forEach((testValue) => {
+  add_task(function * () {
     // setup
     rpPrefBranch.set("someRandomPrefName", "foo");
-    let observedEvent;
-    const dListenerFnCalled = defer();
-    let listenerFn = (event) => {
-      observedEvent = event;
-      dListenerFnCalled.resolve(undefined);
-    };
+    let changesArray = [];
+    let listenerFn = (changes) => changesArray.push(changes);
     const storageApi = createStorageApi();
     storageApi.startup();
-    do_test_pending();
-    storageApi.whenReady.then(() => {
-      storageApi.backgroundApi.onChanged.addListener(listenerFn),
-
-      // exercise
-      rpPrefBranch.set("someRandomPrefName", testValue);
-
-      return dListenerFnCalled.promise;
-    }).then(() => {
-      // verify
-      Assert.deepEqual(observedEvent, {changes: {newValue: testValue}});
-
-      // cleanup
-      storageApi.backgroundApi.onChanged.removeListener(listenerFn),
-      rpPrefBranch.reset("someRandomPrefName");
-      storageApi.shutdown();
-
-      do_test_finished();
-      return;
-    }).catch((e) => {
-      console.dir(e);
-      Assert.ok(false, e);
-    });
-
-    run_next_test();
-  });
-});
-
-// pref creation
-[true, 42, "someValue"].forEach((testValue) => {
-  add_test(function() {
-    // setup
-    rpPrefBranch.reset("someRandomPrefName");
-    let observedEvent;
-    const dListenerFnCalled = defer();
-    let listenerFn = (event) => {
-      observedEvent = event;
-      dListenerFnCalled.resolve(undefined);
-    };
-    const storageApi = createStorageApi();
-    storageApi.startup();
-    do_test_pending();
-    storageApi.whenReady.then(() => {
-      storageApi.backgroundApi.onChanged.addListener(listenerFn),
-
-      // exercise
-      rpPrefBranch.set("someRandomPrefName", testValue);
-
-      return dListenerFnCalled.promise;
-    }).then(() => {
-      // verify
-      Assert.deepEqual(observedEvent, {changes: {newValue: testValue}});
-
-      // cleanup
-      storageApi.backgroundApi.onChanged.removeListener(listenerFn),
-      rpPrefBranch.reset("someRandomPrefName");
-      storageApi.shutdown();
-
-      do_test_finished();
-      return;
-    }).catch((e) => {
-      console.dir(e);
-      Assert.ok(false, e);
-    });
-
-    run_next_test();
-  });
-});
-
-// pref removed
-add_test(function() {
-  // setup
-  rpPrefBranch.set("someRandomPrefName", "foo");
-  let observedEvent;
-  const dListenerFnCalled = defer();
-  let listenerFn = (event) => {
-    observedEvent = event;
-    dListenerFnCalled.resolve(undefined);
-  };
-  const storageApi = createStorageApi();
-  storageApi.startup();
-  do_test_pending();
-  storageApi.whenReady.then(() => {
+    yield storageApi.whenReady;
     storageApi.backgroundApi.onChanged.addListener(listenerFn),
 
     // exercise
-    rpPrefBranch.reset("someRandomPrefName");
+    yield storageApi.backgroundApi.local.set({"someRandomPrefName": testValue});
 
-    return dListenerFnCalled.promise;
-  }).then(() => {
     // verify
-    Assert.deepEqual(observedEvent, {changes: {}});
+    Assert.strictEqual(changesArray.length, 1);
+    Assert.deepEqual(changesArray[0], {"someRandomPrefName": {newValue: testValue}});
 
     // cleanup
     storageApi.backgroundApi.onChanged.removeListener(listenerFn),
     rpPrefBranch.reset("someRandomPrefName");
     storageApi.shutdown();
-
-    do_test_finished();
-    return;
-  }).catch((e) => {
-    console.dir(e);
-    Assert.ok(false, e);
   });
+});
 
-  run_next_test();
+// pref creation
+[true, 42, "someValue-pref-creation"].forEach((testValue) => {
+  add_task(function * () {
+    // setup
+    rpPrefBranch.reset("someRandomPrefName");
+    let changesArray = [];
+    let listenerFn = (changes) => changesArray.push(changes);
+    const storageApi = createStorageApi();
+    storageApi.startup();
+    yield storageApi.whenReady;
+    storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+    // exercise
+    yield storageApi.backgroundApi.local.set({"someRandomPrefName": testValue});
+
+    // verify
+    Assert.strictEqual(changesArray.length, 1);
+    Assert.deepEqual(changesArray[0], {"someRandomPrefName": {newValue: testValue}});
+
+    // cleanup
+    storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+    rpPrefBranch.reset("someRandomPrefName");
+    storageApi.shutdown();
+  });
+});
+
+// pref removed
+add_task(function * () {
+  // setup
+  rpPrefBranch.set("someRandomPrefName", "foo");
+  let changesArray = [];
+  let listenerFn = (changes) => changesArray.push(changes);
+  const storageApi = createStorageApi();
+  storageApi.startup();
+  yield storageApi.whenReady;
+  storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+  // exercise
+  yield storageApi.backgroundApi.local.remove("someRandomPrefName");
+
+  // verify
+  Assert.strictEqual(changesArray.length, 1);
+  Assert.deepEqual(changesArray[0], {"someRandomPrefName": {}});
+
+  // cleanup
+  storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+  rpPrefBranch.reset("someRandomPrefName");
+  storageApi.shutdown();
+});
+
+//
+// onChanged (json pref)
+//
+
+// pref change
+[true, 42, "someValue-json-change"].forEach((testValue) => {
+  add_task(function * () {
+    // setup
+    createRPFile("policies/someRandomPrefName.json", `"foo"`);
+    let changesArray = [];
+    let listenerFn = (changes) => changesArray.push(changes);
+    const storageApi = createStorageApi();
+    storageApi.startup();
+    yield storageApi.whenReady;
+    storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+    // exercise
+    yield storageApi.backgroundApi.local.set({"policies/someRandomPrefName": testValue});
+
+    // verify
+    Assert.strictEqual(changesArray.length, 1);
+    Assert.deepEqual(changesArray[0], {"policies/someRandomPrefName": {newValue: testValue}});
+
+    // cleanup
+    storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+    removeAllRPFiles();
+    storageApi.shutdown();
+  });
+});
+
+// pref creation
+[true, 42, "someValue-json-creation"].forEach((testValue) => {
+  add_task(function * () {
+    // setup
+    removeAllRPFiles();
+    let changesArray = [];
+    let listenerFn = (changes) => changesArray.push(changes);
+    const storageApi = createStorageApi();
+    storageApi.startup();
+    yield storageApi.whenReady;
+    storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+    // exercise
+    yield storageApi.backgroundApi.local.set({"policies/someRandomPrefName": testValue});
+
+    // verify
+    Assert.strictEqual(changesArray.length, 1);
+    Assert.deepEqual(changesArray[0], {"policies/someRandomPrefName": {newValue: testValue}});
+
+    // cleanup
+    storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+    removeAllRPFiles();
+    storageApi.shutdown();
+  });
+});
+
+// pref removed
+add_task(function * () {
+  // setup
+  createRPFile("policies/someRandomPrefName.json", `"foo"`);
+  let changesArray = [];
+  let listenerFn = (changes) => changesArray.push(changes);
+  const storageApi = createStorageApi();
+  storageApi.startup();
+  yield storageApi.whenReady;
+  storageApi.backgroundApi.onChanged.addListener(listenerFn),
+
+  // exercise
+  yield storageApi.backgroundApi.local.remove("policies/someRandomPrefName");
+
+  // verify
+  Assert.strictEqual(changesArray.length, 1);
+  Assert.deepEqual(changesArray[0], {"policies/someRandomPrefName": {}});
+
+  // cleanup
+  storageApi.backgroundApi.onChanged.removeListener(listenerFn),
+  removeAllRPFiles();
+  storageApi.shutdown();
 });

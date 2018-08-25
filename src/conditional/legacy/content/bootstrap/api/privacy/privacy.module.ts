@@ -32,7 +32,7 @@ export class PrivacyApi extends Module {
       log: Common.ILog,
       private networkPredictionEnabled: networkPredictionEnabledSetting,
   ) {
-    super("browser.privacy", log);
+    super("API.privacy", log);
   }
 
   public get backgroundApi() {

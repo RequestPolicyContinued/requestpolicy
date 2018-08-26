@@ -5,6 +5,10 @@ Note: ChangeLogs for the source code and unit tests, both not relevant for
 
 #### next version
 * improvements
+  * Automatic storage migration: On browsers which allow both ”legacy“
+    extensions and WebExtensions, always keep the storage (settings and rules)
+    of both sides synchronized. (”legacy“ version only; via an ”empedded“ WE)
+    (#892)
   * Add an option to allow all website redirections (top-level requests).
     (#53)
 * other changes

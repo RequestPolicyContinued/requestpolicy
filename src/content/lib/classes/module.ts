@@ -21,6 +21,7 @@
  */
 
 import { Common } from "common/interfaces";
+import { C } from "data/constants";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import {
   defer,
@@ -54,7 +55,7 @@ type PromiseState = "not awaiting" | "awaiting" | "done" | "failed";
 
 export class Module {
   protected log: Common.ILog;
-  protected get debugEnabled() { return false; }
+  protected get debugEnabled() { return C.LOG_ALL; }
   protected debugLog: Common.ILog;
 
   // tslint:disable-next-line:variable-name

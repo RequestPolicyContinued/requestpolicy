@@ -27,15 +27,20 @@ const env = (str: TemplateStringsArray) => (
     !str[0].startsWith("/* @echo ")
 );
 
+const LOG_ALL = env`/* @echo LOG_ALL */`;
+
 export const C = {
-  LOG_BG_CONTENT_BOUNDARIES: env`/* @echo LOG_BG_CONTENT_BOUNDARIES */`,
-  LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */`,
-  LOG_EVENT_LISTENERS: env`/* @echo LOG_EVENT_LISTENERS */`,
-  LOG_FLAG_STATE: env`/* @echo LOG_FLAG_STATE */`,
-  LOG_GETTING_SAVED_REQUESTS: env`/* @echo LOG_GETTING_SAVED_REQUESTS */`,
-  LOG_MESSAGE_LISTENERS: env`/* @echo LOG_MESSAGE_LISTENERS */`,
-  LOG_REQUESTS: env`/* @echo LOG_REQUESTS */`,
-  LOG_STORAGE_MIGRATION: env`/* @echo LOG_STORAGE_MIGRATION */`,
+  LOG_ALL,
+  // tslint:disable:max-line-length
+  LOG_BG_CONTENT_BOUNDARIES: env`/* @echo LOG_BG_CONTENT_BOUNDARIES */` || LOG_ALL,
+  LOG_ENVIRONMENT: env`/* @echo LOG_ENVIRONMENT */` || LOG_ALL,
+  LOG_EVENT_LISTENERS: env`/* @echo LOG_EVENT_LISTENERS */` || LOG_ALL,
+  LOG_FLAG_STATE: env`/* @echo LOG_FLAG_STATE */` || LOG_ALL,
+  LOG_GETTING_SAVED_REQUESTS: env`/* @echo LOG_GETTING_SAVED_REQUESTS */` || LOG_ALL,
+  LOG_MESSAGE_LISTENERS: env`/* @echo LOG_MESSAGE_LISTENERS */` || LOG_ALL,
+  LOG_REQUESTS: env`/* @echo LOG_REQUESTS */` || LOG_ALL,
+  LOG_STORAGE_MIGRATION: env`/* @echo LOG_STORAGE_MIGRATION */` || LOG_ALL,
+  // tslint:enable:max-line-length
 
   // tslint:disable-next-line:object-literal-sort-keys
   AMO: env`/* @echo AMO */`,

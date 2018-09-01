@@ -49,7 +49,7 @@ export class StorageAvailabilityController extends Module
   ) {
     super(
         (outerWindowID === null ? "app" : `AppContent[${outerWindowID}]`) +
-        `.storage`,
+        `.storage.available`,
         log,
     );
 

@@ -22,23 +22,21 @@
 
 import { App } from "app/interfaces";
 import { Common } from "common/interfaces";
-import {
-  StorageMigrationToWebExtension,
-} from "legacy/app/migration/storage-migration-to-we";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 import { PrefetchSettingsMerger } from "./merge-prefetch-settings";
 
 export class SettingsMigration extends Module
     implements App.migration.storage.ISettingsMigration {
-  private storageMigrationToWE: StorageMigrationToWebExtension | null;
+  private storageMigrationToWE:
+      App.migration.storage.IStorageMigrationToWebExtension | null;
 
   constructor(
       log: Common.ILog,
       // tslint:disable-next-line:max-line-length
       private storageArea: browser.storage.StorageArea,  // badword-linter:allow:browser.storage:
       private pStorageMigrationToWE:
-          Promise<StorageMigrationToWebExtension | null>,
+          Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,
   ) {
     super("app.migration.storage.settings", log);
   }
@@ -48,10 +46,13 @@ export class SettingsMigration extends Module
   }
 
   protected async startupSelfAsync() {
+    this.debugLog.log(`awaiting pStorageMigrationToWE`);
     this.storageMigrationToWE = await this.pStorageMigrationToWE;
     if (this.storageMigrationToWE) {
+      this.debugLog.log(`awaiting pStorageReadyForAccess`);
       await this.storageMigrationToWE.pStorageReadyForAccess;
     }
+    this.debugLog.log(`awaiting actions`);
     await Promise.all([
       this.performMergeActions(),
       this.performRemoveActions(),

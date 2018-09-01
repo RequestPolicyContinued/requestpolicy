@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { App, IObject } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
@@ -41,12 +41,15 @@ export class Windows extends Module implements App.IWindows {
   }
 
   protected get subModules() {
-    const subModules: {[name: string]: Module} = {
-      chromeStyleSheets: this.chromeStyleSheets,
-      toolbarbutton: this.toolbarbutton,
-      windowModules: this.windowModules,
-    };
-    return subModules;
+    return Object.assign(
+        {
+          chromeStyleSheets: this.chromeStyleSheets,
+          windowModules: this.windowModules,
+        } as IObject<Module>,
+        this.toolbarbutton ? {
+          toolbarbutton: this.toolbarbutton,
+        } : {},
+    );
   }
 
   constructor(
@@ -56,7 +59,7 @@ export class Windows extends Module implements App.IWindows {
       private readonly windowService: App.services.IWindowService,
 
       public readonly chromeStyleSheets: App.windows.IChromeStyleSheets,
-      public readonly toolbarbutton: App.windows.IToolbarButton,
+      public readonly toolbarbutton: App.windows.IToolbarButton | null,
       public readonly windowModules: App.windows.IWindowModuleMap,
   ) {
     super("app.windows", parentLog);

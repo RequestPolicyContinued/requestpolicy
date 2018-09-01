@@ -21,7 +21,7 @@
  */
 
 import { App } from "app/interfaces";
-import { API, JSMs, XUL } from "bootstrap/api/interfaces";
+import { JSMs, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
@@ -32,8 +32,6 @@ import { TOOLBARBUTTON_ATTRIBUTES } from "ui/xul-trees";
 // -----------------------------------------------------------------------------
 
 export class AustralisToolbarButton extends Module {
-  private isAustralis = this.miscInfos.isAustralis;
-
   protected get dependencies() {
     return {
       windowModuleMap: this.windowModuleMap,
@@ -43,23 +41,18 @@ export class AustralisToolbarButton extends Module {
   constructor(
       parentLog: Common.ILog,
       private readonly mozCustomizableUI: JSMs.CustomizableUI | null,
-      private readonly miscInfos: API.IMiscInfos,
       private readonly windowModuleMap: App.windows.IWindowModuleMap,
   ) {
     super(`app.windows.toolbarbutton`, parentLog);
   }
 
   protected startupSelf() {
-    if (this.isAustralis) {
-      this.addToolbarButtonToAustralis();
-    }
+    this.addToolbarButtonToAustralis();
     return MaybePromise.resolve(undefined);
   }
 
   protected shutdownSelf(): void {
-    if (this.isAustralis) {
-      this.removeToolbarButtonFromAustralis();
-    }
+    this.removeToolbarButtonFromAustralis();
   }
 
   private removeToolbarButtonFromAustralis() {

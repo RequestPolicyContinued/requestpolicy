@@ -90,7 +90,7 @@ export function getDOMWindowUtils(
 }
 
 export function getDOMWindowFromXULWindow(
-    xulWindow: XPCOM.nsIXULWindow,
+  xulWindow: XPCOM.nsIXULWindow,
 ): XPCOM.nsIDOMWindow {
   return xulWindow.
       QueryInterface<XPCOM.nsIInterfaceRequestor>(
@@ -98,7 +98,6 @@ export function getDOMWindowFromXULWindow(
       ).
       getInterface<XPCOM.nsIDOMWindow>(Ci.nsIDOMWindow);
 }
-
 //
 // Window & DOM utilities
 //
@@ -131,7 +130,7 @@ export function getElementsByIdOnLoad(
 }
 
 export function getWindowtype(
-    aChromeWindow: XPCOM.nsIDOMWindow,
+    aWindow: XUL.chromeWindow,
 ): string | null {
-  return aChromeWindow.document.documentElement.getAttribute("windowtype");
+  return aWindow.document.documentElement.getAttribute("windowtype");
 }

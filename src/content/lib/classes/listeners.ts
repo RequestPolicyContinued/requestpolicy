@@ -22,15 +22,17 @@
 
 import { OverridableSet } from "lib/classes/set";
 
-export type Listener<Trv = void> = (...args: any[]) => Trv | Promise<Trv>;
+export type Listener<Trv = void, Targ = any> =
+    (...arg: Targ[]) => Trv | Promise<Trv>;
 
-export interface IListenInterface<Trv = void> {
-  addListener: (listener: Listener<Trv>) => void;
-  removeListener: (listener: Listener<Trv>) => void;
-  hasListener: (listener: Listener<Trv>) => boolean;
+export interface IListenInterface<Trv = void, Targ = any> {
+  addListener: (listener: Listener<Trv, Targ>) => void;
+  removeListener: (listener: Listener<Trv, Targ>) => void;
+  hasListener: (listener: Listener<Trv, Targ>) => boolean;
 }
 
-export class Listeners<Trv = void> extends OverridableSet<Listener<Trv>> {
+export class Listeners<Trv = void, Targ = any>
+    extends OverridableSet<Listener<Trv, Targ>> {
   public readonly interface: IListenInterface<Trv> = {
     addListener: this.add.bind(this),
     hasListener: this.has.bind(this),
@@ -44,7 +46,7 @@ export class Listeners<Trv = void> extends OverridableSet<Listener<Trv>> {
     return super.add(listener);
   }
 
-  public emit(...args: any[]): Trv[] | Promise<Trv[]> {
+  public emit(...args: Targ[]): Trv[] | Promise<Trv[]> {
     const returnValues: Array<Trv | Promise<Trv>> = [];
     let withPromises = false;
     for (const listener of this.values()) {

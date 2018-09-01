@@ -570,7 +570,6 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
   return new WindowModule(
       log,
       windowID,
-      window,
       eventListener,
       classicMenu,
       keyboardShortcuts,
@@ -580,7 +579,6 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       redirectionNotifications,
       nonAustralisToolbarButton,
       xulTrees,
-      windowService,
   );
 };
 const chromeStyleSheets = new ChromeStyleSheets(

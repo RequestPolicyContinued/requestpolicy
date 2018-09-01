@@ -21,7 +21,7 @@
  */
 
 import { App } from "app/interfaces";
-import { API, XUL } from "bootstrap/api/interfaces";
+import { API } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
 
@@ -42,18 +42,9 @@ export class WindowModule extends Module implements App.windows.IWindowModule {
     };
   }
 
-  protected get startupPreconditions() {
-    return {
-      // FIXME
-      pTabBrowser: this.windowService.
-          promiseTabBrowser(this.window) as Promise<any>,
-    };
-  }
-
   constructor(
       parentLog: Common.ILog,
       public readonly windowID: number,
-      private window: XUL.chromeWindow,
 
       private readonly eventListener: App.common.IEventListenerModule,
 
@@ -65,8 +56,6 @@ export class WindowModule extends Module implements App.windows.IWindowModule {
       public readonly r21n: App.windows.window.IRedirectionNotifications,
       public readonly toolbarButton: App.windows.window.IToolbarButton,
       public readonly xulTrees: App.windows.window.IXulTrees,
-
-      private readonly windowService: App.services.IWindowService,
   ) {
     super(`app.windows[${windowID}]`, parentLog);
   }

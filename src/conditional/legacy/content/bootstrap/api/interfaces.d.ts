@@ -177,6 +177,12 @@ export namespace XPCOM {
 	  readonly rootTreeItem: nsIDocShellTreeItem;
   }
 
+  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMChromeWindow.idl
+  export interface nsIDOMChromeWindow extends nsISupports {
+    messageManager: XPCOM.GlobalFrameMessageManager;
+    windowState: number;
+  }
+
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMDocument.idl
   export interface nsIDOMDocument extends nsIDOMNode {}
 
@@ -950,7 +956,7 @@ export namespace XPCOM {
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIXULWindow.idl
-  export interface nsIXULWindow extends nsISupports {
+  export interface nsIXULWindow extends nsISupports, Window {
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsPIDOMWindow.h
@@ -1035,6 +1041,7 @@ export namespace XPCOM {
     nsIWebNavigation: XPCOM.nsIJSID;
     nsIXMLHttpRequest: XPCOM.nsIJSID;
     nsIXULAppInfo: XPCOM.nsIJSID;
+    nsIXULWindow: XPCOM.nsIJSID;
   }
 
   export interface nsXPCComponents_Manager extends nsIComponentManager {
@@ -1194,24 +1201,27 @@ export namespace JSMs {
 
 export namespace XUL {
   export type chromeDocument = XPCOM.nsIDOMDocument & Document & {
+    defaultView: chromeWindow;
+    documentElement: chromeWindowElement;
   }
 
   export type contentDocument = XPCOM.nsIDOMDocument & Document & {
     readonly defaultView: contentWindow;
   }
 
-  export type chromeWindow = XPCOM.nsIDOMWindow & Window & utilityOverlay & {
+  export type chromeWindow = XPCOM.nsIDOMChromeWindow & XPCOM.nsIDOMWindow & Window & utilityOverlay & {
     document: chromeDocument;
     gBrowser: tabBrowser | null;  // bug 1009938 - may be null in SeaMonkey
     gContextMenu: nsContextMenu;
     gContextMenuContentData: any;
     getBrowser(): tabBrowser;
-    messageManager:
-        XPCOM.nsIFrameScriptLoader &
-        XPCOM.nsIMessageListenerManager &
-        XPCOM.nsIMessageBroadcaster;
     // https://dxr.mozilla.org/comm-esr45/search?q=regexp%3A%22%5Cbwindowtype%5Cb%22&redirect=false
     windowtype: "navigator:browser" | "devtools:scratchpad" | "navigator:view-source";  // ...
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/window
+  export type chromeWindowElement = XPCOM.nsIDOMWindow & HTMLElement & {
+    parentNode: chromeDocument;
   }
 
   export type contentWindow = XPCOM.nsIDOMWindow & Window & {

@@ -26,7 +26,7 @@ import { Common } from "common/interfaces";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-export class XulTrees extends Module {
+export class XulTrees extends Module implements App.windows.window.IXulTrees {
   private get overlay() { return this.overlayWrapper.module!; }
 
   protected get startupPreconditions() {

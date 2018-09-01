@@ -69,6 +69,8 @@ export class Windows extends Module implements App.IWindows {
     const promises = this.windowService.
         forEachOpenWindow<Windows, Promise<void>>(
             this.boundMethods.get(this.loadIntoWindow),
+            undefined,
+            { ready: true },
         );
     this.windowService.onWindowLoaded.addListener(
         this.boundMethods.get(this.onWindowLoaded),
@@ -83,19 +85,18 @@ export class Windows extends Module implements App.IWindows {
     this.windowService.
         forEachOpenWindow<Windows, void>(
             this.boundMethods.get(this.unloadFromWindow),
+            undefined,
+            { ready: true },
         );
   }
 
-  private onWindowLoaded(event: ProgressEvent): void {
-    const doc = event.target as XUL.chromeDocument;
-    const win = doc.defaultView as XUL.chromeWindow;
-    this.loadIntoWindow(win).catch(this.log.onError("loadIntoWindow()"));
+  private onWindowLoaded(chromeWindow: XUL.chromeWindow): void {
+    this.loadIntoWindow(chromeWindow).
+        catch(this.log.onError("loadIntoWindow()"));
   }
 
-  private onWindowUnloaded(event: ProgressEvent): void {
-    const doc = event.target as XUL.chromeDocument;
-    const win = doc.defaultView as XUL.chromeWindow;
-    this.unloadFromWindow(win);
+  private onWindowUnloaded(chromeWindow: XUL.chromeWindow): void {
+    this.unloadFromWindow(chromeWindow);
   }
 
   private loadIntoWindow(window: XUL.chromeWindow): Promise<void> {

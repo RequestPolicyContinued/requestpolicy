@@ -41,14 +41,21 @@ export class Windows extends Module implements App.IWindows {
   }
 
   protected get subModules() {
+    // On startup, `windowModules` will contain nothing, but on shutdown
+    // it will contain all `IWindowModule`s.
+    const windowModules = {} as IObject<Module>;
+    this.windowModules._map.forEach((v, k) => {
+      windowModules[`windowModule #${k}`] = v;
+    });
     return Object.assign(
         {
           chromeStyleSheets: this.chromeStyleSheets,
-          windowModules: this.windowModules,
+          windowModuleMap: this.windowModules,
         } as IObject<Module>,
         this.toolbarbutton ? {
           toolbarbutton: this.toolbarbutton,
         } : {},
+        windowModules,
     );
   }
 
@@ -79,15 +86,6 @@ export class Windows extends Module implements App.IWindows {
         this.boundMethods.get(this.onWindowUnloaded),
     );
     return MaybePromise.all(promises) as MaybePromise<any>;
-  }
-
-  protected shutdownSelf(): void {
-    this.windowService.
-        forEachOpenWindow<Windows, void>(
-            this.boundMethods.get(this.unloadFromWindow),
-            undefined,
-            { ready: true },
-        );
   }
 
   private onWindowLoaded(chromeWindow: XUL.chromeWindow): void {

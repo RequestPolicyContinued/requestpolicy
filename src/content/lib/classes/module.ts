@@ -130,7 +130,11 @@ export class Module {
     return this.whenReady;
   }
 
-  public shutdown() {
+  public shutdown(): void {
+    if (this.shutdownState !== "not yet shut down") {
+      this.log.error("shutdown() has already been called!");
+      return;
+    }
     const allModules = new Set(this.recursivelyGetSubmodules());
     for (let n = 1000; n > 0; --n) { // n is just an arbitrary number
       if (allModules.size === 0) break;
@@ -231,6 +235,10 @@ export class Module {
   }
 
   private tryShuttingDownSelf() {
+    if (this.shutdownState !== "not yet shut down") {
+      this.log.error("shutdown() has already been called!");
+      return;
+    }
     const isStartingUp = this.startupState === "starting up";
     if (!isStartingUp && this.startupState !== "startup done") {
       this.debugLog.log(`shutdown not necessary: ${this.startupState}`);

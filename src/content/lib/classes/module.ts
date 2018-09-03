@@ -46,7 +46,8 @@ export type StartupState =
     "not yet initialized" |
     "not yet started" |
     "starting up" |
-    "startup done";
+    "startup done" |
+    "startup aborted";
 export type ShutdownState =
     "not yet shut down" |
     "shutting down" |
@@ -136,7 +137,7 @@ export class Module {
       const shutDownModules: Module[] = [];
       for (const m of allModules.values()) {
         if (m.dependents.size === 0) {
-          m.shutdown_();
+          m.tryShuttingDownSelf();
           shutDownModules.push(m);
         }
       }
@@ -229,8 +230,20 @@ export class Module {
     });
   }
 
-  private shutdown_() {
-    this.debugLog.log("shutting down self...");
+  private tryShuttingDownSelf() {
+    const isStartingUp = this.startupState === "starting up";
+    if (!isStartingUp && this.startupState !== "startup done") {
+      this.debugLog.log(`shutdown not necessary: ${this.startupState}`);
+      this._shutdownState = "shutdown done";
+      this._startupState = "startup aborted";
+    }
+    this._shutdownState = "shutting down";
+    if (isStartingUp) {
+      this._startupState = "startup aborted";
+    }
+    this.debugLog.log(
+        `${ isStartingUp ? "trying to shut" : "shutting" } down self...`,
+    );
     try {
       this.shutdownSelf();
       this.debugLog.log("done shutting down self.");
@@ -240,6 +253,7 @@ export class Module {
     for (const m of objectValues(this.dependencies)) {
       m.unregisterDependent(this);
     }
+    this._shutdownState = "shutdown done";
   }
 
   private startupSubmodules(): MaybePromise<void> {

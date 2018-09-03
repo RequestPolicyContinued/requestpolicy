@@ -118,6 +118,8 @@ export class Windows extends Module implements App.IWindows {
       return;
     }
     const windowModule = this.windowModules._map.get(windowID)!;
-    return windowModule.shutdown();
+    const rv = windowModule.shutdown();
+    this.windowModules._map.delete(windowID);
+    return rv;
   }
 }

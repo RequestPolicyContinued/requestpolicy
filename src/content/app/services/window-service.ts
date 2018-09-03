@@ -38,6 +38,7 @@ import { createListenersMap } from "lib/utils/listener-factories";
 import {
   getDOMWindowFromXULWindow,
   getTabBrowser,
+  getWindowId,
   getWindowtype,
 } from "lib/utils/window-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
@@ -290,10 +291,13 @@ export class WindowService extends Module
       return;
     }
 
+    const windowID = getWindowId(chromeWindow);
+
     switch (event.type) {
       case "load":
         this.debugLog.log(
             `window "load" event, ` +
+            `windowID=${ windowID }, ` +
             `#listeners=${ this.events.listenersMap.onWindowLoaded.size }`,
         );
         this.events.listenersMap.onWindowLoaded.emit(chromeWindow);
@@ -302,6 +306,7 @@ export class WindowService extends Module
       case "unload":
         this.debugLog.log(
             `window "unload" event", ` +
+            `windowID=${ windowID }, ` +
             `#listeners=${ this.events.listenersMap.onWindowUnloaded.size }`,
         );
         this.events.listenersMap.onWindowUnloaded.emit(chromeWindow);

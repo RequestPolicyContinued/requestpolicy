@@ -920,6 +920,7 @@ export namespace XPCOM {
   }
 
   // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediatorListener.idl
+  // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIWindowMediator
   export interface nsIWindowMediatorListener_without_nsISupports {
     onWindowTitleChange(
         window: nsIXULWindow,

@@ -89,6 +89,11 @@ export function getDOMWindowUtils(
       getInterface<XPCOM.nsIDOMWindowUtils>(Ci.nsIDOMWindowUtils);
 }
 
+export function getWindowId(window: XUL.chromeWindow): number {
+  const domWindowUtils = getDOMWindowUtils(window);
+  return domWindowUtils.outerWindowID;
+}
+
 export function getDOMWindowFromXULWindow(
   xulWindow: XPCOM.nsIXULWindow,
 ): XPCOM.nsIDOMWindow {

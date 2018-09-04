@@ -1,4 +1,5 @@
 #!./dev_env/python/bin/python2.7
+# -*- coding: utf-8 -*-
 
 import argparse
 import textwrap

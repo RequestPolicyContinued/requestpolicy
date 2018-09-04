@@ -27,6 +27,7 @@ import { IRuleSpec, Ruleset } from "app/policy/ruleset";  // fixme
 import { XPCOM, XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import {C} from "data/constants";
+import { BoundMethods } from "lib/classes/bound-methods";
 import {
   GUIDestination, GUILocation, GUILocationProperties, GUIOrigin,
 } from "lib/classes/gui-location";
@@ -114,6 +115,8 @@ export class Menu extends Module implements App.windows.window.IMenu {
   private currentUri: string;
   private currentUriObj: XPCOM.nsIURI;
   private isChromeUri: boolean;
+
+  private boundMethods = new BoundMethods(this);
 
   private allRequestsOnDocument: RequestSet;
 
@@ -362,7 +365,11 @@ export class Menu extends Module implements App.windows.window.IMenu {
     {
       const elements = aList.getElementsByClassName("listen-click");
       for (const el of Array.from(elements)) {
-        el.removeEventListener("click", this.itemSelected, false);
+        el.removeEventListener(
+            "click",
+            this.boundMethods.get(this.itemSelected),
+            false,
+        );
       }
     }
 
@@ -676,7 +683,11 @@ export class Menu extends Module implements App.windows.window.IMenu {
     const {document} = this.window;
     const box = document.createElement("div");
     box.setAttribute("class", `${cssClass} listen-click`);
-    box.addEventListener("click", this.itemSelected, false);
+    box.addEventListener(
+        "click",
+        this.boundMethods.get(this.itemSelected),
+        false,
+    );
     list.insertBefore(box, null);
 
     const destLabel = document.createElement("span");

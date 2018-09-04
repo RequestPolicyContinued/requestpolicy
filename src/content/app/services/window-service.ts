@@ -38,6 +38,7 @@ import { createListenersMap } from "lib/utils/listener-factories";
 import {
   getDOMWindowFromXULWindow,
   getTabBrowser,
+  getWindowId,
   getWindowtype,
 } from "lib/utils/window-utils";
 import {CompatibilityRules} from "models/compatibility-rules";
@@ -49,7 +50,7 @@ export class WindowService extends Module
   public readonly pWindowsAvailable = this.areWindowsAvailable() ?
       Promise.resolve() : this.promiseSessionstoreWindowsRestored();
 
-  private events = createListenersMap([
+  private events = createListenersMap<void, XUL.chromeWindow>([
     "onWindowLoaded",
     "onWindowUnloaded",
   ]);
@@ -59,7 +60,7 @@ export class WindowService extends Module
   public onWindowUnloaded = this.events.interfaces.onWindowUnloaded;
   // tslint:enable:member-ordering
 
-  private windows = new Set<XPCOM.nsIDOMWindow>();
+  private chromeWindows = new Set<XUL.chromeWindow>();
 
   private boundMethods = new BoundMethods(this);
 
@@ -67,13 +68,7 @@ export class WindowService extends Module
       XPCOM.nsIWindowMediatorListener_without_nsISupports
   ) = {
     onCloseWindow: (xulWindow: XPCOM.nsIXULWindow) => undefined,
-    onOpenWindow: (xulWindow: XPCOM.nsIXULWindow) => {
-      const domWindow = getDOMWindowFromXULWindow(xulWindow);
-      this.windows.add(domWindow);
-      const progressEventListener = this.boundMethods.get(this.onProgressEvent);
-      domWindow.addEventListener("load", progressEventListener, false);
-      domWindow.addEventListener("unload", progressEventListener, false);
-    },
+    onOpenWindow: this.boundMethods.get(this.onChromeWindowOpened),
     onWindowTitleChange: (
         xulWindow: XPCOM.nsIXULWindow,
         newTitle: any,
@@ -129,13 +124,20 @@ export class WindowService extends Module
   public forEachOpenWindow<Tthis, Trv = void>(
       aCallback: (this: Tthis, window: XUL.chromeWindow) => Trv,
       aThisArg: Tthis | null = null,
+      { ready: aReady }: { ready?: boolean } = {},
   ): Trv[] {
     // Apply a function to all open browser windows
-    const windows = this.windowMediator.getEnumerator("navigator:browser");
+    const xulWindows = this.windowMediator.getEnumerator("navigator:browser");
     const rvs: Trv[] = [];
-    while (windows.hasMoreElements()) {
-      const window = windows.getNext().
+    while (xulWindows.hasMoreElements()) {
+      const window = xulWindows.getNext().
           QueryInterface<XPCOM.nsIDOMWindow>(this.ci.nsIDOMWindow);
+      if (aReady !== undefined) {
+        const isReady = window.document.readyState === "complete";
+        if (isReady !== aReady) {
+          continue;
+        }
+      }
       const rv = aCallback.call(aThisArg, window);
       rvs.push(rv);
     }
@@ -218,6 +220,9 @@ export class WindowService extends Module
   }
 
   protected startupSelf() {
+    this.forEachOpenWindow(
+        this.boundMethods.get(this.watchWindow),
+    );
     this.windowMediator.addListener(this.windowMediatorListener);
     return MaybePromise.resolve(undefined);
   }
@@ -226,54 +231,86 @@ export class WindowService extends Module
     this.windowMediator.removeListener(this.windowMediatorListener);
 
     const progressEventListener = this.boundMethods.get(this.onProgressEvent);
-    for (const window of this.windows.values()) {
+    for (const window of this.chromeWindows.values()) {
       window.removeEventListener("load", progressEventListener, false);
       window.removeEventListener("unload", progressEventListener, false);
     }
-    this.windows.clear();
+    this.chromeWindows.clear();
+  }
+
+  private onChromeWindowOpened(xulWindow: XPCOM.nsIXULWindow) {
+    this.debugLog.log("window opened");
+    const chromeWindow =
+        getDOMWindowFromXULWindow(xulWindow) as XUL.chromeWindow;
+    return this.watchWindow(chromeWindow, { emitIfAlreadyLoaded: true });
+  }
+
+  private watchWindow(
+      chromeWindow: XUL.chromeWindow,
+      { emitIfAlreadyLoaded = false }: { emitIfAlreadyLoaded?: boolean } = {},
+  ) {
+    this.chromeWindows.add(chromeWindow);
+    const progressEventListener = this.boundMethods.get(this.onProgressEvent);
+
+    if (chromeWindow.document.readyState !== "complete") {
+      this.debugLog.log(`adding window "load" listener`);
+      chromeWindow.addEventListener("load", progressEventListener, false);
+    } else if (emitIfAlreadyLoaded) {
+      this.debugLog.log(`immediately emitting window "load" event`);
+      this.events.listenersMap.onWindowLoaded.emit(chromeWindow);
+    }
+    chromeWindow.addEventListener("unload", progressEventListener, false);
   }
 
   private onProgressEvent(event: ProgressEvent) {
+    try {
+      return this.onProgressEvent_(event);
+    } catch (e) {
+      this.log.error("onProgressEvent() error", e);
+      throw e;
+    }
+  }
+
+  private onProgressEvent_(event: ProgressEvent) {
     this.debugLog.log(`obtaining progress event...`);
-
-    const document = event.target as XUL.chromeDocument;
-
-    // `document.defaultView` is the exact same object as returned by
-    // `getDOMWindowFromXULWindow(xulWindow: XPCOM.nsIXULWindow)`
-    // in `XPCOM.nsIWindowMediatorListener.onOpenWindow()`.
-    const domWindow = document.defaultView as XPCOM.nsIDOMWindow /* !! */;
+    const chromeDocument = event.target as XUL.chromeDocument;
+    const chromeWindow = chromeDocument.defaultView;
 
     if (event.type in ["load", "unload"]) {
-      domWindow.removeEventListener(
+      chromeWindow.removeEventListener(
           event.type,
           this.boundMethods.get(this.onProgressEvent),
           false,
       );
     }
 
-    const windowtype = getWindowtype(domWindow);
+    const windowtype = getWindowtype(chromeWindow);
 
     if (windowtype !== "navigator:browser") {
       this.debugLog.log(`ignoring window with type "${windowtype}"`);
       return;
     }
 
+    const windowID = getWindowId(chromeWindow);
+
     switch (event.type) {
       case "load":
         this.debugLog.log(
             `window "load" event, ` +
+            `windowID=${ windowID }, ` +
             `#listeners=${ this.events.listenersMap.onWindowLoaded.size }`,
         );
-        this.events.listenersMap.onWindowLoaded.emit(event);
+        this.events.listenersMap.onWindowLoaded.emit(chromeWindow);
         break;
 
       case "unload":
         this.debugLog.log(
             `window "unload" event", ` +
+            `windowID=${ windowID }, ` +
             `#listeners=${ this.events.listenersMap.onWindowUnloaded.size }`,
         );
-        this.events.listenersMap.onWindowUnloaded.emit(event);
-        this.windows.delete(domWindow);
+        this.events.listenersMap.onWindowUnloaded.emit(chromeWindow);
+        this.chromeWindows.delete(chromeWindow);
         break;
 
       default:
@@ -282,15 +319,7 @@ export class WindowService extends Module
   }
 
   private areWindowsAvailable() {
-    if (this.getMostRecentBrowserWindow() === null) {
-      return false;
-    }
-    try {
-      this.forEachOpenWindow((win) => getTabBrowser(win));
-    } catch (e) {
-      return false;
-    }
-    return true;
+    return this.getMostRecentBrowserWindow() !== null;
   }
 
   private promiseSessionstoreWindowsRestored() {

@@ -89,8 +89,13 @@ export function getDOMWindowUtils(
       getInterface<XPCOM.nsIDOMWindowUtils>(Ci.nsIDOMWindowUtils);
 }
 
+export function getWindowId(window: XUL.chromeWindow): number {
+  const domWindowUtils = getDOMWindowUtils(window);
+  return domWindowUtils.outerWindowID;
+}
+
 export function getDOMWindowFromXULWindow(
-    xulWindow: XPCOM.nsIXULWindow,
+  xulWindow: XPCOM.nsIXULWindow,
 ): XPCOM.nsIDOMWindow {
   return xulWindow.
       QueryInterface<XPCOM.nsIInterfaceRequestor>(
@@ -98,7 +103,6 @@ export function getDOMWindowFromXULWindow(
       ).
       getInterface<XPCOM.nsIDOMWindow>(Ci.nsIDOMWindow);
 }
-
 //
 // Window & DOM utilities
 //
@@ -131,7 +135,7 @@ export function getElementsByIdOnLoad(
 }
 
 export function getWindowtype(
-    aChromeWindow: XPCOM.nsIDOMWindow,
+    aWindow: XUL.chromeWindow,
 ): string | null {
-  return aChromeWindow.document.documentElement.getAttribute("windowtype");
+  return aWindow.document.documentElement.getAttribute("windowtype");
 }

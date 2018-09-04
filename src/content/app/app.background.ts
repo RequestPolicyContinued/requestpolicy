@@ -133,7 +133,10 @@ const {pEWEConnection, pWebextStorageMigration}: {
   pWebextStorageMigration:
       Promise<StorageMigrationToWebExtension | null>,
   pEWEConnection: Promise<Connection<any, any> | null>,
-} = C.EXTENSION_TYPE === "legacy" ? (() => {
+} = (
+  C.EXTENSION_TYPE === "legacy" &&
+  LegacyApi.miscInfos.isFirefox
+) ? (() => {
   // @if EXTENSION_TYPE='legacy'
   const getEWEModules = (ewe: IEmbeddedWebExtension) => {
     const eweBrowser = ewe.browser;
@@ -194,7 +197,6 @@ function whenLegacy<T>(gen: () => T): T | null {
 const jsmService = whenLegacy(() => new JSMService(Cu));
 const xpconnectService = whenLegacy(() => new XPConnectService());
 // JSMs
-const mozCustomizableUI = whenLegacy(() => jsmService!.getCustomizableUI());
 const mozPrivateBrowsingUtils = whenLegacy(() =>
     jsmService!.getPrivateBrowsingUtils());
 const mozServices = whenLegacy(() => jsmService!.getServices());
@@ -568,7 +570,6 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
   return new WindowModule(
       log,
       windowID,
-      window,
       eventListener,
       classicMenu,
       keyboardShortcuts,
@@ -578,7 +579,6 @@ const windowModuleFactory: App.windows.WindowModuleFactory = (
       redirectionNotifications,
       nonAustralisToolbarButton,
       xulTrees,
-      windowService,
   );
 };
 const chromeStyleSheets = new ChromeStyleSheets(
@@ -587,12 +587,15 @@ const chromeStyleSheets = new ChromeStyleSheets(
     LegacyApi.miscInfos,
     uriService,
 );
-const toolbarbuttonAustralis = new AustralisToolbarButton(
-    log,
-    mozCustomizableUI,
-    LegacyApi.miscInfos,
-    windowModuleMap,
-);
+const toolbarbuttonAustralis = ((): AustralisToolbarButton | null => {
+  if (!LegacyApi.miscInfos.isAustralis) return null;
+  const mozCustomizableUI = jsmService!.getCustomizableUI();
+  return new AustralisToolbarButton(
+      log,
+      mozCustomizableUI,
+      windowModuleMap,
+  );
+})();
 const windows = new Windows(
     log,
     cachedSettings,

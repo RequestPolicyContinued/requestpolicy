@@ -7,6 +7,8 @@ from firefox_ui_harness.arguments import FirefoxUIArguments
 from rp_utils import constants as C
 from rp_utils import utils
 
+import os
+
 
 class RequestPolicyUIBaseArguments(object):
     name = 'RequestPolicy UI Tests'
@@ -75,7 +77,6 @@ class RequestPolicyUIBaseArguments(object):
             for xpi in [args.rp_addon, "helper.dev", "helper.ui-testing"]
         ]
         if args.address is None:
-            import os
             # localhost:28xxx
             display = os.environ["DISPLAY"].replace(":", "")
             args.address = "localhost:28{:0>3}".format(display)
@@ -88,14 +89,24 @@ class RequestPolicyUIBaseArguments(object):
         def log_filename(ext):
             return "{}/{}{}".format(C.LOGS_DIR, args.logfile_stem, ext)
 
+        def create_symlink(ext):
+            target = "{}{}".format(args.logfile_stem, ext)
+            link_name = "{}/latest{}".format(C.LOGS_DIR, ext)
+            if os.path.isfile(link_name):
+                os.remove(link_name)
+            os.symlink(target, link_name)
+
         if args.gecko_log is None:
             args.gecko_log = log_filename(".gecko.log")
+        create_symlink(".gecko.log")
         if args.log_html is None:
             args.log_html = []
         args.log_html.append(log_filename(".html"))
+        create_symlink(".html")
         if args.log_tbpl is None:
             args.log_tbpl = []
         args.log_tbpl.append(log_filename(".tbpl.log"))
+        create_symlink(".tbpl.log")
 
 
 class RequestPolicyUIArguments(FirefoxUIArguments):

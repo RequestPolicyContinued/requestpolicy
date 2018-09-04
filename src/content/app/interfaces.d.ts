@@ -170,7 +170,7 @@ export namespace App {
     export type IWindowModule = WindowModule;
     export type IToolbarButton = AustralisToolbarButton;
     export type WindowModuleFactory = (
-        window: XPCOM.nsIDOMWindow,
+        window: XUL.chromeWindow,
     ) => WindowModule;
   }
 

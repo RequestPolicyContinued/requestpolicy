@@ -31,14 +31,14 @@ interface IObject<T> {
   [key: string]: T;
 }
 
-export function createListenersMap<Trv = void>(
+export function createListenersMap<Trv = void, Targ = any>(
     aEventNames: ReadonlyArray<string>,
     {
         assignInterfacesTo: interfaces = {},
         assignListenersTo: listenersMap = {},
     }: {
-        assignInterfacesTo?: IObject<IListenInterface<Trv>>,
-        assignListenersTo?: IObject<Listeners<Trv>>,
+        assignInterfacesTo?: IObject<IListenInterface<Trv, Targ>>,
+        assignListenersTo?: IObject<Listeners<Trv, Targ>>,
     } = {
         assignInterfacesTo: {},
         assignListenersTo: {},
@@ -47,7 +47,7 @@ export function createListenersMap<Trv = void>(
   const eventNames =
       Array.isArray(aEventNames) ? aEventNames : [aEventNames];
   eventNames.forEach((eventName) => {
-    const eventListeners = new Listeners<Trv>();
+    const eventListeners = new Listeners<Trv, Targ>();
     listenersMap[eventName] = eventListeners;
     interfaces[eventName] = eventListeners.interface;
   });

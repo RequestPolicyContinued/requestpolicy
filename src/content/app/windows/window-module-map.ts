@@ -24,7 +24,7 @@ import { App } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { Module } from "lib/classes/module";
-import { getDOMWindowUtils } from "lib/utils/window-utils";
+import { getWindowId } from "lib/utils/window-utils";
 
 export class WindowModuleMap extends Module
     implements App.windows.IWindowModuleMap {
@@ -38,11 +38,6 @@ export class WindowModuleMap extends Module
   }
 
   public get(window: XUL.chromeWindow): App.windows.IWindowModule | undefined {
-    return this._map.get(this.getWindowId(window));
-  }
-
-  public getWindowId(window: XUL.chromeWindow): number {
-    const domWindowUtils = getDOMWindowUtils(window);
-    return domWindowUtils.outerWindowID;
+    return this._map.get(getWindowId(window));
   }
 }

@@ -20,13 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 
-import { App } from "app/interfaces";
+import { App, IObject } from "app/interfaces";
 import { XUL } from "bootstrap/api/interfaces";
 import { Common } from "common/interfaces";
 import { C } from "data/constants";
 import { BoundMethods } from "lib/classes/bound-methods";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
+import { getWindowId } from "lib/utils/window-utils";
 
 export class Windows extends Module implements App.IWindows {
   protected get debugEnabled() { return C.LOG_BG_CONTENT_BOUNDARIES; }
@@ -41,12 +42,22 @@ export class Windows extends Module implements App.IWindows {
   }
 
   protected get subModules() {
-    const subModules: {[name: string]: Module} = {
-      chromeStyleSheets: this.chromeStyleSheets,
-      toolbarbutton: this.toolbarbutton,
-      windowModules: this.windowModules,
-    };
-    return subModules;
+    // On startup, `windowModules` will contain nothing, but on shutdown
+    // it will contain all `IWindowModule`s.
+    const windowModules = {} as IObject<Module>;
+    this.windowModules._map.forEach((v, k) => {
+      windowModules[`windowModule #${k}`] = v;
+    });
+    return Object.assign(
+        {
+          chromeStyleSheets: this.chromeStyleSheets,
+          windowModuleMap: this.windowModules,
+        } as IObject<Module>,
+        this.toolbarbutton ? {
+          toolbarbutton: this.toolbarbutton,
+        } : {},
+        windowModules,
+    );
   }
 
   constructor(
@@ -56,7 +67,7 @@ export class Windows extends Module implements App.IWindows {
       private readonly windowService: App.services.IWindowService,
 
       public readonly chromeStyleSheets: App.windows.IChromeStyleSheets,
-      public readonly toolbarbutton: App.windows.IToolbarButton,
+      public readonly toolbarbutton: App.windows.IToolbarButton | null,
       public readonly windowModules: App.windows.IWindowModuleMap,
   ) {
     super("app.windows", parentLog);
@@ -66,6 +77,8 @@ export class Windows extends Module implements App.IWindows {
     const promises = this.windowService.
         forEachOpenWindow<Windows, Promise<void>>(
             this.boundMethods.get(this.loadIntoWindow),
+            undefined,
+            { ready: true },
         );
     this.windowService.onWindowLoaded.addListener(
         this.boundMethods.get(this.onWindowLoaded),
@@ -76,27 +89,17 @@ export class Windows extends Module implements App.IWindows {
     return MaybePromise.all(promises) as MaybePromise<any>;
   }
 
-  protected shutdownSelf(): void {
-    this.windowService.
-        forEachOpenWindow<Windows, void>(
-            this.boundMethods.get(this.unloadFromWindow),
-        );
+  private onWindowLoaded(chromeWindow: XUL.chromeWindow): void {
+    this.loadIntoWindow(chromeWindow).
+        catch(this.log.onError("loadIntoWindow()"));
   }
 
-  private onWindowLoaded(event: ProgressEvent): void {
-    const doc = event.target as XUL.chromeDocument;
-    const win = doc.defaultView as XUL.chromeWindow;
-    this.loadIntoWindow(win).catch(this.log.onError("loadIntoWindow()"));
-  }
-
-  private onWindowUnloaded(event: ProgressEvent): void {
-    const doc = event.target as XUL.chromeDocument;
-    const win = doc.defaultView as XUL.chromeWindow;
-    this.unloadFromWindow(win);
+  private onWindowUnloaded(chromeWindow: XUL.chromeWindow): void {
+    this.unloadFromWindow(chromeWindow);
   }
 
   private loadIntoWindow(window: XUL.chromeWindow): Promise<void> {
-    const windowID = this.windowModules.getWindowId(window);
+    const windowID = getWindowId(window);
     this.debugLog.log(`loadIntoWindow(), windowID=${windowID}`);
     if (this.windowModules._map.has(windowID)) {
       this.log.error(`Window #${windowID} already loaded.`);
@@ -108,13 +111,15 @@ export class Windows extends Module implements App.IWindows {
   }
 
   private unloadFromWindow(window: XUL.chromeWindow): void {
-    const windowID = this.windowModules.getWindowId(window);
+    const windowID = getWindowId(window);
     this.debugLog.log(`unloadFromWindow(), windowID=${windowID}`);
     if (!this.windowModules._map.has(windowID)) {
       this.log.warn(`Window #${windowID} not loaded.`);
       return;
     }
     const windowModule = this.windowModules._map.get(windowID)!;
-    return windowModule.shutdown();
+    const rv = windowModule.shutdown();
+    this.windowModules._map.delete(windowID);
+    return rv;
   }
 }

@@ -22,6 +22,7 @@ def main():
         assert args.prev is not None
         assert args.current is not None
 
+        headline = None
         current = "v{}".format(args.current)
         prev = "v{}".format(args.prev)
         prev_version = prev
@@ -34,6 +35,22 @@ def main():
         current = check_output(["./scripts/get_git_head_sha.sh"]).strip()
         prev = args.prev
         prev_version = "v{}".format(args.prev_version)
+
+        rev_count = check_output(["scripts/get_git_rev_count.sh"]).strip()
+        current_version_formatted = (
+            """{prev_version}.<b>{rev_count}</b>.r{current}.pre"""
+        ).format(
+            prev_version=prev_version,
+            rev_count=rev_count,
+            current=current,
+        )
+        headline = (
+            """<b>Release <i>#</i>{rev_count}</b> &nbsp;&#x2014;&nbsp; """
+            """<code>{current_version_formatted}</code>"""
+        ).format(
+            rev_count=rev_count,
+            current_version_formatted=current_version_formatted,
+        )
 
         changelog_hash = "next-version"
 
@@ -67,6 +84,8 @@ def main():
         prev_version=prev_version,
     )
 
+    headline = "" if headline is None else headline + "\n\n"
+
     uri_to_changes = (
         """{base_uri}/blob/{current}/ChangeLog.md#{changelog_hash}"""
     ).format(**print_kwargs)
@@ -81,7 +100,7 @@ def main():
     print_str__diff = print_str__diff.format(**print_kwargs)
 
     print (
-        textwrap.dedent("""\
+        headline + textwrap.dedent("""\
             {link_to_changes}
 
             Source code of this release: {link_to_code}

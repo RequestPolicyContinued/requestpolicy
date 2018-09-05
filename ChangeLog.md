@@ -3,7 +3,7 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
-#### next version
+#### Version 1.0.beta14.0
 * improvements
   * Automatic storage migration: On browsers which allow both ”legacy“
     extensions and WebExtensions, always keep the storage (settings and rules)

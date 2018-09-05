@@ -55,9 +55,9 @@ class TestRuleWithSchemeOnly(RequestPolicyTestCase):
 
     def _run_test_case(self, is_default_allow, allow_rule_exists,
                        deny_rule_exists, request_should_be_allowed):
-        #=======================================================================
+        # =====================================================================
         # Set up the test case
-        #=======================================================================
+        # =====================================================================
         # Default policy.
         self.prefs.set_pref(PREF_DEFAULT_ALLOW, is_default_allow)
 
@@ -67,9 +67,9 @@ class TestRuleWithSchemeOnly(RequestPolicyTestCase):
         if (deny_rule_exists):
             self.deny_rule.add()
 
-        #=======================================================================
+        # =====================================================================
         # Navigate to the test page and record requests.
-        #=======================================================================
+        # =====================================================================
         with self.requests.listen():
             with self.marionette.using_context("content"):
                 self.marionette.navigate(TEST_URL)
@@ -79,9 +79,9 @@ class TestRuleWithSchemeOnly(RequestPolicyTestCase):
                     .get_attribute("src")
                 )
 
-        #=======================================================================
+        # =====================================================================
         # Assertions
-        #=======================================================================
+        # =====================================================================
         self.assertTrue(iframe_uri.startswith(SCHEME + ":"),
                         ("The iframe's URI starts with scheme '{}'."
                          .format(SCHEME)))

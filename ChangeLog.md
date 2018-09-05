@@ -3,6 +3,20 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
+#### Version 1.0.beta14.0
+* improvements
+  * Automatic storage migration: On browsers which allow both ”legacy“
+    extensions and WebExtensions, always keep the storage (settings and rules)
+    of both sides synchronized. (”legacy“ version only; via an ”empedded“ WE)
+    (#892)
+  * Add an option to allow all website redirections (top-level requests).
+    (#53)
+* other changes
+  * merge the fine-grained settings to disable Link Prefetching,
+    DNS Prefetching and Speculative Pre-Connections into one setting
+    called "Disable Network Prediction".
+
+
 #### Version 1.0.beta13.2
 * bugfixes
   * Redirections to WebExtensions' internal resources shouldn't be blocked.

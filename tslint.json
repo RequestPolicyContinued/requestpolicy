@@ -1,0 +1,27 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {},
+  "rules": {
+    "align": [
+      true,
+      "parameters",
+      "statements"
+    ],
+    "ban-types": [true, "browser"],
+    "curly": [true, "ignore-same-line"],
+    "import-spacing": false,
+    "indent": [
+      true, "spaces", 2
+    ],
+    "max-line-length": [true, 80],
+    "no-console": [
+      false
+    ],
+    "no-floating-promises": [true],
+    "no-reference": false
+  },
+  "rulesDirectory": []
+}

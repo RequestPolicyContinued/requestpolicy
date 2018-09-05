@@ -1,0 +1,581 @@
+{
+  "extensionDescription": {
+    "message": "控制允许哪些跨站点的请求。改进您浏览时的隐私保护。确保自己不被跨站点请求伪造（CSRF）攻击和其他攻击。",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "冲突的扩展：$1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "noOrigin": {
+    "message": "[无源]",
+    "description": "[no origin]"
+  },
+
+  "allowOrigin": {
+    "message": "允许从 $1 的请求",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "允许到 $1 的请求",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "允许从 $1 到 $2 的请求",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "临时允许从 $1 的请求",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "临时允许到 $1 的请求",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "临时允许从 $1 到 $2 的请求",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "stopAllowingOrigin": {
+    "message": "停止允许从 $1 的请求",
+    "description": "Stop allowing requests from $1"
+  },
+
+  "stopAllowingDestination": {
+    "message": "停止允许到 $1 的请求",
+    "description": "Stop allowing requests to $1"
+  },
+
+  "stopAllowingOriginToDestination": {
+    "message": "停止允许从 $1 到 $2 的请求",
+    "description": "Stop allowing requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "阻止所有从 $1 的请求",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "阻止所有到 $1 的请求",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "阻止从 $1 到 $2 的请求",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "denyOriginTemporarily": {
+    "message": "临时阻止所有从 $1 的请求",
+    "description": "Temporarily block all requests from $1"
+  },
+
+  "denyDestinationTemporarily": {
+    "message": "临时阻止所有到 $1 的请求",
+    "description": "Temporarily block all requests to $1"
+  },
+
+  "denyOriginToDestinationTemporarily": {
+    "message": "临时阻止从 $1 到 $2 的请求",
+    "description": "Temporarily block requests from $1 to $2"
+  },
+
+  "stopDenyingOrigin": {
+    "message": "停止阻止所有从 $1 的请求",
+    "description": "Stop blocking requests from $1"
+  },
+
+  "stopDenyingDestination": {
+    "message": "停止阻止所有到 $1 的请求",
+    "description": "Stop blocking requests to $1"
+  },
+
+  "stopDenyingOriginToDestination": {
+    "message": "停止阻止从 $1 到 $2 的请求",
+    "description": "Stop blocking requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "不能阻止从 $1 的请求",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "此网页要求重定向到 $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "redirectNotificationWithOrigin": {
+    "message": "链接 $1 已被重定向到 $2",
+    "description": "The URL $1 has asked to redirect to $2"
+  },
+
+  "allow": {
+    "message": "允许",
+    "description": "Allow"
+  },
+
+  "deny": {
+    "message": "拒绝",
+    "description": "Deny"
+  },
+
+  "more": {
+    "message": "更多...",
+    "description": "More…"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "请求日志是空的。",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "当您访问网页时，这里将出现日志条目。",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "禁止动作",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "此网址只能被复制到剪贴板。",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "设置",
+    "description": "Preferences"
+  },
+
+  "managePolicies": {
+    "message": "管理策略",
+    "description": "Manage Policies"
+  },
+
+  "about": {
+    "message": "关于",
+    "description": "About"
+  },
+
+  "help": {
+    "message": "帮助",
+    "description": "Help"
+  },
+
+  "basic": {
+    "message": "基础",
+    "description": "Basic"
+  },
+
+  "advanced": {
+    "message": "高级",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "标示已阻止的图像",
+    "description": "Indicate blocked images"
+  },
+
+  "dontIndicateBlacklisted": {
+    "message": "例外：黑名单中的图像不显示被阻止标识",
+    "description": "Exception: images blocked by a blacklist"
+  },
+
+  "autoReload": {
+    "message": "白名单更改后重新载入当前页面",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "网页",
+    "description": "Web Pages"
+  },
+
+  "menu": {
+    "message": "菜单",
+    "description": "Menu"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "允许在使用隐私浏览模式时添加永久性白名单",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "advancedPreferences": {
+    "message": "高级设置",
+    "description": "Advanced Preferences"
+  },
+
+  "enabled": {
+    "message": "启用",
+    "description": "Enabled"
+  },
+
+  "menuPreferences": {
+    "message": "菜单设置",
+    "description": "Menu Preferences"
+  },
+
+  "menuSorting": {
+    "message": "目标排序",
+    "description": "sorting of destinations"
+  },
+
+  "sortByNumRequests": {
+    "message": "依照请求数量",
+    "description": "by the number of requests"
+  },
+
+  "sortByDestName": {
+    "message": "仅依照域名",
+    "description": "by the domain name only"
+  },
+
+  "noSorting": {
+    "message": "不排序",
+    "description": "do not sort"
+  },
+
+  "hint": {
+    "message": "提示：",
+    "description": "Hint:"
+  },
+
+  "menuSortingHint": {
+    "message": "在禁用排序的情况下，域列表的顺序是依照网站请求的顺序。这通常有助于在默认拒绝模式下寻找必须允许的请求，网站先发出的请求更可能是必不可少的。",
+    "description": "When disabling sorting, the domains are listed in the order they have been requested by the website. This might be helpful in default-deny mode when looking for requests that have to be allowed, as the first requests by the webpage might be essential."
+  },
+
+  "menuIndicatedInformation": {
+    "message": "指示信息",
+    "description": "indicated information"
+  },
+
+  "menuIndicateNumRequests": {
+    "message": "显示每个目标的请求数量",
+    "description": "show the number of requests for every destination"
+  },
+
+  "yourPolicy": {
+    "message": "您的策略",
+    "description": "Your Policy"
+  },
+
+  "defaultPolicy": {
+    "message": "默认策略",
+    "description": "Default Policy"
+  },
+
+  "subscriptions": {
+    "message": "订阅",
+    "description": "Subscriptions"
+  },
+
+  "search": {
+    "message": "搜索",
+    "description": "Search"
+  },
+
+  "scheme": {
+    "message": "模式",
+    "description": "scheme"
+  },
+
+  "host": {
+    "message": "主机",
+    "description": "host"
+  },
+
+  "port": {
+    "message": "端口",
+    "description": "port"
+  },
+
+  "type": {
+    "message": "类型",
+    "description": "Type"
+  },
+
+  "origin": {
+    "message": "来源",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "目标",
+    "description": "Destination"
+  },
+
+  "block": {
+    "message": "阻止",
+    "description": "Block"
+  },
+
+  "temporary": {
+    "message": "临时",
+    "description": "Temporary"
+  },
+
+  "addRule": {
+    "message": "添加规则",
+    "description": "Add rule"
+  },
+
+  "learnMoreAboutRules": {
+    "message": "了解更多规则",
+    "description": "Learn more about rules."
+  },
+
+  "learnMore": {
+    "message": "了解更多。",
+    "description": "Learn more."
+  },
+
+  "defaultPolicyDefinition": {
+    "message": "在您没有为匹配请求设置“允许”或者“阻止”规则时，这将是 RequestPolicy 的默认行为。",
+    "description": "When you don't have any \"allow\" or \"block\" rules that match a request, this is what RequestPolicy will do."
+  },
+
+  "allowRequestsByDefault": {
+    "message": "默认允许请求。",
+    "description": "Allow requests by default."
+  },
+
+  "blockRequestsByDefault": {
+    "message": "默认阻止请求。（仅限高级用户。会导致很多网站出现问题。）",
+    "description": "Block requests by default. (For advanced users. Breaks many websites.)"
+  },
+
+  "allowRequestsToTheSameDomain": {
+    "message": "允许同一域的请求（www.example.com -> static.example.com）。",
+    "description": "Allow requests to the same domain (www.example.com -> static.example.com)."
+  },
+
+  "differentSubscriptionsAreAvailable": {
+    "message": "更改您的默认规则即改变订阅规则。",
+    "description": "Changing your default rule means different subscriptions are available."
+  },
+
+  "manageSubscriptions": {
+    "message": "管理订阅。",
+    "description": "Manage subscriptions."
+  },
+
+  "subscriptionPolicies": {
+    "message": "订阅策略",
+    "description": "Subscription Policies"
+  },
+
+  "learnMoreAboutSubscriptions": {
+    "message": "了解更多的订阅策略",
+    "description": "Learn more about subscriptions."
+  },
+
+  "privacy": {
+    "message": "隐私",
+    "description": "Privacy"
+  },
+
+  "usability": {
+    "message": "可用性",
+    "description": "Usability"
+  },
+
+  "browser": {
+    "message": "浏览器",
+    "description": "Browser"
+  },
+
+  "subscriptionDenyTrackersDescription": {
+    "message": "阻止目标跟踪你的网上活动",
+    "description": "Block destinations that can track you as you browse the web"
+  },
+
+  "subscriptionAllowSameOrgDescription": {
+    "message": "允许与网页来源同属一个组织的目标",
+    "description": "Allow destinations that belong to the same organization as the origin webpage"
+  },
+
+  "subscriptionAllowFunctionalityDescription": {
+    "message": "允许网站正常工作所必需的请求",
+    "description": "Allow requests that are needed for websites to work properly"
+  },
+
+  "subscriptionAllowEmbeddedDescription": {
+    "message": "允许嵌入的图像、视频等内容的请求",
+    "description": "Allow requests for embedded content such as images and videos"
+  },
+
+  "subscriptionAllowMozillaDescription": {
+    "message": "允许有关 Mozilla 和 Firefox 的请求",
+    "description": "Allow requests related to Mozilla and Firefox websites"
+  },
+
+  "subscriptionAllowExtensionsDescription": {
+    "message": "允许其他扩展正常工作所必需的请求",
+    "description": "Allow requests that are needed for other extensions to work properly"
+  },
+
+  "welcomeToRequestPolicy": {
+    "message": "欢迎使用 RequestPolicy",
+    "description": "Welcome to RequestPolicy"
+  },
+
+  "forMostUsersDefaultsAreIdeal": {
+    "message": "大多数人应该使用 RequestPolicy 的默认规则",
+    "description": "For most users, RequestPolicy's default settings are ideal."
+  },
+
+  "youCanConfigureRequestPolicyToBeMoreStrict": {
+    "message": "但是，您也可以配置 RequestPolicy 使其更加严格（只建议高级用户使用）。",
+    "description": "However, you can configure RequestPolicy to make it much more strict (only recommended for advanced users)."
+  },
+
+  "teachMeHowToUseRequestPolicy": {
+    "message": "教我如何使用 RequestPolicy",
+    "description": "Teach me how to use RequestPolicy"
+  },
+
+  "returnToBrowsing": {
+    "message": "返回浏览",
+    "description": "Return to browsing"
+  },
+
+  "configureRequestPolicy": {
+    "message": "配置 RequestPolicy",
+    "description": "Configure RequestPolicy"
+  },
+
+  "yesUseSubscriptions": {
+    "message": "是的，使用订阅策略。（推荐）",
+    "description": "Yes, use subscription policies. (Recommended.)"
+  },
+
+  "noDoNotUseSubscriptions": {
+    "message": "不，不使用订阅策略。",
+    "description": "No, don't use subscription policies."
+  },
+
+  "removeOldRules": {
+    "message": "删除旧版本 RequestPolicy 遗留的未使用规则。",
+    "description": "Remove unused rules left over from the old version of RequestPolicy."
+  },
+
+  "importOldRules": {
+    "message": "导入旧规则",
+    "description": "Import Old Rules"
+  },
+
+  "deleteOldRules": {
+    "message": "删除旧规则",
+    "description": "Delete old rules"
+  },
+
+  "showOldRuleReimportOptions": {
+    "message": "显示重新导入选项",
+    "description": "Show re-import options."
+  },
+
+  "yourOldRulesHaveBeenDeleted": {
+    "message": "您的旧规则已删除。",
+    "description": "Done! Your old rules have been deleted."
+  },
+
+  "ruleSet": {
+    "message": "规则集",
+    "description": "Rule Set"
+  },
+
+  "filterRules": {
+    "message": "过滤规则",
+    "description": "Filter Rules"
+  },
+
+  "policy": {
+    "message": "策略",
+    "description": "Policy"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "撤销所有临时允许",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "阻止目标",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "允许目标",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_mixedDestinations": {
+    "message": "混合目标",
+    "description": "Mixed destinations"
+  },
+
+  "rp_menu_otherOrigins": {
+    "message": "其他来源",
+    "description": "Other origins"
+  },
+
+  "rp_menu_enableBlocking": {
+    "message": "启用阻止",
+    "description": "Enable blocking"
+  },
+
+  "rp_menu_disableBlocking": {
+    "message": "禁用阻止",
+    "description": "Disable blocking"
+  },
+
+  "rp_menu_help": {
+    "message": "帮助",
+    "description": "Help"
+  },
+
+  "rp_menu_preferences": {
+    "message": "设置",
+    "description": "Preferences"
+  },
+
+  "managePolicies@menu": {
+    "message": "管理策略",
+    "description": "Manage Policies"
+  },
+
+  "rp_requestLog_title": {
+    "message": "请求日志",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "清除",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "总是需要确认",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "您正准备向$2提交一个查询以查看\"$1\"站点信息。您要继续吗？",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

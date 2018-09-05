@@ -3,13 +3,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from marionette import SkipTest
 
 
 class TestTotalNumRequestsAfterReload(RequestPolicyTestCase):
     """Reloading a Tab should reset the request counter.
     """
 
-    TEST_URL = "http://www.maindomain.test/img_1.html";
+    TEST_URL = "http://www.maindomain.test/img_1.html"
 
     def setUp(self):
         super(TestTotalNumRequestsAfterReload, self).setUp()
@@ -41,6 +42,9 @@ class TestTotalNumRequestsAfterReload(RequestPolicyTestCase):
     ##########################
 
     def _test(self, reload_url):
+        if not self.menu.is_working:
+            raise SkipTest("menu is defunct")
+
         self._navigate(self.TEST_URL)
         n_before = self._get_num_requests()
         reload_url(self.TEST_URL)
@@ -52,7 +56,8 @@ class TestTotalNumRequestsAfterReload(RequestPolicyTestCase):
 
     def _get_num_requests(self):
         self.menu.open()
-        num_requests = self.menu.total_num_requests
+        with self.menu.in_iframe():
+            num_requests = self.menu.total_num_requests
         self.menu.close()
         return num_requests
 

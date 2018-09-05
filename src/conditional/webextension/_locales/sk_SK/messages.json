@@ -1,0 +1,201 @@
+{
+  "extensionDescription": {
+    "message": "Určiť, ktoré požiadavky externých stránok sú povolené. Zlepšiť súkromie vášho prehliadania. Zabezpečte sa od Cross-Site Request Forgery (CSRF) a ďalších útokov.",
+    "description": "Control which cross-site requests are allowed. Improve the privacy of your browsing. Secure yourself from Cross-Site Request Forgery (CSRF) and other attacks."
+  },
+
+  "extensionConflictWarning": {
+    "message": "Konfliktné rozšírenia: $1",
+    "description": "Conflicting extensions: $1"
+  },
+
+  "allowOrigin": {
+    "message": "Povoliť požiadavky z $1",
+    "description": "Allow requests from $1"
+  },
+
+  "allowDestination": {
+    "message": "Povoliť požiadavky na $1",
+    "description": "Allow requests to $1"
+  },
+
+  "allowOriginToDestination": {
+    "message": "Povoliť požiadavky z $1 na $2",
+    "description": "Allow requests from $1 to $2"
+  },
+
+  "allowOriginTemporarily": {
+    "message": "Dočasne umožniť požiadavky z $1",
+    "description": "Temporarily allow requests from $1"
+  },
+
+  "allowDestinationTemporarily": {
+    "message": "Dočasne umožniť požiadavky na $1",
+    "description": "Temporarily allow requests to $1"
+  },
+
+  "allowOriginToDestinationTemporarily": {
+    "message": "Dočasne umožniť požiadavky z $1 na $2",
+    "description": "Temporarily allow requests from $1 to $2"
+  },
+
+  "denyOrigin": {
+    "message": "Zakázať všetky požiadavky z $1",
+    "description": "Block all requests from $1"
+  },
+
+  "denyDestination": {
+    "message": "Zakázať všetky požiadavky od $1",
+    "description": "Block all requests to $1"
+  },
+
+  "denyOriginToDestination": {
+    "message": "Zakázať všetky požiadavky z $1 na $2",
+    "description": "Block requests from $1 to $2"
+  },
+
+  "unrestrictedOrigin": {
+    "message": "Požiadavky z $1 nemôžu byť blokované",
+    "description": "Requests from $1 cannot be blocked"
+  },
+
+  "redirectNotification": {
+    "message": "Táto stránka požaduje presmerovanie na $1",
+    "description": "This webpage has asked to redirect to $1"
+  },
+
+  "allow": {
+    "message": "Povoliť",
+    "description": "Allow"
+  },
+
+  "allow_accesskey": {
+    "message": "P",
+    "description": "A"
+  },
+
+  "deny": {
+    "message": "Zakázať",
+    "description": "Deny"
+  },
+
+  "deny_accesskey": {
+    "message": "Z",
+    "description": "D"
+  },
+
+  "more": {
+    "message": "Viac…",
+    "description": "More…"
+  },
+
+  "more_accesskey": {
+    "message": "V",
+    "description": "M"
+  },
+
+  "requestLogIsEmpty": {
+    "message": "Protokol požiadaviek je na začiatku prázdny.",
+    "description": "The Request Log is initially empty."
+  },
+
+  "requestLogDirections": {
+    "message": "Položky protokolu sa zobrazia pri návšteve webovej stránky.",
+    "description": "Log entries will appear when you visit web pages."
+  },
+
+  "actionForbidden": {
+    "message": "Úloha zakázaná",
+    "description": "Action forbidden"
+  },
+
+  "urlCanOnlyBeCopiedToClipboard": {
+    "message": "Táto adresa URL môže byť skopírovaná len do schránky.",
+    "description": "This URL can only be copied to the clipboard."
+  },
+
+  "preferences": {
+    "message": "Nastavenia",
+    "description": "Preferences"
+  },
+
+  "advanced": {
+    "message": "Pokročilé",
+    "description": "Advanced"
+  },
+
+  "indicateBlockedImages": {
+    "message": "Uviesť blokované obrázky",
+    "description": "Indicate blocked images"
+  },
+
+  "autoReload": {
+    "message": "Znovu načítať aktuálnu stránku pri zmene whitelist",
+    "description": "Reload current page when whitelist is changed"
+  },
+
+  "webPages": {
+    "message": "Webové stránky",
+    "description": "Web Pages"
+  },
+
+  "allowAddingNonTemporaryRulesInPBM": {
+    "message": "Povoliť trvalé whitelisting pri používaní Súkromného ​​prehliadania",
+    "description": "Allow adding non-temporary rules when using Private Browsing Mode"
+  },
+
+  "enabled": {
+    "message": "Zapnuté",
+    "description": "Enabled"
+  },
+
+  "origin": {
+    "message": "Zdroj",
+    "description": "Origin"
+  },
+
+  "destination": {
+    "message": "Ciele",
+    "description": "Destination"
+  },
+
+  "rp_menu_revokeTemporaryPermissions": {
+    "message": "Odvolať všetky dočasné oprávnenie",
+    "description": "Revoke all temporary permissions"
+  },
+
+  "rp_menu_blockedDestinations": {
+    "message": "Blokované ciele",
+    "description": "Blocked destinations"
+  },
+
+  "rp_menu_allowedDestinations": {
+    "message": "Povolené ciele",
+    "description": "Allowed destinations"
+  },
+
+  "rp_menu_preferences": {
+    "message": "Nastavenia",
+    "description": "Preferences"
+  },
+
+  "rp_requestLog_title": {
+    "message": "Protokol požiadaviek",
+    "description": "Request Log"
+  },
+
+  "rp_requestLog_clear": {
+    "message": "Vyčistiť",
+    "description": "Clear"
+  },
+
+  "alwaysAsk": {
+    "message": "Vždy sa opýtať na potvrdenie",
+    "description": "Always ask for confirmation"
+  },
+
+  "siteInfoConfirm": {
+    "message": "Chystáte sa požiadať o informácie o stránke \"$1\"\nodoslaním požiadavky na $2.\nChcete pokračovať?",
+    "description": "You're about to ask for information about the \"$1\" site\nby submitting a query to $2.\nDo you want to continue?"
+  }
+}

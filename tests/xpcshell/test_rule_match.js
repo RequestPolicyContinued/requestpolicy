@@ -1,7 +1,7 @@
 /* exported run_test */
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("chrome://rpcontinued/content/lib/ruleset.jsm");
-Components.utils.import("chrome://rpcontinued/content/lib/utils/constants.jsm");
+Components.utils.import("chrome://rpcontinued/content/data/constants.jsm");
 
 function run_test() {
   run_next_test();
@@ -21,7 +21,7 @@ add_test(function() {
     let destUri = Services.io.newURI(destUriSpec, null, null);
 
     // EXERCISE
-    let [matchedAllowRules, ] = ruleset.check(originUri, destUri);
+    let [matchedAllowRules ] = ruleset.check(originUri, destUri);
 
     // VERIFY
     strictEqual(shouldMatch ? 1 : 0, matchedAllowRules.length);

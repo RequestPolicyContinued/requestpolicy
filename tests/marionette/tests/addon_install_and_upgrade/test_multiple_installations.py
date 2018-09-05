@@ -13,7 +13,7 @@ RP_BETA_9 = {"id": "requestpolicy@requestpolicy.com",
              "xpi": "requestpolicy-v1.0.beta9.3__preprocess.py.xpi"}
 # AMO version
 RP_AMO = {"id": "rpcontinued@amo.requestpolicy.org",
-          "xpi": "requestpolicy-amo-nightly.xpi"}
+          "xpi": "requestpolicy-legacy-amo-nightly.xpi"}
 
 NOTICE_URL = "chrome://rpcontinued/content/multiple-installations.html"
 
@@ -97,7 +97,9 @@ class CommonTests:
     https://stackoverflow.com/questions/1323455/python-unit-test-with-base-and-sub-class/25695512#25695512
     """
 
-    class OtherVersionActive_ThenInstallCurrentVersion(MultipleInstallationsTestCase):
+    class OtherVersionActive_ThenInstallCurrentVersion(
+        MultipleInstallationsTestCase
+    ):
         def test_notice_is_shown(self):
             self.rp_addon.uninstall()
             self.gecko_log.start_ignoring_errors()
@@ -106,7 +108,9 @@ class CommonTests:
             self.rp_addon.install()
             self._assert_notice_tab()
 
-    class OtherVersionActive_ThenEnableCurrentVersion(MultipleInstallationsTestCase):
+    class OtherVersionActive_ThenEnableCurrentVersion(
+        MultipleInstallationsTestCase
+    ):
         def test_notice_is_shown(self):
             self.rp_addon.disable()
             self.gecko_log.start_ignoring_errors()
@@ -137,7 +141,9 @@ class CommonTests:
             self.other_rp.enable()
             self._assert_notice_tab()
 
-    class OtherAndCurrentVersionActiveAfterRestart(MultipleInstallationsTestCase):
+    class OtherAndCurrentVersionActiveAfterRestart(
+        MultipleInstallationsTestCase
+    ):
         def test_notice_is_shown(self):
             self.gecko_log.start_ignoring_errors()
             self.other_rp.install()
@@ -145,55 +151,55 @@ class CommonTests:
 
             self.restart()
             # Don't require the tab to be selected. It somehow doesn't get
-            # selected in the unit test, but it works when done manually.
+            # selected in the UI test, but it works when done manually.
             self._assert_notice_tab(selected_required=False)
 
 
-class TestAMOVersionActive_ThenInstallCurrentVersion(\
+class TestAMOVersionActive_ThenInstallCurrentVersion(
         CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
     OTHER_ADDON = RP_AMO
 
 
-class TestAMOVersionActive_ThenEnableCurrentVersion(\
+class TestAMOVersionActive_ThenEnableCurrentVersion(
         CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
     OTHER_ADDON = RP_AMO
 
 
-class TestAMOVersionNotActive_ThenInstall(\
+class TestAMOVersionNotActive_ThenInstall(
         CommonTests.OtherVersionNotActive_ThenInstall):
     OTHER_ADDON = RP_AMO
 
 
-class TestAMOVersionNotActive_ThenEnable(\
+class TestAMOVersionNotActive_ThenEnable(
         CommonTests.OtherVersionNotActive_ThenEnable):
     OTHER_ADDON = RP_AMO
 
 
-class TestAMOAndNonAMOVersionActiveAfterRestart(\
+class TestAMOAndNonAMOVersionActiveAfterRestart(
         CommonTests.OtherAndCurrentVersionActiveAfterRestart):
     OTHER_ADDON = RP_AMO
 
 
-class TestOldVersionActive_ThenInstallCurrentVersion(\
+class TestOldVersionActive_ThenInstallCurrentVersion(
         CommonTests.OtherVersionActive_ThenInstallCurrentVersion):
     OTHER_ADDON = RP_BETA_9
 
 
-class TestOldVersionActive_ThenEnableCurrentVersion(\
+class TestOldVersionActive_ThenEnableCurrentVersion(
         CommonTests.OtherVersionActive_ThenEnableCurrentVersion):
     OTHER_ADDON = RP_BETA_9
 
 
-class TestOldVersionNotActive_ThenInstall(\
+class TestOldVersionNotActive_ThenInstall(
         CommonTests.OtherVersionNotActive_ThenInstall):
     OTHER_ADDON = RP_BETA_9
 
 
-class TestOldVersionNotActive_ThenEnable(\
+class TestOldVersionNotActive_ThenEnable(
         CommonTests.OtherVersionNotActive_ThenEnable):
     OTHER_ADDON = RP_BETA_9
 
 
-class TestOldAndCurrentVersionActiveAfterRestart(\
+class TestOldAndCurrentVersionActiveAfterRestart(
         CommonTests.OtherAndCurrentVersionActiveAfterRestart):
     OTHER_ADDON = RP_BETA_9

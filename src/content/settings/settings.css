@@ -151,6 +151,10 @@ table.settings tr:not(:first-child) {
   margin-top: 10px;
 }
 
+#allowtoplevelsetting {
+  margin-top: 2em;
+}
+
 #defaultpolicyword {
   font-weight: bold;
 }

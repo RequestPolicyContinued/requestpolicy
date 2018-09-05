@@ -7,15 +7,19 @@ from mozlog import get_default_logger
 import time
 import ptvsd
 
-from rp_puppeteer.api.gecko_log import GeckoLog
+from rp_puppeteer.api.gecko_log_parser import GeckoLogParser
+from rp_ui_harness.decorators import lazyprop
 
 
 class RequestPolicyUITestRunner(FirefoxUITestRunner):
 
     gecko_log_relpath = None
+    _nth_test = 0
 
     def __init__(self, vscode_debug_secret=None,
-                 vscode_debug_address=None, vscode_debug_port=None, **kwargs):
+                 vscode_debug_address=None, vscode_debug_port=None,
+                 wait_before_first_test=False,
+                 wait_on_failure=False, **kwargs):
         if vscode_debug_secret is not None:
             ptvsd.enable_attach(
                 vscode_debug_secret,
@@ -23,6 +27,9 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
             )
             print "Waiting for VS Code to attach"
             ptvsd.wait_for_attach()
+
+        self.wait_before_first_test = wait_before_first_test
+        self.wait_on_failure = wait_on_failure
 
         if kwargs["gecko_log"] is None:
             kwargs["gecko_log"] = ("logs/marionette.{}.gecko.log"
@@ -35,21 +42,37 @@ class RequestPolicyUITestRunner(FirefoxUITestRunner):
             rv = {}
             marionette = test._marionette_weakref()
 
-            if marionette.session is not None:
-                try:
-                    self._add_logging_info(rv, marionette)
-                except Exception:
-                    logger = get_default_logger()
-                    logger.warning("Failed to gather test failure debug.",
-                                   exc_info=True)
+            if self.wait_on_failure:
+                raw_input("Press Enter to continue...")
+
+            try:
+                self._add_logging_info(rv)
+            except Exception:
+                logger = get_default_logger()
+                logger.warning("Failed to gather test failure debug.",
+                               exc_info=True)
             return rv
 
         self.result_callbacks.append(gather_debug)
 
-    def _add_logging_info(self, rv, marionette):
-        gecko_log = GeckoLog(lambda: self.marionette)
-        lines = gecko_log.get_lines_of_current_test()
+    def run_test(self, *args, **kwargs):
+        self._nth_test += 1
+        if self.wait_before_first_test and self._nth_test == 1:
+            raw_input("Press Enter to start the tests...")
+        super(RequestPolicyUITestRunner, self).run_test(*args, **kwargs)
+
+    @lazyprop
+    def _gecko_log_parser(self):
+        return GeckoLogParser(self.gecko_log)
+
+    def _add_logging_info(self, rv):
+        parser = self._gecko_log_parser
+        if self._nth_test == 1:
+            lines = parser.get_all_lines()
+            error_lines = parser.get_all_error_lines()
+        else:
+            lines = parser.get_lines_of_current_test()
+            error_lines = parser.get_error_lines_of_current_test()
         rv["gecko-log"] = "\n".join(lines)
-        error_lines = gecko_log.get_error_lines_of_current_test()
         if len(error_lines) > 0:
             rv["detected-error-lines"] = "\n".join(error_lines)

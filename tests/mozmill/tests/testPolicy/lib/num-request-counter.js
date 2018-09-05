@@ -19,7 +19,7 @@ function NumRequestsCounter(controller) {
   let self = this;
 
   let rpcMenuButton = findElement.ID(controller.window.document,
-                                    'rpcontinuedToolbarButton');
+                                    '/* @echo ALPHABETICAL_ID */ToolbarButton');
   let rpcMenuPopup = findElement.ID(controller.window.document, 'rpc-popup');
 
 

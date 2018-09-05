@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:name>RequestPolicy Continued</em:name>
+    <em:version><!-- @echo RP_VERSION --></em:version>
+    <em:type>2</em:type>
+    <em:id><!-- @echo EXTENSION_ID --></em:id>
+
+    <em:unpack>false</em:unpack>
+    <em:bootstrap>true</em:bootstrap>
+    <em:multiprocessCompatible>false</em:multiprocessCompatible>
+    <em:hasEmbeddedWebExtension>true</em:hasEmbeddedWebExtension>
+
+    <em:homepageURL><!-- @echo RP_HOMEPAGE_URL --></em:homepageURL>
+    <em:optionsURL>about:requestpolicy</em:optionsURL>
+    <em:optionsType>3</em:optionsType>
+    <em:iconURL>chrome://rpcontinued/skin/requestpolicy-icon-32.png</em:iconURL>
+
+    <!-- @ifndef AMO -->
+    <em:updateURL>https://requestpolicycontinued.github.io/updates/update-<!-- @echo RELEASE_CHANNEL -->.rdf</em:updateURL>
+    <!-- @endif -->
+
+<!-- @echo INSTALL_RDF_LOCALIZED_SECTION -->
+
+    <em:creator>RequestPolicy Continued Team</em:creator>
+
+    <em:developer>Justin Samuel (original author)</em:developer>
+    <em:developer>Martin Kimmerle (main developer)</em:developer>
+
+    <em:contributor>Brad Horrocks</em:contributor>
+    <em:contributor>Beichuan Zhang</em:contributor>
+    <em:contributor>Christoph Langguth</em:contributor>
+    <em:contributor>Christopher Bura</em:contributor>
+    <em:contributor>Gaetan Gilbert</em:contributor>
+    <em:contributor>John Hartman</em:contributor>
+    <em:contributor>Justin Cappos</em:contributor>
+    <em:contributor>Mike Cardwell</em:contributor>
+    <em:contributor>nodiscc</em:contributor>
+    <em:contributor>Robert Hansen (RSnake)</em:contributor>
+    <em:contributor>Vern Paxson</em:contributor>
+
+    <em:translator>Antxon Baldarra (Basque)</em:translator>
+    <em:translator>wenketel (Chinese [simplified])</em:translator>
+    <em:translator>yfdyh000 (Chinese [simplified])</em:translator>
+    <em:translator>James (Silencer) (Chinese [traditional])</em:translator>
+    <em:translator>markh van BabelZilla.org (Dutch)</em:translator>
+    <em:translator>Aleksej R. Serdjukov kaj babilejanoj (Esperanto)</em:translator>
+    <em:translator>Gaetan Gilbert (French)</em:translator>
+    <em:translator>myahoo (French)</em:translator>
+    <em:translator>nodiscc (French)</em:translator>
+    <em:translator>Team erweiterungen.de (German)</em:translator>
+    <em:translator>Archaeopteryx (German)</em:translator>
+    <em:translator>anthologist (Italian)</em:translator>
+    <em:translator>Random (Italian)</em:translator>
+    <em:translator>Anonymous (Japanese)</em:translator>
+    <em:translator>Sumin Byeon (Korean)</em:translator>
+    <em:translator>Aleksandrs Ļedovskis (Latvian)</em:translator>
+    <em:translator>petruc (Portuguese [Brazil])</em:translator>
+    <em:translator>alpmild (Russian)</em:translator>
+    <em:translator>Jacen (Slovak)</em:translator>
+    <em:translator>pedro arana matus (Spanish [Mexico])</em:translator>
+    <em:translator>Natanael_L01 (Swedish)</em:translator>
+    <em:translator>nikneyim (Turkish)</em:translator>
+    <em:translator>Володимир Савчук / Volodymyr Savchuk (Ukrainian)</em:translator>
+    <em:translator>Brad Horrocks</em:translator>
+
+    <!-- Firefox -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>45.0</em:minVersion>
+        <em:maxVersion>56.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+    <!-- SeaMonkey -->
+    <em:targetApplication>
+      <Description>
+        <em:id>{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}</em:id>
+        <em:minVersion>2.42</em:minVersion>
+        <em:maxVersion>2.49.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+    <!-- Pale Moon -->
+    <em:targetApplication>
+       <Description>
+          <em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
+          <em:minVersion>27.0</em:minVersion>
+          <em:maxVersion>28.*</em:maxVersion>
+       </Description>
+    </em:targetApplication>
+
+  </Description>
+</RDF>

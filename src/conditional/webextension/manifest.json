@@ -1,0 +1,28 @@
+{
+  "name": "RequestPolicy Continued",
+  "version": "/* @echo RP_VERSION */",
+  "manifest_version": 2,
+
+  "applications": {
+    "gecko": {
+      "id": "/* @echo EXTENSION_ID */",
+      "strict_min_version": "56.0"
+    }
+  },
+
+  "default_locale": "en_US",
+
+  "background": {
+    "scripts": ["content/main.js"]
+  },
+
+  "options_ui": {
+    "page": "content/settings/basicprefs.html",
+    "open_in_tab": true
+  },
+
+  "permissions": [
+    "management",
+    "storage"
+  ]
+}

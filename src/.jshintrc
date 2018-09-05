@@ -1,7 +1,0 @@
-{
-  "extends": "../.jshintrc",
-
-  "forin": false,
-  "maxcomplexity": 100,
-  "maxdepth": 6
-}

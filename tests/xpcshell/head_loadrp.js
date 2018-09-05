@@ -1,57 +1,103 @@
-/* exported Cc, Ci, Cr, Cu */
-const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
+/* exported Cc, Ci, Cr, Cu, console, require */
 
-// Note: "resource://test" always resolves to the current test folder.
+const {
+  // @ts-ignore
+  Cc, Ci, Cr, Cu, console, require,
+} = (function() {
+  const {
+    classes: Cc,
+    interfaces: Ci,
+    manager: Cm,
+    results: Cr,
+    utils: Cu,
+  } = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
+  // Note: "resource://test" always resolves to the current test folder.
 
-//------------------------------------------------------------------------------
-// Initialize the profile.
-//------------------------------------------------------------------------------
+  const {Services} = Cu.import("resource://gre/modules/Services.jsm", {});
 
-// This will create a Directory Service Provider for the
-// profile directory. See `head.js` in mozilla-central.
-// The return value is the profile directory, and can be
-// simply ignored.
-do_get_profile();
+  // -----------------------------------------------------------------------------
+  // Initialize the profile.
+  // -----------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Register RequestPolicy's Chrome Manifest.
-//------------------------------------------------------------------------------
+  // This will create a Directory Service Provider for the
+  // profile directory. See `head.js` in mozilla-central.
+  // The return value is the profile directory, and can be
+  // simply ignored.
+  do_get_profile();
 
-function getRPChromeManifest() {
-  var cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
+  // -----------------------------------------------------------------------------
+  // Register RequestPolicy's Chrome Manifest.
+  // -----------------------------------------------------------------------------
 
-  var manifestFile = cwd.parent.parent.clone();
-  manifestFile.appendRelativePath("build/unit_testing/chrome.manifest");
-  return manifestFile;
-}
+  function getRPChromeManifest() {
+    const cwd = Services.dirsvc.get("CurWorkD", Ci.nsIFile);
 
-function registerRPChromeManifest() {
-  Components.manager.QueryInterface(Ci.nsIComponentRegistrar)
-                    .autoRegister(getRPChromeManifest());
-}
+    const manifestFile = cwd.parent.parent.clone();
+    manifestFile.appendRelativePath("build/legacy/nightly/chrome.manifest");
+    return manifestFile;
+  }
 
-registerRPChromeManifest();
+  function registerRPChromeManifest() {
+    Components.manager.QueryInterface(Ci.nsIComponentRegistrar).
+        autoRegister(getRPChromeManifest());
+  }
 
-//------------------------------------------------------------------------------
-// Load the default preferences
-//------------------------------------------------------------------------------
+  registerRPChromeManifest();
 
-Services.scriptloader.loadSubScript("chrome://rpcontinued/content/" +
-                                    "main/default-pref-handler.js", {});
+  // -----------------------------------------------------------------------------
+  // CommonJS
+  // -----------------------------------------------------------------------------
 
-//------------------------------------------------------------------------------
-// Set up the Logger module
-//------------------------------------------------------------------------------
+  const {XPCOMUtils} = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+  const {Loader} = Cu.import("resource://gre/modules/commonjs/toolkit/loader.js", {});
+  const {console} = Cu.import("resource://gre/modules/Console.jsm", {});
+  const {clearTimeout, setTimeout} = Cu.import("resource://gre/modules/Timer.jsm");
 
-{
-  let tmpScope = {};
-  Cu.import("chrome://rpcontinued/content/lib/logger.jsm", tmpScope);
+  const RUN_ID = Math.random();
 
-  // Use |do_print| instead of |dump| because that's what's
-  // available for xpcshell tests.
-  tmpScope.Logger.printFunc = function(msg) {
-    do_print(msg.trimRight());
-  };
-}
+  function getGlobals() {
+    return {
+      Cc, Ci, Cm, Cr, Cu,
+      ComponentsID: Components.ID,
+      RUN_ID,
+      Services,
+      XPCOMUtils,
+
+      clearTimeout,
+      console,
+      setTimeout,
+    };
+  }
+
+  function createCommonjsEnv() {
+    let loaderWrapper = {};
+    let main;
+
+    return {
+      load(mainFile) {
+        let globals = getGlobals();
+        // eslint-disable-next-line new-cap
+        loaderWrapper.loader = Loader.Loader({
+          paths: Object.assign({
+            "toolkit/": "resource://gre/modules/commonjs/toolkit/",
+            "": "chrome://rpcontinued/content/",
+          }),
+          globals,
+        });
+        main = Loader.main(loaderWrapper.loader, mainFile);
+        return main;
+      },
+      unload: (function(Loader, loaderWrapper) {
+        return function unload(aReason) {
+          Loader.unload(loaderWrapper.loader, aReason);
+        };
+      })(Loader, loaderWrapper),
+    };
+  }
+
+  const COMMONJS = createCommonjsEnv();
+  const require = COMMONJS.load.bind(COMMONJS);
+
+  return {Cc, Ci, Cr, Cu, console, require};
+})();

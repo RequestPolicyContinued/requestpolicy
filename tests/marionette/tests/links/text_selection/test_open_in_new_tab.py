@@ -13,7 +13,7 @@ class TestOpenInNewTab(RequestPolicyTestCase):
 
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
-        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False)
 
     def test_open_in_new_tab(self):
         with self.marionette.using_context("content"):

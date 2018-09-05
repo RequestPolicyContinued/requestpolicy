@@ -40,20 +40,18 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             # The page might redirect with a delay. There shouldn't be the
             # notification neither before nor after the redirection.
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification.")
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=False)
             redirections.wait_until_url_load(self, dest_url,
                                              "The location has changed.")
-            self.assertFalse(self.redir.is_shown(),
-                             "There's no redirect notification.")
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=False)
 
         def test_appear((test_url, dest_url), info):
             self._load_about_blank()
             self._navigate_expecting_r21n(test_url)
 
-            self.assertTrue(self.redir.is_shown(),
-                            "The redirect notification has been displayed.")
-            redirections.assert_url_does_not_load(self, dest_url,
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=True)
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
 
             self.redir.close()
@@ -67,17 +65,17 @@ class TestAutoRedirect(RequestPolicyTestCase):
         redirections.for_each_possible_redirection_scenario(test, "auto")
 
     def test_allow(self):
-        def test((test_url, dest_uri), info):
+        def test((test_url, dest_url), info):
             if info["is_same_host"]:
                 # the notification won't appear
                 return
 
             self._navigate_expecting_r21n(test_url)
-            self.assertTrue(self.redir.is_shown())
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=True)
             self.redir.allow()
-            self.assertFalse(self.redir.is_shown())
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=False)
             with self.marionette.using_context("content"):
-                self.assertEqual(self.marionette.get_url(), dest_uri)
+                self.assertEqual(self.marionette.get_url(), dest_url)
 
         redirections.for_each_possible_redirection_scenario(test, "auto")
 
@@ -91,15 +89,17 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
             self._load_about_blank()
             self._navigate_expecting_r21n(test_url)
-            self.assertTrue(self.redir.is_shown())
-            redirections.assert_url_does_not_load(self, dest_url,
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=True)
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
             self.redir.allow()
 
             self._load_about_blank()
             self._navigate_expecting_r21n(test_url)
-            self.assertTrue(self.redir.is_shown())
-            redirections.assert_url_does_not_load(self, dest_url,
+            self._assert_redir_is_shown(test_url, dest_url, is_shown=True)
+            redirections.assert_url_does_not_load(
+                self, dest_url,
                 expected_delay=info["delay"])
             self.redir.close()
 
@@ -108,6 +108,10 @@ class TestAutoRedirect(RequestPolicyTestCase):
     ##########################
     # Private Helper Methods #
     ##########################
+
+    def _assert_redir_is_shown(self, test_url, dest_url, is_shown):
+        redirections.assert_redir_is_shown(
+            self, test_url, dest_url, is_shown)
 
     def _navigate_expecting_r21n(self, url):
         """Navigate to a URL, catching all expected exceptions."""
@@ -128,16 +132,18 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
                 # Set the timeout to a low value in order to speed up the
                 # test.
-                self.marionette.timeouts("page load", 100) # seconds
+                self.marionette.timeouts("page load", 100)  # seconds
                 # The following code can be used when Bug 1316622 lands:
-                #original_page_load_timeout = self.marionette.timeout.page_load
-                #self.marionette.timeout.page_load = 0.1 # miliseconds
+                # original_page_load_timeout = (
+                #     self.marionette.timeout.page_load)
+                # self.marionette.timeout.page_load = 0.1  # miliseconds
 
                 self.assertRaises(TimeoutException, self.marionette.navigate,
                                   url)
 
                 self.marionette.timeouts("page load", 20000)
-                #self.marionette.timeout.page_load = original_page_load_timeout
+                # self.marionette.timeout.page_load = (
+                #     original_page_load_timeout)
 
     def _get_url(self):
         with self.marionette.using_context("content"):

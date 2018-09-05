@@ -157,7 +157,8 @@ class TestRules(RulesTestCase):
                 expected_result = (rule.allow in allow and
                                    rule.temp in temp)
                 returned_result = self.rules.rule_exists(rule.rule_data,
-                                                         allow=allow, temp=temp)
+                                                         allow=allow,
+                                                         temp=temp)
                 self.assertEqual(expected_result, returned_result)
 
             # remove rule
@@ -197,7 +198,9 @@ class TestRulesFile(RulesTestCase):
         for rule in rules:
             rule.add()
         self.rules.save()
-        self.assertListEqual(sorted(self.rules_file.get_rules()), sorted(rules))
+        self.assertListEqual(
+            sorted(self.rules_file.get_rules()),
+            sorted(rules))
 
         self.rules.remove_all()
         self.rules.save()

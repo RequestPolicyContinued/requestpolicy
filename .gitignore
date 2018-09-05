@@ -1,6 +1,14 @@
+####
+# FILES
+####
+
 .*
 !.github/
 !.gitignore
+!.gitkeep
+!.babelrc
+!.eslintrc.*
+!.eslintignore
 !.jshintrc
 !.jshintignore
 !.jscsrc
@@ -11,15 +19,21 @@
 *.orig
 *.pyc
 
-# build and dist directories in the root folder
-/build/
-/dist/
-/logs/
+####
+# DIRECTORIES
+####
 
-/dev_env/browsers/
-/dev_env/node/
-/dev_env/python/
-/node_modules/
+# NOTE:
+#   To allow directories to be symlinks, do not append slashes to the dirname.
+
+/build
+/dist
+/logs
+
+/dev_env/browsers
+/dev_env/node
+/dev_env/python
+/node_modules
 
 /tests/mozmill/data
 /tests/mozmill/mozmill-tests

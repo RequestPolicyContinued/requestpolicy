@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from firefox_puppeteer.api.keys import Keys
 from rp_ui_harness.testcases import RequestPolicyTestCase
 
 
@@ -21,13 +22,13 @@ class TestWebUtils(RequestPolicyTestCase):
             # Select the element's text.
             self.web_utils.select_element_text(element)
 
-        # Copy the selection to the clipboard.
-        self.ctx_menu.select_entry("context-copy", element)
+            # Copy the selection to the clipboard.
+            element.send_keys(Keys.CONTROL, "c")
 
         # Get the clipboard content.
         text_in_clipboard = self.marionette.execute_script("""
           // Code taken from
-          // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Using_the_clipboard
+          // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Using_the_clipboard  # noqa
 
           var Cc = Components.classes, Ci = Components.interfaces;
           Components.utils.import("resource://gre/modules/Services.jsm");
@@ -50,10 +51,10 @@ class TestWebUtils(RequestPolicyTestCase):
         # contents plus one leading and one trailing space. The same behavior
         # occurs when triple-clicking on the node. The triple-clicking behavior
         # can be changed when the `browser.triple_click_selects_paragraph`
-        # pref is set to `false`, but, however, this doesn't change the behavior
-        # for `select_element_text()`. Still, as long as this is not a problem
-        # for the use cases of `select_element_text()`, there's no need to
-        # fix it.
+        # pref is set to `false`, but, however, this doesn't change the
+        # behavior for `select_element_text()`. Still, as long as this is not
+        # a problem for the use cases of `select_element_text()`, there's no
+        # need to fix it.
         expected_text = " {} ".format(element_text)
 
         self.assertEqual(text_in_clipboard, expected_text)

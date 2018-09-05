@@ -6,6 +6,13 @@ from firefox_puppeteer.base import BaseLib
 from contextlib import contextmanager
 
 
+GET_BACKGROUND_PAGE = """
+    Components.utils.
+        import("chrome://rpcontinued/content/bootstrap.jsm", {}).
+        FakeWebExt.api.backgroundApi.extension.getBackgroundPage()
+"""
+
+
 class Requests(BaseLib):
     """Class for observing requests."""
 
@@ -35,7 +42,8 @@ class Requests(BaseLib):
         """Whether or not requests are currently observed."""
 
         return self.marionette.execute_script("""
-          return typeof this.listening === "boolean" && this.listening === true;
+          return (typeof this.listening === "boolean" &&
+                  this.listening === true);
         """, sandbox=self._sandbox, new_sandbox=False)
 
     @property
@@ -56,25 +64,28 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          Components.utils.import("chrome://rpcontinued/content/lib/" +
-                                  "request-processor.jsm");
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.
+              rp.webRequest;
 
           this.requestObserver = (function (self) {
             self.requests = self.requests || [];
-            self.pushRequest = function (aIsAllowed, aOriginUri, aDestUri,
-                                         aRequestResult) {
+            self.pushRequest = function({
+                isAllowed: aIsAllowed,
+                originUri: aOriginUri,
+                destUri: aDestUri,
+                requestResult: aRequestResult,
+            }) {
               self.requests.push({
                 origin: aOriginUri,
                 dest: aDestUri,
                 isAllowed: aIsAllowed
               });
             };
-            self.observeBlockedRequest = self.pushRequest.bind(self, false);
-            self.observeAllowedRequest = self.pushRequest.bind(self, true);
+            self.observeRequest = self.pushRequest;
             return self;
           })(this.requestObserver || {});
 
-          RequestProcessor.addRequestObserver(requestObserver);
+          requestMemory.onRequest.addListener(this.requestObserver.observeRequest);
           this.listening = true;
         """, sandbox=self._sandbox, new_sandbox=False)
 
@@ -85,7 +96,9 @@ class Requests(BaseLib):
             return
 
         return self.marionette.execute_script("""
-          RequestProcessor.removeRequestObserver(this.requestObserver);
+          const {requestMemory} = """ + GET_BACKGROUND_PAGE + """.
+              rp.webRequest;
+          requestMemory.onRequest.removeListener(this.requestObserver.observeRequest);
           this.listening = false;
         """, sandbox=self._sandbox, new_sandbox=False)
 

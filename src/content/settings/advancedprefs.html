@@ -1,12 +1,26 @@
 <!doctype html>
-<html>
+<html id="advancedprefs">
 <head>
   <title>RequestPolicy - Advanced Preferences</title>
-  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
-  <script src="chrome://rpcontinued/content/settings/common.js"></script>
-  <script src="chrome://rpcontinued/content/settings/advancedprefs.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/bootstrap-environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script data-main="advancedprefs.js" src="../lib/third-party/static/require.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -20,20 +34,46 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" selected="true"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" selected="true">__MSG_preferences__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" selected="true">__MSG_preferences__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy">__MSG_managePolicies__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">__MSG_managePolicies__</a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                   target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                   target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" data-string="basic"></a></li>
-            <li><a href="about:requestpolicy?advancedprefs" selected="true" data-string="advanced"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs">__MSG_basic__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html">__MSG_basic__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?advancedprefs" selected="true">__MSG_advanced__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./advancedprefs.html" selected="true">__MSG_advanced__</a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>
@@ -41,115 +81,51 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="advancedprefs">
-        <div id="pagetitle" data-string="advancedPreferences"></div>
+        <div id="pagetitle">__MSG_advancedPreferences__</div>
+
+        <div id="page-subsection">__MSG_browserSettings__</div>
 
         <table class="settings">
           <tr>
-            <td data-string="linkPrefetching"></td>
+            <td>__MSG_networkPrediction__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
-                         id="pref-linkPrefetch"/>
-                  <span data-string="enabled"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.link.disableOnStartup"/>
-                  <span data-string="disableOnStartup"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.link.restoreDefaultOnUninstall"/>
-                  <span data-string="restoreDefaultOnUninstall"></span>
-                </label>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td data-string="dnsPrefetching"></td>
-            <td>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-dnsPrefetch"/>
-                  <span data-string="enabled"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.dns.disableOnStartup"/>
-                  <span data-string="disableOnStartup"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.dns.restoreDefaultOnUninstall"/>
-                  <span data-string="restoreDefaultOnUninstall"></span>
-                </label>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td data-string="speculativePreConnections"></td>
-            <td>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-speculativePreConnections"/>
-                  <span data-string="enabled"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.preconnections.disableOnStartup"/>
-                  <span data-string="disableOnStartup"></span>
-                </label>
-              </div>
-              <div>
-                <label>
-                  <input type="checkbox"
-                         id="pref-prefetch.preconnections.restoreDefaultOnUninstall"/>
-                  <span data-string="restoreDefaultOnUninstall"></span>
+                         id="pref-browserSettings.disableNetworkPrediction"/>
+                  <span>__MSG_disableNetworkPrediction__</span>
                 </label>
               </div>
             </td>
           </tr>
         </table>
 
-        <div id="page-subsection" data-string="menuPreferences"></div>
+        <div id="page-subsection">__MSG_menuPreferences__</div>
 
         <table class="settings">
           <tr>
-            <td data-string="menuSorting"></td>
+            <td>__MSG_menuSorting__</td>
             <td>
               <div>
                 <label>
                   <input type="radio" name="menu.sorting"
                          id="sortByNumRequests" value="numRequests" />
-                  <span data-string="sortByNumRequests"></span>
+                  <span>__MSG_sortByNumRequests__</span>
                 </label><br/>
                 <label>
                   <input type="radio" name="menu.sorting"
                          id="sortByDestName" value="destName" />
-                  <span data-string="sortByDestName"></span>
+                  <span>__MSG_sortByDestName__</span>
                 </label><br/>
                 <label>
                   <input type="radio" name="menu.sorting" id="noSorting"
                          value="none" />
-                  <span data-string="noSorting"></span>
+                  <span>__MSG_noSorting__</span>
                 </label>
 
                 <p>
-                  <span data-string="hint" style="font-weight:bold;"></span>
-                  <span data-string="menuSortingHint"></span>
+                  <span style="font-weight:bold;">__MSG_hint__</span>
+                  <span>__MSG_menuSortingHint__</span>
                 </p>
               </div>
               <div>
@@ -157,13 +133,13 @@
             </td>
           </tr>
           <tr>
-            <td data-string="menuIndicatedInformation"></td>
+            <td>__MSG_menuIndicatedInformation__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="menu.info.showNumRequests"/>
-                  <span data-string="menuIndicateNumRequests"></span>
+                  <span>__MSG_menuIndicateNumRequests__</span>
                 </label>
               </div>
             </td>

@@ -5,14 +5,14 @@
 from rp_ui_harness import RequestPolicyTestCase
 
 
-TEST_URL = "http://www.maindomain.test/link_1.html";
+TEST_URL = "http://www.maindomain.test/link_1.html"
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
 
 
 class TestLinkClick(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
-        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False)
 
     def test_link_click(self):
         with self.marionette.using_context("content"):

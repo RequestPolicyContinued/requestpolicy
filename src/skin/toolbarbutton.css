@@ -1,4 +1,3 @@
-
 /*********************************************
  * ________________ Overview _________________
  *
@@ -39,26 +38,24 @@
  *********************************************
  */
 
+@import url("toolbarbutton-variables.css");
 
 /*
  * Case: customizing.
  * ==> red flag.
  * (the !important keyword is necessary.)
  */
-toolbarpaletteitem #rpcontinuedToolbarButton,
-toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
+toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton,
+toolbar[iconsize="small"] > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16) !important;
 }
-toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
-toolbar[iconsize="large"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png) !important;
+toolbar > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton,
+toolbar[iconsize="large"] > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-24) !important;
 }
-toolbarpaletteitem[place="palette"] #rpcontinuedToolbarButton,
-toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png) !important;
+toolbarpaletteitem[place="palette"] #/* @echo ALPHABETICAL_ID */ToolbarButton,
+toolbarpaletteitem[place="panel"] #/* @echo ALPHABETICAL_ID */ToolbarButton {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32) !important;
 }
 
 
@@ -69,26 +66,23 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
  */
 
 /*** Australis only: (the new menu) ***/
-/* default: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"],
-/* blocked: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32.png);
+/* default: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="menu-panel"],
+/* blocked: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32);
 }
 /*** non-Australis only ***/
-/* default: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton,
-/* blocked: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-blocked.png);
+/* default: */ toolbar[iconsize="large"] #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar[iconsize="large"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
-/* default: */ #rpcontinuedToolbarButton[cui-areatype="toolbar"],
-/* blocked: */ #rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="true"],
+/* default: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="toolbar"],
+/* blocked: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="true"],
 /** non-Australis: **/
-/* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
-/* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+/* default: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16);
 }
 
 
@@ -99,22 +93,19 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
 
 
 /*** Australis only: (the new menu) ***/
-/* allowed: */ #rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
+/* allowed: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="menu-panel"][rpcontinuedBlocked="false"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-32);
 }
 /*** non-Australis only ***/
-/* allowed: */ toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-allowed.png);
+/* allowed: */ toolbar[iconsize="large"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** selectors for Australis **/
-/* allowed: */ #rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="false"],
+/* allowed: */ #/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="toolbar"][rpcontinuedBlocked="false"],
 /** selectors for non-Australis **/
-/* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+/* allowed: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-16);
 }
 
 /*
@@ -123,20 +114,17 @@ toolbarpaletteitem[place="panel"] #rpcontinuedToolbarButton {
  */
 
 /*** Australis only: (the new menu) ***/
-#rpcontinuedToolbarButton[cui-areatype="menu-panel"][rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
+#/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="menu-panel"][rpcontinuedPermissive="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-32);
 }
 /*** non-Australis only ***/
-toolbar[iconsize="large"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-24-disabled.png);
+toolbar[iconsize="large"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-24);
 }
 /*** "normal" toolbars (16px icons) ***/
 /** Australis: **/
-#rpcontinuedToolbarButton[cui-areatype="toolbar"][rpcontinuedPermissive="true"],
+#/* @echo ALPHABETICAL_ID */ToolbarButton[cui-areatype="toolbar"][rpcontinuedPermissive="true"],
 /** non-Australis: **/
-toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-16);
 }

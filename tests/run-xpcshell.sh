@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MOZ_SRC_DIR=/moz/mozilla-central
+MOZ_SRC_DIR=/moz/source
 MOZ_OBJ_DIR=$MOZ_SRC_DIR/obj-*
 MOZ_BIN_DIR=$MOZ_OBJ_DIR/dist/bin
 

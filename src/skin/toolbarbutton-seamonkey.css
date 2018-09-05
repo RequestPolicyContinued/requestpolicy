@@ -1,3 +1,4 @@
+@import url("toolbarbutton-variables.css");
 
 /*
  * Case: customizing.
@@ -5,14 +6,12 @@
  * (the !important keyword is necessary.)
  */
 /* 32px is the default icon size in SeaMonkey */
-toolbar > toolbarpaletteitem #rpcontinuedToolbarButton,
-#palette-box #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png) !important;
+toolbar > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton,
+#palette-box #/* @echo ALPHABETICAL_ID */ToolbarButton {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32) !important;
 }
-toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png) !important;
+toolbar[iconsize="small"] > toolbarpaletteitem #/* @echo ALPHABETICAL_ID */ToolbarButton {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16) !important;
 }
 
 
@@ -22,15 +21,13 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> red flag.
  */
 
-/* default: */ toolbar #rpcontinuedToolbarButton,
-/* blocked: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-blocked.png);
+/* default: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-32);
 }
-/* default: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton,
-/* blocked: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-blocked.png);
+/* default: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton,
+/* blocked: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-blocked-16);
 }
 
 
@@ -39,13 +36,11 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> grey flag.
  */
 
-/* allowed: */ toolbar #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-allowed.png);
+/* allowed: */ toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-32);
 }
-/* allowed: */ toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedBlocked="false"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-allowed.png);
+/* allowed: */ toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedBlocked="false"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-allowed-16);
 }
 
 
@@ -54,11 +49,9 @@ toolbar[iconsize="small"] > toolbarpaletteitem #rpcontinuedToolbarButton {
  * ==> yellow flag.
  */
 
-toolbar #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-32-disabled.png);
+toolbar #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-32);
 }
-toolbar[iconsize="small"] #rpcontinuedToolbarButton[rpcontinuedPermissive="true"] {
-  list-style-image:
-    url(chrome://rpcontinued/skin/requestpolicy-icon-disabled.png);
+toolbar[iconsize="small"] #/* @echo ALPHABETICAL_ID */ToolbarButton[rpcontinuedPermissive="true"] {
+  list-style-image: var(--rpc-toolbarbutton-icon-disabled-16);
 }

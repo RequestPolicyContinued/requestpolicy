@@ -24,9 +24,9 @@ class TestYourPolicy(RequestPolicyTestCase):
     def test_link_to_oldrules(self):
         def assert_visibility(should_be_displayed):
             try:
-                link = (self.marionette
-                        .find_element("css selector",
-                                      "a[href='about:requestpolicy?oldrules']"))
+                link = self.marionette.find_element(
+                    "css selector",
+                    "a[href='about:requestpolicy?oldrules']")
                 self.assertEqual(link.is_displayed(), should_be_displayed)
             except NoSuchElementException:
                 if should_be_displayed:

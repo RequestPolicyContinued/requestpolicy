@@ -1,14 +1,26 @@
 <!doctype html>
-<html>
+<html id="subscriptions">
 <head>
   <title>RequestPolicy - Subscriptions</title>
-  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
-  <script src="chrome://rpcontinued/content/settings/common.js"></script>
-  <script src="chrome://rpcontinued/content/settings/subscriptions.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/bootstrap-environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script data-main="subscriptions.js" src="../lib/third-party/static/require.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
-  <style>
-  </style>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -22,24 +34,54 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy" selected="true"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs">__MSG_preferences__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html">__MSG_preferences__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy" selected="true">__MSG_managePolicies__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html" selected="true">__MSG_managePolicies__</a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                   target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                   target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="about:requestpolicy?yourpolicy"
-                   data-string="yourPolicy"></a></li>
-            <li><a href="about:requestpolicy?defaultpolicy"
-                   data-string="defaultPolicy"></a></li>
-            <li><a href="about:requestpolicy?subscriptions" selected="true"
-                   data-string="subscriptions"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy">__MSG_yourPolicy__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">__MSG_yourPolicy__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?defaultpolicy">__MSG_defaultPolicy__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./defaultpolicy.html">__MSG_defaultPolicy__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?subscriptions" selected="true">__MSG_subscriptions__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./subscriptions.html" selected="true">__MSG_subscriptions__</a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>
@@ -47,62 +89,62 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="subscriptions">
-        <div id="pagetitle" data-string="subscriptionPolicies"></div>
+        <div id="pagetitle">__MSG_subscriptionPolicies__</div>
 
         <p class="learnmore">
-          <span data-string="subscriptionPoliciesDefinition"></span>
+          <span>__MSG_subscriptionPoliciesDefinition__</span>
           <a href="https://github.com/RequestPolicyContinued/subscriptions/"
-             target="_blank" data-string="learnMoreAboutSubscriptions"></a>
+             target="_blank">__MSG_learnMoreAboutSubscriptions__</a>
         </p>
 
         <table class="settings">
           <tr data-defaultpolicy="allow">
-            <td data-string="privacy"></td>
+            <td>__MSG_privacy__</td>
             <td>
               <div id="deny_trackers" class="subscription">
                 <label>
                   <input type="checkbox" name="deny_trackers"/>
-                  <span data-string="subscriptionDenyTrackersDescription"/>
+                  <span>__MSG_subscriptionDenyTrackersDescription__</span>
                 </label>
               </div>
             </td>
           </tr>
           <tr data-defaultpolicy="deny">
-            <td data-string="usability"></td>
+            <td>__MSG_usability__</td>
             <td>
               <div id="allow_sameorg" class="subscription">
                 <label>
                   <input type="checkbox" name="allow_sameorg"/>
-                  <span data-string="subscriptionAllowSameOrgDescription"/>
+                  <span>__MSG_subscriptionAllowSameOrgDescription__</span>
                 </label>
               </div>
               <div id="allow_functionality" class="subscription">
                 <label>
                   <input type="checkbox" name="allow_functionality"/>
-                  <span data-string="subscriptionAllowFunctionalityDescription"/>
+                  <span>__MSG_subscriptionAllowFunctionalityDescription__</span>
                 </label>
               </div>
               <div id="allow_embedded" class="subscription">
                 <label>
                   <input type="checkbox" name="allow_embedded"/>
-                  <span data-string="subscriptionAllowEmbeddedDescription"/>
+                  <span>__MSG_subscriptionAllowEmbeddedDescription__</span>
                 </label>
               </div>
             </td>
           </tr>
           <tr data-defaultpolicy="deny">
-            <td data-string="browser"></td>
+            <td>__MSG_browser__</td>
             <td>
               <div id="allow_mozilla" class="subscription">
                 <label>
                   <input type="checkbox" name="allow_mozilla"/>
-                  <span data-string="subscriptionAllowMozillaDescription"/>
+                  <span>__MSG_subscriptionAllowMozillaDescription__</span>
                 </label>
               </div>
               <div id="allow_extensions" class="subscription">
                 <label>
                   <input type="checkbox" name="allow_extensions"/>
-                  <span data-string="subscriptionAllowExtensionsDescription"/>
+                  <span>__MSG_subscriptionAllowExtensionsDescription__</span>
                 </label>
               </div>
             </td>

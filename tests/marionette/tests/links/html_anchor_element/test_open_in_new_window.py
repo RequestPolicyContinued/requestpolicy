@@ -5,14 +5,14 @@
 from rp_ui_harness import RequestPolicyTestCase
 
 
-TEST_URL = "http://www.maindomain.test/link_1.html";
+TEST_URL = "http://www.maindomain.test/link_1.html"
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
 
 
 class TestOpenInNewWindow(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
-        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False)
         self.main_window = self.windows.current
 
     def tearDown(self):
@@ -28,7 +28,9 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
             link_url = link.get_attribute("href")
 
         with self.marionette.using_context("chrome"):
-            self.assertEqual(len(self.windows.all), 1, "There is only one window.")
+            self.assertEqual(
+                len(self.windows.all), 1,
+                "There is only one window.")
 
             # Open the link in a new tab, using all possible methods
             # sequentially.

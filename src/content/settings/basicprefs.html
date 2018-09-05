@@ -1,12 +1,26 @@
 <!doctype html>
-<html>
+<html id="basicprefs">
 <head>
   <title>RequestPolicy - Preferences</title>
-  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
-  <script src="chrome://rpcontinued/content/settings/common.js"></script>
-  <script src="chrome://rpcontinued/content/settings/basicprefs.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/bootstrap-environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script data-main="basicprefs.js" src="../lib/third-party/static/require.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -20,22 +34,46 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" selected="true"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" selected="true">__MSG_preferences__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" selected="true">__MSG_preferences__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy">__MSG_managePolicies__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">__MSG_managePolicies__</a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                  target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
+                  target="_blank">__MSG_about__</a></li>
           </ul>
         </div>
         <div id="subnav1" class="nav subnav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs" selected="true"
-                   data-string="basic"></a></li>
-            <li><a href="about:requestpolicy?advancedprefs"
-                   data-string="advanced"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs" selected="true">__MSG_basic__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html" selected="true">__MSG_basic__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?advancedprefs">__MSG_advanced__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./advancedprefs.html">__MSG_advanced__</a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>
@@ -43,16 +81,16 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="basicprefs">
-        <div id="pagetitle" data-string="preferences"></div>
+        <div id="pagetitle">__MSG_preferences__</div>
 
         <table class="settings">
           <tr>
-            <td data-string="webPages"></td>
+            <td>__MSG_webPages__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox" id="pref-indicateBlockedObjects"/>
-                  <span data-string="indicateBlockedImages"></span>
+                  <span>__MSG_indicateBlockedImages__</span>
                 </label>
               </div>
               <div id="indicateBlockedImages-details">
@@ -60,25 +98,25 @@
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   <input type="checkbox"
                          id="pref-dontIndicateBlacklistedObjects"/>
-                  <span data-string="dontIndicateBlacklisted"></span>
+                  <span>__MSG_dontIndicateBlacklisted__</span>
                 </label>
               </div>
               <div>
                 <label>
                   <input type="checkbox" id="pref-autoReload"/>
-                  <span data-string="autoReload"></span>
+                  <span>__MSG_autoReload__</span>
                 </label>
               </div>
             </td>
           </tr>
           <tr>
-            <td data-string="menu"></td>
+            <td>__MSG_menu__</td>
             <td>
               <div>
                 <label>
                   <input type="checkbox"
                          id="pref-privateBrowsingPermanentWhitelisting"/>
-                  <span data-string="allowAddingNonTemporaryRulesInPBM"></span>
+                  <span>__MSG_allowAddingNonTemporaryRulesInPBM__</span>
                 </label>
               </div>
             </td>

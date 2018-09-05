@@ -8,17 +8,17 @@ function run_test() {
 function test_1() {
   do_test_pending();
 
-  var userSubs = new UserSubscriptions();
+  const userSubs = new UserSubscriptions();
   userSubs.save();
-  var serials = {
+  const serials = {
     "official": {
       "embedded": 2329159661,
       "extensions": 0,
       "functionality": 0,
       "mozilla": 0,
       "sameorg": 0,
-      "trackers": 0
-    }
+      "trackers": 0,
+    },
   };
   // var serials = {
   // };
@@ -29,9 +29,9 @@ function test_1_completed(updateResults) {
   if (!updateResults.official) {
     do_throw("No \"official\" key in updateResults.");
   }
-  Logger.vardump(updateResults.official);
+  Log.dir(updateResults.official);
   do_check_true(updateResults.official.embedded);
   do_check_true(false);
   do_test_finished();
-  //deepEqual(readJsonObj, exampleJsonObj);
+  // deepEqual(readJsonObj, exampleJsonObj);
 }

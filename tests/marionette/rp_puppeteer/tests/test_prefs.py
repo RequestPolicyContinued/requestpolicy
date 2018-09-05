@@ -10,14 +10,14 @@ class TestPrefs(RequestPolicyTestCase):
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
 
-        self.new_pref = 'marionette.unittest.using_pref'
+        self.new_pref = 'marionette.ui_test.using_pref'
 
     def test_using_pref(self):
         self.assertEqual(self.prefs.get_pref(self.new_pref), None,
                          msg="The pref initially doesn't exist.")
 
-        with self.prefs.using_pref(self.new_pref, 'unittest'):
-            self.assertEqual(self.prefs.get_pref(self.new_pref), 'unittest',
+        with self.prefs.using_pref(self.new_pref, 'ui_test'):
+            self.assertEqual(self.prefs.get_pref(self.new_pref), 'ui_test',
                              msg="The pref has been set.")
 
         self.assertEqual(self.prefs.get_pref(self.new_pref), None,
@@ -65,9 +65,9 @@ class TestOldRulesPrefs(RequestPolicyTestCase):
         self.assertDictEqual(self.old_rules.get_rules(), expected_rules,
                              "The unspecified prefs have been emptied.")
 
-    #===========================================================================
+    # =========================================================================
     # Test Getter/Setter properties
-    #===========================================================================
+    # =========================================================================
 
     def test_set_origin_rules(self):
         self.old_rules.origin_rules = "mozilla.org"
@@ -84,7 +84,8 @@ class TestOldRulesPrefs(RequestPolicyTestCase):
     def test_set_origin_to_dest_rules(self):
         self.old_rules.origin_to_dest_rules = "mozilla.org|mozilla.net"
         expected_rules = self._data__prefs_removed
-        expected_rules["allowedOriginsToDestinations"] = "mozilla.org|mozilla.net"
+        expected_rules["allowedOriginsToDestinations"] = (
+            "mozilla.org|mozilla.net")
         self.assertDictEqual(self.old_rules.get_rules(), expected_rules)
 
     def test_get_origin_rules(self):

@@ -3,37 +3,74 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from marionette import SkipTest
 
 
-class TestMenu(RequestPolicyTestCase):
+class MenuTestCase(RequestPolicyTestCase):
 
     def tearDown(self):
         try:
-            self.menu.close()
+            if not self.disabled:
+                self.menu.close()
         finally:
             super(RequestPolicyTestCase, self).tearDown()
 
-    def test_open_close(self):
-        def test(trigger, test_close=True):
+    @property
+    def disabled(self):
+        return not self.menu.is_working
+
+    @property
+    def skip_if_disabled(self):
+        if self.disabled:
+            raise SkipTest("menu is defunct")
+
+
+# ==============================================================================
+
+
+class MenuTests:
+    class TriggeringMenuTests(MenuTestCase):
+        trigger = None
+        test_close = True
+
+        def test_open_close(self):
+            self.skip_if_disabled()
+
             try:
                 self.assertFalse(self.menu.is_open())
-                self.menu.open(trigger=trigger)
+                self.menu.open(trigger=self.trigger)
                 self.assertTrue(self.menu.is_open())
-                if test_close:
-                    self.menu.close(trigger=trigger)
+                if self.test_close:
+                    self.menu.close(trigger=self.trigger)
                 else:
                     self.menu.close()
                 self.assertFalse(self.menu.is_open())
-            except:
-                print "trigger: " + trigger
+            except:  # noqa
+                print "trigger: " + self.trigger
                 raise
 
-        test("api")
-        test("button")
-        # The keyboard shortcut is not captured when the menu is open.
-        test("shortcut", test_close=False)
 
+class TestTriggeringMenuViaApi(MenuTests.TriggeringMenuTests):
+    trigger = "api"
+
+
+class TestTriggeringMenuViaButton(MenuTests.TriggeringMenuTests):
+    trigger = "button"
+
+
+class TestTriggeringMenuViaShortcut(MenuTests.TriggeringMenuTests):
+    trigger = "shortcut"
+    # The keyboard shortcut is not captured when the menu is open.
+    test_close = False
+
+
+# ------------------------------------------------------------------------------
+
+
+class TestMenu(MenuTestCase):
     def test_total_num_requests(self):
+        self.skip_if_disabled()
+
         with self.requests.listen():
             with self.marionette.using_context("content"):
                 self.marionette.navigate(

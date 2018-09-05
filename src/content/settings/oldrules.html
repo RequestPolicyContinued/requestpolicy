@@ -1,12 +1,26 @@
 <!doctype html>
-<html>
+<html id="oldrules">
 <head>
   <title>RequestPolicy - Old Rules</title>
-  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
-  <script src="chrome://rpcontinued/content/settings/common.js"></script>
-  <script src="chrome://rpcontinued/content/settings/oldrules.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/bootstrap-environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script data-main="oldrules.js" src="../lib/third-party/static/require.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -23,7 +37,7 @@
     <td id="contentpad"></td>
     <td id="content">
       <div id="contentcontainer" class="yourpolicy">
-        <div id="pagetitle" data-string="importOldRules"></div>
+        <div id="pagetitle">__MSG_importOldRules__</div>
 
         <style>
           #description {
@@ -72,16 +86,18 @@
               imported, you can delete your old rules.</p>
 
             <p id="deleteOldRules">
-              <button type="submit" onclick="deleteOldRules()"
-                      data-string="deleteOldRules"></button>
+              <button type="submit" onclick="deleteOldRules()" id="deleteOldRulesButton"
+                     >__MSG_deleteOldRules__</button>
             </p>
 
             <p id="showReimportOptions">
               <button type="submit" onclick="showReimportOptions()"
-                 data-string="showOldRuleReimportOptions"></button>
+                id="showOldRuleReimportOptionsButton"
+                >__MSG_showOldRuleReimportOptions__</button>
             </p>
 
-            <div id="deletedone" data-string="yourOldRulesHaveBeenDeleted">
+            <div id="deletedone">
+              __MSG_yourOldRulesHaveBeenDeleted__
             </div>
           </div>
 
@@ -97,9 +113,9 @@
                   </colgroup>
                   <thead>
                     <tr>
-                      <th data-string="policy"></th>
-                      <th data-string="origin"></th>
-                      <th data-string="destination"></th>
+                      <th>__MSG_policy__</th>
+                      <th>__MSG_origin__</th>
+                      <th>__MSG_destination__</th>
                     </tr>
                   </thead>
                   <tbody id="rules"></tbody>
@@ -108,12 +124,17 @@
             </div>
 
             <div id="doimport">
-              <button onclick="importOldRules()"
-                  data-string="importOldRules"></button>
+              <button onclick="importOldRules()" id="importOldRulesButton"
+                 >__MSG_importOldRules__</button>
             </div>
             <div id="importdone">
               Done! Your old rules have been imported into
+              <!-- @if EXTENSION_TYPE='legacy' -->
               <a href="about:requestpolicy?yourpolicy">your policy</a>.
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">your policy</a>.
+              <!-- @endif -->
             </div>
 
           </div>

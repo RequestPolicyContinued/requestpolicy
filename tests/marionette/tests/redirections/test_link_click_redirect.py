@@ -87,7 +87,8 @@ class TestLinkClickRedirect(RequestPolicyTestCase):
 
         self.assertTrue(self.redir.is_shown(),
                         "The redirect notification has been displayed.")
-        redirections.assert_url_does_not_load(self, dest_url,
+        redirections.assert_url_does_not_load(
+            self, dest_url,
             expected_delay=info["delay"])
 
         self.redir.close()

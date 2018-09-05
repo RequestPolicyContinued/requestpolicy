@@ -5,7 +5,7 @@
 from rp_ui_harness import RequestPolicyTestCase
 
 
-TEST_URL = "http://www.maindomain.test/link_1.html";
+TEST_URL = "http://www.maindomain.test/link_1.html"
 PREF_DEFAULT_ALLOW = "extensions.requestpolicy.defaultPolicy.allow"
 
 
@@ -13,7 +13,7 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
 
     def setUp(self):
         RequestPolicyTestCase.setUp(self)
-        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False);
+        self.prefs.set_pref(PREF_DEFAULT_ALLOW, False)
 
         self.origin_window = self.windows.current
 
@@ -39,8 +39,9 @@ class TestOpenInNewWindow(RequestPolicyTestCase):
                                  "A new window has been opened.")
 
                 dest_window_handle = self.windows.focused_chrome_window_handle
-                self.assertNotEqual(dest_window_handle, self.origin_window.handle,
-                                    "The new window has been focused.")
+                self.assertNotEqual(
+                    dest_window_handle, self.origin_window.handle,
+                    "The new window has been focused.")
                 dest_window = self.windows.create_window_instance(
                     dest_window_handle
                 )

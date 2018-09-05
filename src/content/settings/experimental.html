@@ -1,12 +1,26 @@
 <!doctype html>
-<html>
+<html id="experimental">
 <head>
   <title>RequestPolicy - Experimental Features</title>
-  <script src="chrome://rpcontinued/content/settings/jquery.min.js"></script>
-  <script src="chrome://rpcontinued/content/settings/common.js"></script>
-  <script src="chrome://rpcontinued/content/settings/experimental.js"></script>
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script src="../lib/third-party/static/jquery.min.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
+  <script src="chrome://rpcontinued/content/bootstrap-environments/settings.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <script data-main="experimental.js" src="../lib/third-party/static/require.js"></script>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE='legacy' -->
   <link href="chrome://rpcontinued/content/settings/settings.css"
         rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
+  <!-- @if EXTENSION_TYPE!='legacy' -->
+  <link href="settings.css" rel="stylesheet" type="text/css"/>
+  <!-- @endif -->
 </head>
 <body>
 <table>
@@ -20,17 +34,34 @@
         </div>
         <div id="mainnav" class="nav">
           <ul>
-            <li><a href="about:requestpolicy?basicprefs"
-                   data-string="preferences"></a></li>
-            <li><a href="about:requestpolicy?yourpolicy"
-                   data-string="managePolicies"></a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?basicprefs">__MSG_preferences__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./basicprefs.html">__MSG_preferences__</a>
+              <!-- @endif -->
+            </li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?yourpolicy">__MSG_managePolicies__</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./yourpolicy.html">__MSG_managePolicies__</a>
+              <!-- @endif -->
+            </li>
             <li><a href="https://requestpolicycontinued.github.io/#quick-start"
-                   data-string="help" target="_blank"></a></li>
+                   target="_blank">__MSG_help__</a></li>
             <li><a href="https://requestpolicycontinued.github.io/About.html"
-                   data-string="about" target="_blank"></a></li>
-            <li><a href="about:requestpolicy?experimental" selected="true">
-              Experimental
-            </a></li>
+                   target="_blank">__MSG_about__</a></li>
+            <li>
+              <!-- @if EXTENSION_TYPE='legacy' -->
+              <a href="about:requestpolicy?experimental" selected="true">Experimental</a>
+              <!-- @endif -->
+              <!-- @if EXTENSION_TYPE!='legacy' -->
+              <a href="./experimental.html" selected="true">Experimental</a>
+              <!-- @endif -->
+            </li>
           </ul>
         </div>
       </div>

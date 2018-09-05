@@ -173,11 +173,11 @@ class TestGettingRequests(RequestPolicyTestCase):
             },
             {
                 "origin": "http://www.maindomain.test/img_1.html",
-                "dest": "http://www.maindomain.test/subdirectory/flag-gray.png",
+                "dest": "http://www.maindomain.test/subdirectory/flag-gray.png",  # noqa
                 "isAllowed": True
             }, {
                 "origin": "http://www.maindomain.test/img_1.html",
-                "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",
+                "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",  # noqa
                 "isAllowed": False
             }
         ]
@@ -191,7 +191,7 @@ class TestGettingRequests(RequestPolicyTestCase):
                 "isAllowed": True
             }, {
                 "origin": "http://www.maindomain.test/favicon.ico",
-                "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",
+                "dest": "http://www.otherdomain.test/subdirectory/flag-gray.png",  # noqa
                 "isAllowed": False
             }
         ]

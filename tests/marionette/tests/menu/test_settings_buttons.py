@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from rp_ui_harness import RequestPolicyTestCase
+from marionette import SkipTest
 
 
 URLS = {
@@ -18,7 +19,7 @@ URLS = {
 
 class TestSettingsButtons(RequestPolicyTestCase):
 
-    TEST_URL = "http://www.maindomain.test/img_1.html";
+    TEST_URL = "http://www.maindomain.test/img_1.html"
 
     def setUp(self):
         super(TestSettingsButtons, self).setUp()
@@ -29,6 +30,15 @@ class TestSettingsButtons(RequestPolicyTestCase):
             self._close_all_tabs()
         finally:
             super(TestSettingsButtons, self).tearDown()
+
+    @property
+    def disabled(self):
+        return not self.menu.is_working
+
+    @property
+    def skip_if_disabled(self):
+        if self.disabled:
+            raise SkipTest("menu is defunct")
 
     ################
     # Test Methods #
@@ -43,11 +53,15 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._check_tabs([1, url_id, settings_id, 3], 2)
 
     def test_no_settings_tab_open(self):
+        self.skip_if_disabled()
+
         """No settings tab is open."""
         self._test__should_open(2, "preferences")
         self._test__should_open(2, "policies")
 
     def test_non_equivalent_settings_tab_open(self):
+        self.skip_if_disabled()
+
         """A non-equivalent settings tab is open."""
         self._test__should_open("policies", "preferences")
         self._test__should_open("preferences_1", "policies")
@@ -68,10 +82,14 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._check_tabs([url_id, 2, 3], 0)
 
     def test_preferences__basic(self):
+        self.skip_if_disabled()
+
         self._test__basic("preferences_1", "preferences")
         self._test__basic("preferences_2", "preferences")
 
     def test_policies__basic(self):
+        self.skip_if_disabled()
+
         self._test__basic("policies", "policies")
 
     def _test__multiple_equivalent_urls(self, url_id_1, url_id_2, settings_id):
@@ -94,6 +112,8 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._check_tabs([url_id_1, 2, url_id_2], 2)
 
     def test_preferences__multiple(self):
+        self.skip_if_disabled()
+
         self._test__multiple_equivalent_urls("preferences_1", "preferences_1",
                                              "preferences")
         self._test__multiple_equivalent_urls("preferences_1", "preferences_2",
@@ -101,8 +121,9 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._test__multiple_equivalent_urls("preferences_2", "preferences_1",
                                              "preferences")
 
-    def _test__multiple_non_equivalent_urls(self, url_id, non_equivalent_url_id,
-                                            settings_id):
+    def _test__multiple_non_equivalent_urls(
+        self, url_id, non_equivalent_url_id, settings_id
+    ):
         """Multiple settings tabs are open, but they are _not_ equivalent."""
 
         # Already on the correct tab
@@ -122,6 +143,8 @@ class TestSettingsButtons(RequestPolicyTestCase):
         self._check_tabs([url_id, non_equivalent_url_id, 3], 0)
 
     def test_preferences__with_other_settings_tabs(self):
+        self.skip_if_disabled()
+
         self._test__multiple_non_equivalent_urls("preferences_1", "policies",
                                                  "preferences")
         self._test__multiple_non_equivalent_urls("preferences_2", "policies",
@@ -164,9 +187,10 @@ class TestSettingsButtons(RequestPolicyTestCase):
 
     def _open_settings(self, button):
         self.menu.open()
-        if button == "preferences":
-            self.menu.preferences_button.click()
-        elif button == "policies":
-            self.menu.manage_policies_button.click()
-        else:
-            self.fail()
+        with self.menu.in_iframe():
+            if button == "preferences":
+                self.menu.preferences_button.click()
+            elif button == "policies":
+                self.menu.manage_policies_button.click()
+            else:
+                self.fail()

@@ -41,7 +41,7 @@ export namespace XPCOM {
     QueryInterface<T extends nsISupports>(id: nsIJSID): T;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/base/nsIWeakReference.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/base/nsIWeakReference.idl
   export interface nsISupportsWeakReference {
     GetWeakReference<T extends nsISupports>(): nsIWeakReference<T>;
   }
@@ -66,19 +66,19 @@ export namespace XPCOM {
   }
 
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/js/xpconnect/idl/mozIJSSubScriptLoader.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/js/xpconnect/idl/mozIJSSubScriptLoader.idl
   export interface mozIJSSubScriptLoader extends nsISupports {
     loadSubScript(url: AString, obj?: jsval, charset?: AString): jsval;
     loadSubScriptWithOptions(url: AString, options: jsval): jsval;
     precompileScript(uri: nsIURI, principal: nsIPrincipal, observer: nsIObserver): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIAsyncVerifyRedirectCallback.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIAsyncVerifyRedirectCallback.idl
   export interface nsIAsyncVerifyRedirectCallback extends nsISupports {
     onRedirectVerifyCallback(result: nsresult): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsICategoryManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/components/nsICategoryManager.idl
   export interface nsICategoryManager extends nsISupports {
     addCategoryEntry(
         aCategory: string,
@@ -90,7 +90,7 @@ export namespace XPCOM {
     deleteCategoryEntry(aCategory: string, aEntry: string, aPersist: boolean): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIChannel.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIChannel.idl
   export interface nsIChannel extends nsIRequest {
     readonly loadInfo: nsILoadInfo;
     originalURI: nsIURI;
@@ -100,10 +100,10 @@ export namespace XPCOM {
     open(): nsIInputStream;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsIComponentManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/components/nsIComponentManager.idl
   export interface nsIComponentManager extends nsISupports {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/components/nsIComponentRegistrar.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/components/nsIComponentRegistrar.idl
   export interface nsIComponentRegistrar extends nsISupports {
     registerFactory(
         aClass: nsIJSCID,
@@ -117,25 +117,25 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   export interface nsIContentFrameMessageManager extends nsIMessageManagerGlobal {
     readonly content: XUL.contentWindow;
     readonly docShell: nsIDocShell;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicy.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIContentPolicy.idl
   export interface nsIContentPolicy extends nsIContentPolicyBase {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIContentPolicyBase.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIContentPolicyBase.idl
   interface nsIContentPolicyBase extends nsISupports {}
 
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   export interface nsIContentProcessMessageManager extends nsIMessageManagerGlobal {
     readonly initialProcessData: jsval;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIConverterInputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIConverterInputStream.idl
   export interface nsIConverterInputStream extends nsIUnicharInputStream {
     init(
         aStream: nsIInputStream,
@@ -145,7 +145,7 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIConverterOutputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIConverterOutputStream.idl
   export interface nsIConverterOutputStream extends nsIUnicharOutputStream {
     init(
         aOutStream: nsIOutputStream,
@@ -155,10 +155,10 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIDirectoryService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIDirectoryService.idl
   export interface nsIDirectoryService extends nsISupports {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShell.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/base/nsIDocShell.idl
   export interface nsIDocShell extends nsIDocShellTreeItem {
     allowPlugins: boolean;
     allowJavascript: boolean;
@@ -172,44 +172,44 @@ export namespace XPCOM {
     allowContentRetargetingOnChildren: boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIDocShellTreeItem.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/base/nsIDocShellTreeItem.idl
   export interface nsIDocShellTreeItem extends nsISupports {
 	  readonly rootTreeItem: nsIDocShellTreeItem;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMChromeWindow.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/base/nsIDOMChromeWindow.idl
   export interface nsIDOMChromeWindow extends nsISupports {
     messageManager: XPCOM.GlobalFrameMessageManager;
     windowState: number;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMDocument.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/core/nsIDOMDocument.idl
   export interface nsIDOMDocument extends nsIDOMNode {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMElement.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/core/nsIDOMElement.idl
   export interface nsIDOMElement extends nsIDOMNode {}
 
   export interface nsIDOMEventTarget extends nsISupports, EventTarget {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/core/nsIDOMNode.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/core/nsIDOMNode.idl
   export interface nsIDOMNode extends nsISupports {
     readonly localName: string;
     readonly nodeName: string;
     readonly nodeType: number;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindow.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/base/nsIDOMWindow.idl
   export interface nsIDOMWindow extends nsISupports, Window {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/base/nsIDOMWindowUtils.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/base/nsIDOMWindowUtils.idl
   export interface nsIDOMWindowUtils extends nsISupports {
     readonly outerWindowID: number;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/interfaces/xul/nsIDOMXULElement.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/interfaces/xul/nsIDOMXULElement.idl
   export interface nsIDOMXULElement extends nsIDOMElement {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/dns/nsIEffectiveTLDService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/dns/nsIEffectiveTLDService.idl
   export interface nsIEffectiveTLDService extends nsISupports {
     getBaseDomainFromHost(
         aHost: string,
@@ -217,7 +217,7 @@ export namespace XPCOM {
     ): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIEventTarget.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/threads/nsIEventTarget.idl
   interface nsIEventTarget extends nsISupports {
     DISPATCH_NORMAL: 0;
     DISPATCH_SYNC: 1;
@@ -273,7 +273,7 @@ export namespace XPCOM {
     setRelativeDescriptor(fromFile: nsIFile, relativeDesc: string): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIFileStreams.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIFileStreams.idl
   export interface nsIFileInputStream extends nsIInputStream {
     CLOSE_ON_EOF: number;
     REOPEN_ON_REWIND: number;
@@ -283,7 +283,7 @@ export namespace XPCOM {
     init(file: nsIFile, ioFlags: number, perm: number, behaviorFlags: number): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIFileStreams.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIFileStreams.idl
   export interface nsIFileOutputStream extends nsIOutputStream {
     DEFER_OPEN: number;
 
@@ -298,14 +298,14 @@ export namespace XPCOM {
     assertAppHasStatus(aStatus: number): boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIProcessScriptLoader extends nsISupports {
     loadProcessScript(aURL: AString, aAllowDelayedLoad: boolean): void;
     removeDelayedProcessScript(aURL: AString): void;
     getDelayedProcessScripts(): jsval;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/embedding/components/windowwatcher/nsIPromptService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/embedding/components/windowwatcher/nsIPromptService.idl
   export interface nsIPromptService extends nsISupports {
     confirmCheck(
         aParent: nsIDOMWindow,
@@ -318,20 +318,20 @@ export namespace XPCOM {
     ): boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/embedding/components/windowwatcher/nsIPromptService2.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/embedding/components/windowwatcher/nsIPromptService2.idl
   export interface nsIPromptService2 extends nsIPromptService {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsIProperties.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/ds/nsIProperties.idl
   export interface nsIProperties extends nsISupports {
     get<T extends nsISupports>(prop: string, iid: nsIJSID): T;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/file/nsIFileProtocolHandler.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/protocol/file/nsIFileProtocolHandler.idl
   export interface nsIFileProtocolHandler extends nsIProtocolHandler {
     getURLSpecFromDir(file: nsIFile): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIFrameScriptLoader extends nsISupports {
     loadFrameScript(
       aURL: AString,
@@ -342,35 +342,35 @@ export namespace XPCOM {
     getDelayedFrameScripts(): jsval;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIGlobalProcessScriptLoader extends nsIProcessScriptLoader {
     readonly initialProcessData: jsval;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/protocol/http/nsIHttpChannel.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/protocol/http/nsIHttpChannel.idl
   export interface nsIHttpChannel extends nsIChannel {
     referrer: nsIURI;
     getRequestHeader(aHeader: string): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/dns/nsIIDNService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/dns/nsIIDNService.idl
   export interface nsIIDNService extends nsISupports {
     convertToDisplayIDN(input: string, isASCII: {}): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIInputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIInputStream.idl
   export interface nsIInputStream extends nsISupports {
     close(): void;
     available(): number;
     isNonBlocking(): boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/base/nsIInterfaceRequestor.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/base/nsIInterfaceRequestor.idl
   interface nsIInterfaceRequestor extends nsISupports {
     getInterface<T extends nsISupports>(uuid: nsIJSID): T;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIIOService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIIOService.idl
   interface nsIIOService extends nsISupports {
     getProtocolHandler(aScheme: string): nsIProtocolHandler;
     newChannelFromURI?: (aURI: nsIURI) => nsIChannel;
@@ -385,10 +385,10 @@ export namespace XPCOM {
     ): nsIURI;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIIOService2.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIIOService2.idl
   interface nsIIOService2 extends nsIIOService {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsILoadContext.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/base/nsILoadContext.idl
   export interface nsILoadContext extends nsISupports {
     readonly associatedWindow: nsIDOMWindow;
     readonly topWindow: nsIDOMWindow;
@@ -408,7 +408,7 @@ export namespace XPCOM {
     removeRequest(aRequest: nsIRequest, aContext: nsISupports, aStatus: nsresult): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsILoadInfo.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsILoadInfo.idl
   export interface nsILoadInfo extends nsISupports {
     externalContentPolicyType: nsContentPolicyType;
   }
@@ -425,7 +425,7 @@ export namespace XPCOM {
     newLocale(aLocale: string): nsILocale;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIMessageBroadcaster extends nsIMessageListenerManager {
     broadcastAsyncMessage(
       messageName?: AString,
@@ -437,7 +437,7 @@ export namespace XPCOM {
     getChildAt(aIndex: number): nsIMessageListenerManager;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIMessageListener extends nsISupports {
     receiveMessage: (data: {
       target: any,         /* the target of the message. Either an element owning
@@ -453,7 +453,7 @@ export namespace XPCOM {
 
   type MessageListener = nsIMessageListener | nsIMessageListener["receiveMessage"];
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIMessageListenerManager extends nsISupports {
     addMessageListener(
       messageName: AString,
@@ -476,7 +476,7 @@ export namespace XPCOM {
 
   export type nsIMessageManager = nsIMessageManagerGlobal;
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   export interface nsIMessageManagerGlobal extends nsISyncMessageSender {
     dump(aStr: DOMString): void;
     privateNoteIntentionalCrash(): void;
@@ -484,7 +484,7 @@ export namespace XPCOM {
     btoa(aBase64Data: DOMString): DOMString;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsIMessageSender extends nsIMessageListenerManager {
     sendAsyncMessage(
       messageName?: string,
@@ -494,7 +494,7 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsIMessageManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsIMessageManager.idl
   interface nsISyncMessageSender extends nsIMessageSender {
     sendSyncMessage(
       messageName?: AString,
@@ -523,7 +523,7 @@ export namespace XPCOM {
     removeObserver(anObserver: nsIObserver_without_nsISupports, aTopic: string): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIOutputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIOutputStream.idl
   export interface nsIOutputStream extends nsISupports {
     close(): void;
     flush(): void;
@@ -565,13 +565,13 @@ export namespace XPCOM {
     savePrefFile(aFile: nsIFile | null): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/caps/nsIPrincipal.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/caps/nsIPrincipal.idl
   export interface nsIPrincipal extends nsISerializable {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIProtocolHandler.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIProtocolHandler.idl
   export interface nsIProtocolHandler extends nsISupports {}
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIRequest.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIRequest.idl
   interface nsIRequest extends nsISupports {
     LOAD_REQUESTMASK: number;
     LOAD_NORMAL: number;
@@ -611,14 +611,14 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIRunnable.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/threads/nsIRunnable.idl
   export interface nsIRunnable_without_nsISupports {
     run(): void;
   }
 
   type nsIRunnable = nsIRunnable_without_nsISupports & nsISupports;
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHEntry.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/shistory/nsISHEntry.idl
   export interface nsISHEntry extends nsISupports {
     readonly URI: nsIURI;
     originalURI: nsIURI;
@@ -671,7 +671,7 @@ export namespace XPCOM {
     baseURI: nsIURI;
   }
 
-    // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHistory.idl
+    // https://dxr.mozilla.org/mozilla-esr45/source/docshell/shistory/nsISHistory.idl
   export interface nsISHistory extends nsISupports {
     readonly count: number;
     readonly index: number;
@@ -687,7 +687,7 @@ export namespace XPCOM {
     getIndexOfEntry(aEntry: nsISHEntry): number;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/shistory/nsISHistoryListener.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/shistory/nsISHistoryListener.idl
   export interface nsISHistoryListener extends nsISupports {
     OnHistoryNewEntry(aNewURI: nsIURI): void;
     OnHistoryGoBack(aBackURI: nsIURI): boolean;
@@ -698,12 +698,12 @@ export namespace XPCOM {
     OnHistoryReplaceEntry(aIndex: number): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/caps/nsIScriptSecurityManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/caps/nsIScriptSecurityManager.idl
   export interface nsIScriptSecurityManager extends nsISupports {
     isSystemPrincipal(aPrincipal: nsIPrincipal): boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISerializable.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/ds/nsISerializable.idl
   interface nsISerializable extends nsISupports {}
 
   interface nsISimpleEnumerator extends nsISupports {
@@ -711,7 +711,7 @@ export namespace XPCOM {
     hasMoreElements(): boolean;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/netwerk/base/nsIStreamListener.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/netwerk/base/nsIStreamListener.idl
   interface nsIStreamListener extends nsIRequestObserver {
     onDataAvailable(
         aRequest: nsIRequest,
@@ -722,7 +722,7 @@ export namespace XPCOM {
     ): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/layout/base/nsIStyleSheetService.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/layout/base/nsIStyleSheetService.idl
   interface nsIStyleSheetService extends nsISupports {
     AGENT_SHEET: 0;
     USER_SHEET: 1;
@@ -733,7 +733,7 @@ export namespace XPCOM {
     unregisterSheet(sheetURI: nsIURI, type: number): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/ds/nsISupportsPrimitives.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/ds/nsISupportsPrimitives.idl
   interface nsISupportsPrimitive extends nsISupports {
     type: number;
 
@@ -762,13 +762,13 @@ export namespace XPCOM {
     toString(): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIUnicharInputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIUnicharInputStream.idl
   interface nsIUnicharInputStream extends nsISupports {
     readString(aCount: number, aString: string): number;
     close(): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/io/nsIUnicharOutputStream.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/io/nsIUnicharOutputStream.idl
   interface nsIUnicharOutputStream extends nsISupports {
     write(aCount: number, c: char): boolean;
     writeString(str: string): boolean;
@@ -783,7 +783,7 @@ export namespace XPCOM {
     asyncShutdown(): void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpcom/threads/nsIThreadManager.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpcom/threads/nsIThreadManager.idl
   export interface nsIThreadManager extends nsISupports {
     DEFAULT_STACK_SIZE: 0;
     newThread(creationFlags: number, stackSize: number): nsIThread;
@@ -826,7 +826,7 @@ export namespace XPCOM {
     QueryReferent(uuid: nsIIDRef): T;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/docshell/base/nsIWebNavigation.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/docshell/base/nsIWebNavigation.idl
   export interface nsIWebNavigation extends nsISupports {
     readonly canGoBack: boolean;
     readonly canGoForward: boolean;
@@ -911,7 +911,7 @@ export namespace XPCOM {
     ) => void;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediator.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpfe/appshell/nsIWindowMediator.idl
   export interface nsIWindowMediator extends nsISupports {
     addListener(aListener: nsIWindowMediatorListener_without_nsISupports): void;
     removeListener(aListener: nsIWindowMediatorListener_without_nsISupports): void;
@@ -919,7 +919,7 @@ export namespace XPCOM {
     getMostRecentWindow(aWindowType: wstring | null): nsIDOMWindow;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIWindowMediatorListener.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpfe/appshell/nsIWindowMediatorListener.idl
   // https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIWindowMediator
   export interface nsIWindowMediatorListener_without_nsISupports {
     onWindowTitleChange(
@@ -956,11 +956,11 @@ export namespace XPCOM {
     XPCOMABI1: string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/xpfe/appshell/nsIXULWindow.idl
+  // https://dxr.mozilla.org/mozilla-esr45/source/xpfe/appshell/nsIXULWindow.idl
   export interface nsIXULWindow extends nsISupports, Window {
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/dom/base/nsPIDOMWindow.h
+  // https://dxr.mozilla.org/mozilla-esr45/source/dom/base/nsPIDOMWindow.h
   export interface nsPIDOMWindow extends nsIDOMWindow {}
 
   export interface nsXPCComponents {
@@ -1175,7 +1175,7 @@ export namespace JSMs {
     ): string;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/toolkit/modules/PrivateBrowsingUtils.jsm
+  // https://dxr.mozilla.org/mozilla-esr45/source/toolkit/modules/PrivateBrowsingUtils.jsm
   export interface PrivateBrowsingUtils {
     isWindowPrivate(aWindow: XPCOM.nsIDOMWindow): boolean;
   }
@@ -1216,7 +1216,7 @@ export namespace XUL {
     gContextMenu: nsContextMenu;
     gContextMenuContentData: any;
     getBrowser(): tabBrowser;
-    // https://dxr.mozilla.org/comm-esr45/search?q=regexp%3A%22%5Cbwindowtype%5Cb%22&redirect=false
+    // https://dxr.mozilla.org/mozilla-esr45/search?q=regexp%3A%22%5Cbwindowtype%5Cb%22&redirect=false
     windowtype: "navigator:browser" | "devtools:scratchpad" | "navigator:view-source";  // ...
   }
 
@@ -1354,7 +1354,7 @@ export namespace XUL {
     userContextId?: number;
   }
 
-  // https://dxr.mozilla.org/comm-esr45/source/mozilla/browser/base/content/utilityOverlay.js
+  // https://dxr.mozilla.org/mozilla-esr45/source/browser/base/content/utilityOverlay.js
   export interface utilityOverlay {
     openUILinkIn(
         url: string,

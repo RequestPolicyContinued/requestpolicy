@@ -251,7 +251,6 @@ declare const $: typeof JQuery;
           window.clearTimeout(searchTimeoutId);
         }
         // FIXME: use 'setTimeout' of 'Module'
-        // tslint:disable-next-line:max-line-length
         searchTimeoutId = window.setTimeout(() => {  // badword-linter:allow:window.setTimeout:
           populateRuleTable(event.target.value);
         }, SEARCH_DELAY);

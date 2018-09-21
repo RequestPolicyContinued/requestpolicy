@@ -34,7 +34,6 @@ const REMOTE_TARGET_NAME = "legacy-side-storage-migration-controller";
 
 type StorageMessageType = "full-storage" | "storage-changes" |
     "request:full-storage";
-// tslint:disable-next-line:max-line-length
 type IStorageChanges = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
 
 // =============================================================================
@@ -50,7 +49,6 @@ export class StorageMigrationFromXpcom extends Module {
   constructor(
       log: Common.ILog,
       private pConnectionToLegacy: Promise<IConnection>,
-      // tslint:disable-next-line:max-line-length
       private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
   ) {
     super("ewe.storageMigrationFromXpcom", log);

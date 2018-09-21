@@ -22,7 +22,6 @@
 
 // tslint:disable:class-name
 // tslint:disable:interface-name
-// tslint:disable:max-line-length
 // tslint:disable:no-namespace
 
 export namespace XPCOM {

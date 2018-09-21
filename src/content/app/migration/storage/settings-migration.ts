@@ -33,7 +33,6 @@ export class SettingsMigration extends Module
 
   constructor(
       log: Common.ILog,
-      // tslint:disable-next-line:max-line-length
       private storageArea: browser.storage.StorageArea,  // badword-linter:allow:browser.storage:
       private pStorageMigrationToWE:
           Promise<App.migration.storage.IStorageMigrationToWebExtension | null>,

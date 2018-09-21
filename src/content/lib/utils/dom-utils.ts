@@ -29,7 +29,6 @@ export function removeChildren(aElements: Element | Element[]) {
   const elements = Array.isArray(aElements) ? aElements : [aElements];
   // Note on `isArray` (above):
   //     using `instanceof` did not work. For details see
-  // tslint:disable-next-line:max-line-length
   //     https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
 
   for (const el of elements) {

@@ -20,7 +20,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// tslint:disable-next-line:max-line-length
 type IStorageChange = browser.storage.ChangeDict;  // badword-linter:allow:browser.storage:
 
 export function getInfosOfStorageChange(aStorageChanges: IStorageChange) {

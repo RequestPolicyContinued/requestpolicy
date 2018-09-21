@@ -30,7 +30,7 @@
     "gulp-typescript": "^3.2.1",
     "gulp-zip": "^4.0.0",
     "merge-stream": "^1.0.1",
-    "mocha": "^3.4.2",
+    "mocha": "^5.2.0",
     "mocha-repeat": "^0.1.0",
     "pify": "^3.0.0",
     "sinon": "^4.0.0",

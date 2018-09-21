@@ -423,8 +423,9 @@ mocha-integration-tests: ALIASES := legacy-integration
 $(_mocha_test_targets): node-packages
 	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/:src/conditional/legacy/webextension/ \
 	$(MOCHA) \
+		--exit \
 		--recursive \
-		--compilers coffee:coffeescript/register \
+		--require coffeescript/register \
 		--require source-map-support/register \
 		--require ts-node/register \
 		tests/mocha/lib/helper.* \

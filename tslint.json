@@ -20,6 +20,7 @@
     "no-console": [
       false
     ],
+    "no-duplicate-imports": true,
     "no-floating-promises": [true],
     "no-reference": false
   },

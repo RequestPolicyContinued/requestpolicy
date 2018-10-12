@@ -29,7 +29,7 @@
 
   // Listener for origin domain selection
   $id("rpc-origin").addEventListener("click",
-      menu.itemSelected, false);
+      menu.itemSelected.bind(menu), false);
 
   // Listener for revoke temporary permission link
   $id("rpc-revoke-temporary-permissions").addEventListener("click",

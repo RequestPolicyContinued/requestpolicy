@@ -3,7 +3,12 @@
 Note: ChangeLogs for the source code and unit tests, both not relevant for
       users, you can find in the dedicated subdirectories.
 
-#### Version 1.0.beta14.0
+#### next version
+* bugfixes
+  * [menu] clicking on the main origin (top left) had no effect (#901)
+
+
+#### Version 1.0.beta14.0 (not released)
 * improvements
   * Automatic storage migration: On browsers which allow both ”legacy“
     extensions and WebExtensions, always keep the storage (settings and rules)

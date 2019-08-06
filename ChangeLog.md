@@ -1,6 +1,6 @@
 ### RequestPolicyContinued ChangeLog
 
-#### next version
+#### Version 1.0.beta14.1
 * bugfixes
   * [menu] clicking on the main origin (top left) had no effect (#901)
   * gopher: allow chrome DTD files from gopher URIs

@@ -400,6 +400,7 @@ _non_quick_tests := test-makefile ui-tests-non-quick
 
 .PHONY: test-quick test
 test-quick: $(_quick_tests)
+test-quick-non-ui: $(filter-out ui-tests-quick,$(_quick_tests))
 test-non-quick: $(_non_quick_tests)
 test: $(filter-out $(_ui_subtests),$(_quick_tests) $(_non_quick_tests)) ui-tests
 

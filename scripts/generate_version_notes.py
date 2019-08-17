@@ -46,7 +46,7 @@ def main():
             current=current,
         )
         headline = (
-            """<b>Release <i>#</i>{rev_count}</b> &nbsp;&#x2014;&nbsp; """
+            """<b>Release <span>#</span>{rev_count}</b> &nbsp;&#x2014;&nbsp; """
             """<code>{current_version_formatted}</code>"""
         ).format(
             rev_count=rev_count,

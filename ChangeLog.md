@@ -1,5 +1,9 @@
 ### RequestPolicyContinued ChangeLog
 
+#### next version
+no changes yet
+
+
 #### Version 1.0.beta14.1
 * bugfixes
   * [menu] clicking on the main origin (top left) had no effect (#901)

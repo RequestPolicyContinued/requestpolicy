@@ -1,7 +1,10 @@
 ### RequestPolicyContinued ChangeLog
 
-Note: ChangeLogs for the source code and unit tests, both not relevant for
-      users, you can find in the dedicated subdirectories.
+#### Version 1.0.beta14.1
+* bugfixes
+  * [menu] clicking on the main origin (top left) had no effect (#901)
+  * gopher: allow chrome DTD files from gopher URIs
+
 
 #### Version 1.0.beta14.0
 * improvements

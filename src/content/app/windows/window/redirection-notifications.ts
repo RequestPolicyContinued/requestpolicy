@@ -221,7 +221,6 @@ export class RedirectionNotifications extends Module
       //       HTTP response headers [1]. Maybe there is a way to take
       //       those headers into account (e.g. `Set-Cookie`?), or maybe
       //       this is not necessary at all.
-      // tslint:disable-next-line:max-line-length
       // [1] https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields
 
       this.requestProcessor.registerAllowedRedirect(
@@ -365,7 +364,6 @@ export class RedirectionNotifications extends Module
     //     function `notificationbox.removeTransientNotifications()`
     //     is called. It checks for the `persistence` and `timeout`
     //     properties. See MDN documentation:
-    // tslint:disable-next-line:max-line-length
     //     https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XUL/notification
     // See also issue #722.
     (notificationElem as any).timeout = Date.now() + 300;

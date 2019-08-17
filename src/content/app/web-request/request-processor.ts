@@ -334,7 +334,6 @@ export class RequestProcessor extends Module {
         //
         // ### Links:
         // * nsIPrincipal:
-                // tslint:disable-next-line:max-line-length
         //   -> https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Reference/Interface/nsIPrincipal
         //
         // * discussion about RequestPolicy with regard to detecting that

@@ -151,4 +151,4 @@ class TestAutoRedirect(RequestPolicyTestCase):
 
     def _load_about_blank(self):
         with self.marionette.using_context("content"):
-                self.marionette.navigate("about:blank")
+            self.marionette.navigate("about:blank")

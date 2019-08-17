@@ -21,7 +21,6 @@
  * ***** END LICENSE BLOCK *****
  */
 
-// tslint:disable-next-line:max-line-length
 /// <reference path="../../conditional/legacy/content/bootstrap/api/services/xul-service.d.ts" />
 
 import { App } from "app/interfaces";

@@ -14,7 +14,7 @@ import {JSMs} from "bootstrap/api/interfaces";
 const PREF_MATCH_OS_LOCALE = "intl.locale.matchOS";
 const PREF_SELECTED_LOCALE = "general.useragent.locale";
 
-// https://dxr.mozilla.org/comm-esr45/source/mozilla/toolkit/mozapps/extensions/AddonManager.jsm#283-308
+// https://dxr.mozilla.org/mozilla-esr45/source/toolkit/mozapps/extensions/AddonManager.jsm#283-308
 
 // eslint-disable-next-line valid-jsdoc
 /**

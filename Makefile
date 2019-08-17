@@ -400,6 +400,7 @@ _non_quick_tests := test-makefile ui-tests-non-quick
 
 .PHONY: test-quick test
 test-quick: $(_quick_tests)
+test-quick-non-ui: $(filter-out ui-tests-quick,$(_quick_tests))
 test-non-quick: $(_non_quick_tests)
 test: $(filter-out $(_ui_subtests),$(_quick_tests) $(_non_quick_tests)) ui-tests
 
@@ -423,8 +424,9 @@ mocha-integration-tests: ALIASES := legacy-integration
 $(_mocha_test_targets): node-packages
 	NODE_PATH=$${NODE_PATH+$$NODE_PATH:}src/content/:src/conditional/legacy/content/:src/conditional/legacy/webextension/ \
 	$(MOCHA) \
+		--exit \
 		--recursive \
-		--compilers coffee:coffeescript/register \
+		--require coffeescript/register \
 		--require source-map-support/register \
 		--require ts-node/register \
 		tests/mocha/lib/helper.* \

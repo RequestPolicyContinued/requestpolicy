@@ -27,7 +27,6 @@ import { C } from "data/constants";
 import { MaybePromise } from "lib/classes/maybe-promise";
 import { Module } from "lib/classes/module";
 
-// tslint:disable-next-line:max-line-length
 type StorageArea = browser.storage.StorageArea;  // badword-linter:allow:browser.storage:
 
 export class StorageApiWrapper extends Module
@@ -48,7 +47,6 @@ export class StorageApiWrapper extends Module
   constructor(
       protected readonly outerWindowID: number | null,
       log: Common.ILog,
-      // tslint:disable-next-line:max-line-length
       private readonly api: typeof browser.storage,  // badword-linter:allow:browser.storage:
       private readonly storageAvailabilityController:
           App.storage.IStorageAvailabilityController,

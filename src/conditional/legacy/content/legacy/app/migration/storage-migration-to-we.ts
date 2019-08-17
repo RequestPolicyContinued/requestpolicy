@@ -58,7 +58,6 @@ export class StorageMigrationToWebExtension extends Module
 
   constructor(
       log: Common.ILog,
-      // tslint:disable-next-line:max-line-length
       private storageApi: typeof browser.storage,  // badword-linter:allow:browser.storage:
       private pConnectionToEWE: Promise<IConnection>,
   ) {

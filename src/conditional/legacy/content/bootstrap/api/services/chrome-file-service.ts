@@ -130,17 +130,14 @@ private sendHttpGet(url: string): Promise<XMLHttpRequest["responseText"]> {
   });
 }
 
-// tslint:disable:max-line-length
 /**
  * Determines whether a given XPCOM return code (that is, an nsresult value)
  * indicates the success or failure of an operation, returning true or false
  * respectively.
  * An XPCOM return code indicates success if its high-order bit is 0, and
  * it indicates failure if its high-order bit is 1.
- * tslint:disable-next-line:max-line-length
  * see https://developer.mozilla.org/en-US/docs/Mozilla/Tech/XPCOM/Language_Bindings/Components.isSuccessCode
  */
-// tslint:enable:max-line-length
 private isSuccessCode(returnCode: XPCOM.nsresult): boolean {
   // tslint:disable-next-line:no-bitwise
   return (returnCode & 0x80000000) === 0;

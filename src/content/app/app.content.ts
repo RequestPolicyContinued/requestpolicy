@@ -51,7 +51,6 @@ const domWindowUtils = getDOMWindowUtils(cfmm.content);
 const {outerWindowID} = domWindowUtils;
 
 // FIXME: ask the background if the storage migration is done yet
-// tslint:disable-next-line:max-line-length
 const storageAvailabilityController = new StorageAvailabilityController(
     log,
     outerWindowID,

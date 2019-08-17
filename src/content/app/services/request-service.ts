@@ -118,8 +118,8 @@ export class RequestService extends Module {
     if (aRequest instanceof NormalRequest) {
       // If there are entities in the document, they may trigger a local file
       // request. We'll only allow requests to .dtd files, though, so we don't
-      // open up all file:// destinations.
-      if (aRequest.aContentLocation.scheme === "file" &&
+      // open up all file:// and chrome:// destinations.
+      if (["file", "chrome"].includes(aRequest.aContentLocation.scheme) &&
           aRequest.aContentType === Ci.nsIContentPolicy.TYPE_DTD) {
         return true;
       }

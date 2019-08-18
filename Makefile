@@ -345,7 +345,7 @@ T_NODE_PACKAGES := $(node_modules_dir)/.timestamp_packages
 
 .PHONY: node-packages
 node-packages: $(T_NODE_PACKAGES)
-$(T_NODE_PACKAGES): package.json \
+$(T_NODE_PACKAGES): package.json package-lock.json \
 		$(call force_every,7 days)
 ifndef OFFLINE
 	$(NPM) install

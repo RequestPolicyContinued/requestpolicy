@@ -42,7 +42,7 @@
     "web-ext-types": "github:myrdd/web-ext-types#8d773c8"
   },
   "dependencies": {
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "mozilla-version-comparator": "github:myrdd/mozilla-version-comparator#3b77635",
     "requirejs": "^2.3.5"
   }
